@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0" stop-color="#34306a"/>
+      <stop offset="1" stop-color="#131428"/>
+    </radialGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6a4426"/>
+      <stop offset=".45" stop-color="#b98554"/>
+      <stop offset="1" stop-color="#6a4426"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- 砂 -->
+  <path d="M176 176 Q256 196 336 176 Q330 214 268 246 L244 246 Q182 214 176 176Z" fill="#e9dcc0"/>
+  <rect x="252" y="246" width="8" height="96" fill="#e9dcc0"/>
+  <path d="M168 380 Q210 372 256 312 Q302 372 344 380 Q344 392 330 392 L182 392 Q168 392 168 380Z" fill="#d9b166"/>
+  <path d="M206 380 Q232 368 256 336 Q280 368 306 380 Q300 392 256 392 Q212 392 206 380Z" fill="#f2a9bb"/>
+  <circle cx="232" cy="374" r="6" fill="#f6c544"/>
+  <circle cx="284" cy="366" r="5" fill="#f6c544"/>
+  <circle cx="262" cy="384" r="4" fill="#fff3b4"/>
+  <!-- ガラス -->
+  <path d="M190 122 L322 122 Q352 122 352 152 Q352 214 272 252 L272 260 Q352 298 352 360 Q352 390 322 390 L190 390 Q160 390 160 360 Q160 298 240 260 L240 252 Q160 214 160 152 Q160 122 190 122Z"
+        fill="rgba(170,200,255,.08)" stroke="rgba(214,230,255,.75)" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M182 150 Q184 186 212 214" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="8" stroke-linecap="round"/>
+  <!-- 木枠 -->
+  <rect x="132" y="96" width="248" height="26" rx="10" fill="url(#wood)"/>
+  <rect x="132" y="390" width="248" height="26" rx="10" fill="url(#wood)"/>
+</svg>
