@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#05060c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="焚き火くべ">
+<title>焚き火くべ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="scene" aria-label="焚き火"></canvas>
+
+  <header id="hud">
+    <div id="stage">熾火</div>
+    <div id="count">くべた薪 0本</div>
+  </header>
+
+  <div id="toast" role="status" aria-live="polite"><b></b><small></small></div>
+  <div id="hint">画面をタップして薪をくべる<br><small>長押しで連続</small></div>
+
+  <nav id="bar">
+    <button class="sm" id="btnBook" aria-label="図鑑">
+      <i><svg viewBox="0 0 24 24"><path d="M4 5.5c2-1 5-1 8 .5 3-1.5 6-1.5 8-.5v13c-2-1-5-1-8 .5-3-1.5-6-1.5-8-.5z"/><path d="M12 6v13"/></svg><em id="dot"></em></i>
+      <span id="lblBook">図鑑</span>
+    </button>
+    <button class="sm" id="btnSky" aria-label="空の切り替え">
+      <i id="icoSky"></i><span id="lblSky">空・自動</span>
+    </button>
+    <button id="btnFeed" aria-label="薪をくべる">
+      <svg class="ring" viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="47"/><circle class="pg" id="ring" cx="50" cy="50" r="47"/></svg>
+      <svg class="log" viewBox="0 0 48 32"><g transform="rotate(-14 24 16)"><rect x="5" y="9" width="38" height="14" rx="7" fill="#7a4f2b" stroke="#3a2212" stroke-width="1.5"/><path d="M11 13.5h18M13 18.5h14" stroke="#3a2212" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="38" cy="16" rx="3.6" ry="5.4" fill="#dcb47e" stroke="#3a2212" stroke-width="1.2"/></g></svg>
+      <span>くべる</span>
+    </button>
+    <button class="sm" id="btnSound" aria-label="音の切り替え">
+      <i id="icoSound"></i><span id="lblSound">音・OFF</span>
+    </button>
+    <button class="sm" id="btnSet" aria-label="設定">
+      <i><svg viewBox="0 0 24 24"><path d="M4 7h8M18 7h2M4 12h2M12 12h8M4 17h9M19 17h1"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="16" cy="17" r="2.2"/></svg></i>
+      <span>設定</span>
+    </button>
+  </nav>
+
+  <div id="backdrop"></div>
+  <section id="sheet" aria-hidden="true">
+    <div id="grab"><span></span></div>
+    <div id="sheetBody">
+      <div class="pane" id="paneBook"></div>
+      <div class="pane" id="paneLog"></div>
+      <div class="pane" id="paneSet"></div>
+    </div>
+    <div id="tabs">
+      <button data-tab="book">図鑑</button>
+      <button data-tab="log">ログ</button>
+      <button data-tab="set">設定</button>
+      <button id="btnClose">とじる</button>
+    </div>
+  </section>
+
+  <div id="rotate">スマホを縦向きにしてください</div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
