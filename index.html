@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja" data-font="standard">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="color-scheme" content="light">
+  <title>講座・集客ツール</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動する</a>
+
+  <header class="app-header">
+    <div class="app-header-inner">
+      <h1 class="app-title">講座・集客ツール</h1>
+      <p class="app-shop" id="header-shop"></p>
+    </div>
+  </header>
+
+  <!-- 機能の切り替え（スマホでは画面の下、パソコンでは上に出ます） -->
+  <nav class="tabbar" aria-label="機能の切り替え">
+    <div class="tabbar-inner">
+      <button type="button" class="tab-btn" data-tab="price" aria-current="page">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M12 12v5M9 12.5h6M9 15h6"/></svg>
+        <span class="tab-label">料金</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="course">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 5.5c3-1 6-1 9 1 3-2 6-2 9-1v13c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6.5v13"/></svg>
+        <span class="tab-label">講座</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="flyer">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></svg>
+        <span class="tab-label">チラシ</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="qa">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16v11H10l-4 4v-4H4z"/><path d="M10 9a2 2 0 1 1 3 1.7c-.6.4-1 .8-1 1.4M12 14v.2"/></svg>
+        <span class="tab-label">Q&amp;A</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="records">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M8 3v4M16 3v4"/></svg>
+        <span class="tab-label">予約</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="settings">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+        <span class="tab-label">設定</span>
+      </button>
+    </div>
+  </nav>
+
+  <main id="main" tabindex="-1">
+    <noscript>
+      <p class="notice notice-warn">このツールを使うには、ブラウザのJavaScriptを有効にしてください。</p>
+    </noscript>
+    <p class="notice notice-warn" id="storage-warning" hidden>
+      このブラウザでは、データを保存できない設定になっています。閉じると入力が消えるので、ほかのブラウザでお試しください。
+    </p>
+
+    <!-- =====================================================
+         1. 料金シミュレーター
+         ===================================================== -->
+    <section class="tab-panel" id="tab-price" aria-labelledby="title-price">
+      <h2 class="page-title" id="title-price">料金シミュレーター</h2>
+      <p class="page-lead">内容をえらぶと、おおよその金額が見積書の形で出ます。</p>
+
+      <div class="segment" role="group" aria-label="見積もりの種類">
+        <button type="button" class="segment-btn" data-sim="web" aria-pressed="true">Web制作</button>
+        <button type="button" class="segment-btn" data-sim="course" aria-pressed="false">講座</button>
+      </div>
+
+      <div class="split">
+        <div class="split-form">
+          <form id="form-sim-web" class="card form" autocomplete="off">
+            <h3 class="card-title">Web制作（ホームページ）の内容</h3>
+            <div class="field">
+              <label for="sw-client">お客様のお名前（空欄でもOK）</label>
+              <input type="text" id="sw-client" name="client" placeholder="例：〇〇商店">
+            </div>
+            <div class="field">
+              <label for="sw-pages">ページ数（1〜20）</label>
+              <div class="stepper">
+                <button type="button" class="btn stepper-btn" data-step="-1" aria-label="ページ数を1つへらす">－へらす</button>
+                <input type="number" id="sw-pages" name="pages" inputmode="numeric" min="1" max="20" step="1" value="3">
+                <button type="button" class="btn stepper-btn" data-step="1" aria-label="ページ数を1つふやす">＋ふやす</button>
+              </div>
+              <p class="hint">トップページをふくめた枚数です。</p>
+            </div>
+            <fieldset class="field">
+              <legend>追加するもの</legend>
+              <label class="check"><input type="checkbox" name="photo"><span>写真撮影（お店に伺って撮影）</span></label>
+              <label class="check"><input type="checkbox" name="contactForm"><span>お問い合わせフォーム</span></label>
+              <label class="check"><input type="checkbox" name="map"><span>Googleマップへのお店登録</span></label>
+              <label class="check"><input type="checkbox" name="domain"><span>ドメイン・サーバーの手続き代行（ホームページの住所と置き場所）</span></label>
+            </fieldset>
+            <fieldset class="field">
+              <legend>更新の代行（公開したあとの書きかえ）</legend>
+              <label class="check"><input type="radio" name="update" value="none" checked><span>なし（自分で更新する）</span></label>
+              <label class="check"><input type="radio" name="update" value="light"><span>ライト（月1回まで）</span></label>
+              <label class="check"><input type="radio" name="update" value="full"><span>しっかり（月4回まで）</span></label>
+            </fieldset>
+          </form>
+
+          <form id="form-sim-course" class="card form" autocomplete="off" hidden>
+            <h3 class="card-title">講座の内容</h3>
+            <div class="field">
+              <label for="sc-client">お客様・団体のお名前（空欄でもOK）</label>
+              <input type="text" id="sc-client" name="client" placeholder="例：〇〇町内会">
+            </div>
+            <fieldset class="field">
+              <legend>受け方</legend>
+              <label class="check"><input type="radio" name="style" value="group" checked><span>グループ（みんなで一緒に）</span></label>
+              <label class="check"><input type="radio" name="style" value="private"><span>個別（1人ずつ ていねいに）</span></label>
+            </fieldset>
+            <div class="field">
+              <label for="sc-times">回数（1〜12回）</label>
+              <div class="stepper">
+                <button type="button" class="btn stepper-btn" data-step="-1" aria-label="回数を1つへらす">－へらす</button>
+                <input type="number" id="sc-times" name="times" inputmode="numeric" min="1" max="12" step="1" value="4">
+                <button type="button" class="btn stepper-btn" data-step="1" aria-label="回数を1つふやす">＋ふやす</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="sc-people">人数（1〜30人）</label>
+              <div class="stepper">
+                <button type="button" class="btn stepper-btn" data-step="-1" aria-label="人数を1人へらす">－へらす</button>
+                <input type="number" id="sc-people" name="people" inputmode="numeric" min="1" max="30" step="1" value="5">
+                <button type="button" class="btn stepper-btn" data-step="1" aria-label="人数を1人ふやす">＋ふやす</button>
+              </div>
+            </div>
+            <fieldset class="field">
+              <legend>追加するもの</legend>
+              <label class="check"><input type="checkbox" name="visit"><span>出張する（ご自宅・集会所などへ伺う）</span></label>
+              <label class="check"><input type="checkbox" name="text"><span>テキスト（印刷した資料）をつける</span></label>
+            </fieldset>
+          </form>
+          <p class="hint">金額のもとになる単価は、「設定」で変えられます。</p>
+        </div>
+
+        <div class="split-result">
+          <h3 class="result-title">見積もりの結果</h3>
+          <div id="quote-out" aria-live="polite"></div>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="btn-quote-print">印刷する</button>
+            <button type="button" class="btn" id="btn-quote-copy">文章をコピーする</button>
+            <button type="button" class="btn" id="btn-quote-record">予約・進捗メモに登録する</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         2. 講座カリキュラム生成
+         ===================================================== -->
+    <section class="tab-panel" id="tab-course" aria-labelledby="title-course" hidden>
+      <h2 class="page-title" id="title-course">講座カリキュラムづくり</h2>
+      <p class="page-lead">対象・回数・テーマをえらぶと、全回の進め方が表で出ます。</p>
+
+      <div class="split split-stack">
+        <div class="split-form">
+          <form id="form-cur" class="card form" autocomplete="off">
+            <h3 class="card-title">講座の条件</h3>
+            <div class="field">
+              <label for="cur-title">講座名（空欄なら自動でつけます）</label>
+              <input type="text" id="cur-title" name="title" placeholder="例：はじめてのスマホ教室">
+            </div>
+            <fieldset class="field">
+              <legend>対象（だれ向けか）</legend>
+              <div id="cur-audiences" class="check-grid"></div>
+            </fieldset>
+            <div class="field">
+              <label for="cur-count">回数（1〜8回）</label>
+              <div class="stepper">
+                <button type="button" class="btn stepper-btn" data-step="-1" aria-label="回数を1つへらす">－へらす</button>
+                <input type="number" id="cur-count" name="count" inputmode="numeric" min="1" max="8" step="1" value="4">
+                <button type="button" class="btn stepper-btn" data-step="1" aria-label="回数を1つふやす">＋ふやす</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="cur-minutes">1回の時間</label>
+              <select id="cur-minutes" name="minutes">
+                <option value="60">60分</option>
+                <option value="90">90分</option>
+                <option value="120">120分</option>
+              </select>
+            </div>
+            <fieldset class="field">
+              <legend>テーマ（いくつでもえらべます）</legend>
+              <div id="cur-themes" class="check-grid"></div>
+            </fieldset>
+          </form>
+        </div>
+
+        <div class="split-result">
+          <h3 class="result-title">できあがったカリキュラム</h3>
+          <div id="cur-out" aria-live="polite"></div>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="btn-cur-print">印刷する</button>
+            <button type="button" class="btn" id="btn-cur-copy">文章をコピーする</button>
+            <button type="button" class="btn" id="btn-cur-flyer">この講座名でチラシを作る</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         3. チラシ／案内文ジェネレーター
+         ===================================================== -->
+    <section class="tab-panel" id="tab-flyer" aria-labelledby="title-flyer" hidden>
+      <h2 class="page-title" id="title-flyer">チラシ・案内文づくり</h2>
+      <p class="page-lead">講座の内容を入れると、チラシ・SNS用・回覧板用の3種類の下書きが出ます。</p>
+
+      <div class="split">
+        <div class="split-form">
+          <form id="form-flyer" class="card form" autocomplete="off">
+            <h3 class="card-title">講座の内容</h3>
+            <div class="field">
+              <label for="fl-title">講座名</label>
+              <input type="text" id="fl-title" name="title" placeholder="例：はじめてのスマホ・LINE教室">
+            </div>
+            <div class="field">
+              <label for="fl-when">日時</label>
+              <input type="text" id="fl-when" name="when" placeholder="例：12月5日（土） 13時30分〜15時">
+              <details class="helper">
+                <summary>カレンダーから日時を入れる</summary>
+                <div class="helper-body">
+                  <div class="field">
+                    <label for="fl-date">日付</label>
+                    <input type="date" id="fl-date">
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="fl-start">始まる時刻</label>
+                      <input type="time" id="fl-start">
+                    </div>
+                    <div class="field">
+                      <label for="fl-end">終わる時刻</label>
+                      <input type="time" id="fl-end">
+                    </div>
+                  </div>
+                  <button type="button" class="btn" id="btn-flyer-date">この日時を入れる</button>
+                </div>
+              </details>
+            </div>
+            <div class="field">
+              <label for="fl-where">場所</label>
+              <input type="text" id="fl-where" name="where" placeholder="例：旧〇〇食堂（〇〇町〇条〇丁目）">
+            </div>
+            <div class="field">
+              <label for="fl-fee">料金</label>
+              <input type="text" id="fl-fee" name="fee" placeholder="例：1回 1,500円">
+            </div>
+            <div class="field">
+              <label for="fl-cap">定員</label>
+              <input type="text" id="fl-cap" name="cap" placeholder="例：6名（先着順）">
+            </div>
+            <div class="field">
+              <label for="fl-apply">申込方法</label>
+              <textarea id="fl-apply" name="apply" rows="2" placeholder="例：お電話、または店頭でお申し込みください"></textarea>
+            </div>
+            <div class="field">
+              <label for="fl-pr">一言PR</label>
+              <textarea id="fl-pr" name="pr" rows="3" placeholder="例：「孫とLINEがしたい」を、いっしょにかなえましょう。"></textarea>
+            </div>
+            <fieldset class="field">
+              <legend>文体（文章の雰囲気）</legend>
+              <label class="check"><input type="radio" name="tone" value="soft" checked><span>やさしい（親しみやすい言葉）</span></label>
+              <label class="check"><input type="radio" name="tone" value="formal"><span>きちんと（あらたまった言葉）</span></label>
+            </fieldset>
+            <div class="actions">
+              <button type="button" class="btn" id="btn-flyer-sample">記入例を入れてみる</button>
+              <button type="button" class="btn btn-danger" id="btn-flyer-clear">入力を空にする</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="split-result">
+          <section class="out-block" aria-labelledby="out-a4-title">
+            <h3 class="result-title" id="out-a4-title">① A4チラシ（印刷用）</h3>
+            <div class="a4-wrap" id="flyer-a4-wrap">
+              <div class="a4-page" id="flyer-a4"></div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="btn-a4-print">チラシを印刷する</button>
+              <button type="button" class="btn" id="btn-a4-copy">文章をコピーする</button>
+            </div>
+          </section>
+
+          <section class="out-block" aria-labelledby="out-sns-title">
+            <h3 class="result-title" id="out-sns-title">② LINE・SNS用の短い告知文</h3>
+            <div id="flyer-sns-out"></div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="btn-sns-copy">告知文をコピーする</button>
+              <button type="button" class="btn" id="btn-sns-print">印刷する</button>
+            </div>
+          </section>
+
+          <section class="out-block" aria-labelledby="out-notice-title">
+            <h3 class="result-title" id="out-notice-title">③ 回覧板・掲示用の案内文</h3>
+            <div id="flyer-notice-out"></div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="btn-notice-print">案内文を印刷する</button>
+              <button type="button" class="btn" id="btn-notice-copy">文章をコピーする</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         4. つまずきQ&A
+         ===================================================== -->
+    <section class="tab-panel" id="tab-qa" aria-labelledby="title-qa" hidden>
+      <h2 class="page-title" id="title-qa">つまずきQ&amp;A</h2>
+      <p class="page-lead">スマホやAIで困ったときの答えを、言葉やカテゴリでさがせます。</p>
+
+      <div class="card">
+        <div class="field">
+          <label for="qa-search">キーワードでさがす</label>
+          <input type="search" id="qa-search" placeholder="例：通知、写真、パスワード" autocomplete="off">
+        </div>
+        <div class="field">
+          <span class="label" id="qa-cat-label">カテゴリでしぼる</span>
+          <div class="chips" id="qa-cats" role="group" aria-labelledby="qa-cat-label"></div>
+        </div>
+      </div>
+
+      <div class="list-head">
+        <p class="list-count" id="qa-count" aria-live="polite"></p>
+        <button type="button" class="btn btn-primary" id="btn-qa-add">＋ 新しいQ&amp;Aを追加する</button>
+      </div>
+      <div id="qa-list"></div>
+    </section>
+
+    <!-- =====================================================
+         5. 予約・進捗メモ管理
+         ===================================================== -->
+    <section class="tab-panel" id="tab-records" aria-labelledby="title-records" hidden>
+      <h2 class="page-title" id="title-records">予約・進捗メモ</h2>
+      <p class="page-lead">Web制作の案件と、講座の予約をまとめて記録します。</p>
+
+      <div id="rec-cap"></div>
+
+      <div class="card">
+        <button type="button" class="btn btn-primary btn-block" id="btn-rec-add">＋ 新しく登録する</button>
+        <div class="filter-grid">
+          <div class="field">
+            <label for="rec-filter-status">ステータスでしぼる</label>
+            <select id="rec-filter-status"></select>
+          </div>
+          <div class="field">
+            <label for="rec-filter-type">種別でしぼる</label>
+            <select id="rec-filter-type">
+              <option value="all">すべて</option>
+              <option value="web">Web制作</option>
+              <option value="course">講座予約</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rec-sort">並べ方</label>
+            <select id="rec-sort">
+              <option value="desc">日付が新しい順</option>
+              <option value="asc">日付が古い順</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <p class="list-count" id="rec-count" aria-live="polite"></p>
+      <div id="rec-list"></div>
+    </section>
+
+    <!-- =====================================================
+         6. 設定
+         ===================================================== -->
+    <section class="tab-panel" id="tab-settings" aria-labelledby="title-settings" hidden>
+      <h2 class="page-title" id="title-settings">設定</h2>
+
+      <section class="card" aria-labelledby="set-shop-title">
+        <h3 class="card-title" id="set-shop-title">お店の情報</h3>
+        <p class="hint">ここに入れた店名・連絡先・ロゴは、チラシ・案内文・見積書・カリキュラムのいちばん下に小さく入ります。空のときは何も入りません。</p>
+        <form id="form-shop" class="form" autocomplete="off">
+          <div class="field">
+            <label for="set-name">店名・屋号</label>
+            <input type="text" id="set-name" name="shopName" placeholder="例：まちのスマホ教室 〇〇">
+          </div>
+          <div class="field">
+            <label for="set-contact">連絡先（電話・メールなど）</label>
+            <input type="text" id="set-contact" name="contact" placeholder="例：電話 0153-00-0000">
+          </div>
+          <div class="field">
+            <label for="set-address">住所（空欄でもOK）</label>
+            <input type="text" id="set-address" name="address" placeholder="例：北海道〇〇郡〇〇町〇条〇丁目">
+          </div>
+          <div class="field">
+            <span class="label">ロゴ画像</span>
+            <div class="logo-box">
+              <img id="logo-preview" alt="登録されているロゴ" hidden>
+              <p id="logo-empty">まだ登録されていません</p>
+            </div>
+            <p class="hint" id="logo-info">大きな画像は、自動で小さくしてから保存します。</p>
+            <div class="actions">
+              <button type="button" class="btn" id="btn-logo-pick">ロゴの画像をえらぶ</button>
+              <button type="button" class="btn btn-danger" id="btn-logo-del">ロゴを消す</button>
+            </div>
+            <input type="file" id="set-logo" accept="image/*" class="visually-hidden" tabindex="-1" aria-hidden="true">
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">お店の情報を保存する</button>
+          </div>
+        </form>
+        <div class="footer-preview">
+          <p class="label">印刷物の下に入る表示（見本）</p>
+          <div id="footer-preview"></div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="set-font-title">
+        <h3 class="card-title" id="set-font-title">文字の大きさ</h3>
+        <div class="segment segment-3" role="group" aria-labelledby="set-font-title">
+          <button type="button" class="segment-btn" data-fontsize="standard" aria-pressed="true">標準</button>
+          <button type="button" class="segment-btn" data-fontsize="large" aria-pressed="false">大</button>
+          <button type="button" class="segment-btn" data-fontsize="xlarge" aria-pressed="false">特大</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="set-price-title">
+        <h3 class="card-title" id="set-price-title">料金の単価</h3>
+        <p class="hint">ここの金額が、料金シミュレーターの計算に使われます。</p>
+        <form id="form-prices" class="form" autocomplete="off" novalidate>
+          <div id="price-fields"></div>
+          <p class="form-error" id="price-error" role="alert" hidden></p>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">単価を保存する</button>
+            <button type="button" class="btn" id="btn-price-default">単価を初期値にもどす</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="set-backup-title">
+        <h3 class="card-title" id="set-backup-title">バックアップ（データの保存と復元）</h3>
+        <p class="hint">「書き出す」で、すべてのデータを1つのファイルに保存します。「読み込む」で、そのファイルから元にもどせます。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-export">データを書き出す</button>
+          <button type="button" class="btn" id="btn-import">データを読み込む</button>
+        </div>
+        <input type="file" id="import-file" accept=".json,application/json" class="visually-hidden" tabindex="-1" aria-hidden="true">
+      </section>
+
+      <section class="card card-danger" aria-labelledby="set-reset-title">
+        <h3 class="card-title" id="set-reset-title">初期データにもどす</h3>
+        <p class="hint">お店の情報・単価・Q&amp;A・予約メモ・入力途中の内容を、すべて最初の状態にもどします。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" id="btn-reset">すべて初期データにもどす</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- お知らせ（「保存しました」など） -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- 確認の窓 -->
+  <dialog class="dlg" id="dlg-confirm" aria-labelledby="dlg-confirm-title">
+    <div class="dlg-inner">
+      <h2 class="dlg-title" id="dlg-confirm-title">確認</h2>
+      <p class="dlg-message" id="dlg-confirm-message"></p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="dlg-confirm-ok">はい</button>
+        <button type="button" class="btn" id="dlg-confirm-cancel">やめる</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Q&A の追加・編集 -->
+  <dialog class="dlg" id="dlg-qa" aria-labelledby="dlg-qa-title">
+    <form id="form-qa" class="dlg-inner form" autocomplete="off" novalidate>
+      <h2 class="dlg-title" id="dlg-qa-title">Q&amp;Aを追加する</h2>
+      <div class="field">
+        <label for="qa-form-cat">カテゴリ</label>
+        <select id="qa-form-cat" name="cat"></select>
+      </div>
+      <div class="field">
+        <label for="qa-form-q">質問（困りごと）</label>
+        <textarea id="qa-form-q" name="q" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label for="qa-form-a">答え（解決のしかた）</label>
+        <textarea id="qa-form-a" name="a" rows="6"></textarea>
+      </div>
+      <p class="form-error" id="qa-error" role="alert" hidden></p>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">保存する</button>
+        <button type="button" class="btn" data-close>やめる</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 予約・進捗メモ の追加・編集 -->
+  <dialog class="dlg" id="dlg-record" aria-labelledby="dlg-record-title">
+    <form id="form-record" class="dlg-inner form" autocomplete="off" novalidate>
+      <h2 class="dlg-title" id="dlg-record-title">新しく登録する</h2>
+      <div class="field">
+        <label for="rec-name">お名前（お客様・団体）</label>
+        <input type="text" id="rec-name" name="name" placeholder="例：〇〇商店">
+      </div>
+      <fieldset class="field">
+        <legend>種別</legend>
+        <label class="check"><input type="radio" name="type" value="web" checked><span>Web制作（ホームページ）</span></label>
+        <label class="check"><input type="radio" name="type" value="course"><span>講座予約</span></label>
+      </fieldset>
+      <div class="field">
+        <label for="rec-date">日付（予定日・始める日）</label>
+        <input type="date" id="rec-date" name="date">
+      </div>
+      <div class="field">
+        <label for="rec-amount">金額（円）</label>
+        <input type="number" id="rec-amount" name="amount" inputmode="numeric" min="0" step="1" placeholder="例：50000">
+      </div>
+      <div class="field">
+        <label for="rec-status">ステータス（進み具合）</label>
+        <select id="rec-status" name="status"></select>
+      </div>
+      <div class="field">
+        <label for="rec-memo">メモ</label>
+        <textarea id="rec-memo" name="memo" rows="4" placeholder="例：電話で問合せ。来週また連絡する。"></textarea>
+      </div>
+      <p class="notice notice-warn" id="rec-warn" role="alert" hidden></p>
+      <p class="form-error" id="rec-error" role="alert" hidden></p>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">保存する</button>
+        <button type="button" class="btn" data-close>やめる</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 印刷するときだけ使う場所 -->
+  <div id="print-root" aria-hidden="true"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
