@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <title>レポート構成ナビ</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232b4a80'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動する</a>
+
+  <div class="app">
+    <aside class="side">
+      <div class="side-top">
+        <p class="brand">
+          <span class="brand-mark" aria-hidden="true">構</span>
+          <span class="brand-name">レポート構成ナビ</span>
+        </p>
+        <div class="project">
+          <label class="sr-only" for="projectSelect">レポートを切り替える</label>
+          <select id="projectSelect" class="project-select"></select>
+          <button type="button" class="icon-btn" data-act="newProject" aria-label="新しいレポートを作る" title="新しいレポート">＋</button>
+          <button type="button" class="icon-btn" data-act="openMenu" aria-label="メニューを開く" title="メニュー">⋯</button>
+        </div>
+      </div>
+
+      <nav class="steps" id="steps" aria-label="手順"></nav>
+
+      <div class="pledge" role="note">
+        <p><strong>本文は自分で書く</strong>ためのツールです。出すのは<strong>構成と要点だけ</strong>で、文章の代筆や文献の写しは行いません。</p>
+        <button type="button" class="link-btn" data-act="openRules">引用のルールを見る</button>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <p class="storage-warn" id="storageWarn" hidden>このブラウザでは保存機能（localStorage）が使えないため、入力内容はページを閉じると消えます。プライベートブラウズを解除するか、別のブラウザでお試しください。</p>
+      <section class="step" id="step-input" hidden></section>
+      <section class="step" id="step-rq" hidden></section>
+      <section class="step" id="step-outline" hidden></section>
+      <section class="step" id="step-search" hidden></section>
+      <section class="step" id="step-cite" hidden></section>
+    </main>
+  </div>
+
+  <!-- メニュー -->
+  <dialog id="menuDialog" class="dialog" aria-labelledby="menuTitle">
+    <div class="dialog-head">
+      <h2 id="menuTitle">メニュー</h2>
+      <button type="button" class="icon-btn" data-act="closeDialog" aria-label="閉じる">×</button>
+    </div>
+    <div class="dialog-body">
+      <fieldset class="menu-group">
+        <legend>表示</legend>
+        <div class="seg" id="themeSeg">
+          <label><input type="radio" name="uiTheme" value="auto"><span>自動</span></label>
+          <label><input type="radio" name="uiTheme" value="light"><span>ライト</span></label>
+          <label><input type="radio" name="uiTheme" value="dark"><span>ダーク</span></label>
+        </div>
+      </fieldset>
+      <div class="menu-group">
+        <p class="menu-title">バックアップ</p>
+        <p class="note">データはこのブラウザの中（localStorage）だけに保存されます。機種変更やブラウザの掃除に備えて、ときどき書き出しておくと安心です。</p>
+        <div class="btn-row">
+          <button type="button" class="btn" data-act="exportData">書き出す（JSON）</button>
+          <button type="button" class="btn" data-act="importData">読み込む</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+      </div>
+      <div class="menu-group">
+        <p class="menu-title">いま開いているレポート</p>
+        <div class="btn-row">
+          <button type="button" class="btn danger" data-act="deleteProject">このレポートを削除</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 引用のルール -->
+  <dialog id="rulesDialog" class="dialog" aria-labelledby="rulesTitle">
+    <div class="dialog-head">
+      <h2 id="rulesTitle">丸写しをしないための約束</h2>
+      <button type="button" class="icon-btn" data-act="closeDialog" aria-label="閉じる">×</button>
+    </div>
+    <div class="dialog-body">
+      <p>このツールが出すのは、<strong>構成（骨組み）・書く内容の要点・引用の雛形</strong>だけです。提出する本文は、自分で調べ、自分の言葉で書いてください。</p>
+      <ol class="rules">
+        <li><strong>他人の文章をそのまま使うときは「 」でくくる。</strong>出典（著者・年・ページ）を必ず付ける（直接引用）。</li>
+        <li><strong>言い換えや要約でも出典を付ける。</strong>文章を変えても、考えやデータの出どころは元の著者にある（間接引用）。</li>
+        <li><strong>引用は必要最小限に。</strong>自分の文章が主、引用が従になる分量にする。</li>
+        <li><strong>要旨（アブストラクト）だけで引用しない。</strong>検索結果は「選ぶため」のもの。本文を読んで確かめてから使う。</li>
+        <li><strong>孫引きを避ける。</strong>ほかの本に引用されていた文は、できるだけ元の文献にあたる。</li>
+        <li><strong>他人や生成AIが書いた文章を、自分の文章として出さない。</strong>利用の可否は大学・授業のルールを確認する。</li>
+      </ol>
+      <p class="note">引用の雛形は機械的に整えたものです。巻・号・ページ、著者名の表記は、必ず原典と、授業で指定された書式で確認してください。</p>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="printArea"></div>
+
+  <noscript><p class="noscript">このアプリはJavaScriptを使います。ブラウザの設定でJavaScriptを有効にしてください。</p></noscript>
+
+  <script src="js/data.js"></script>
+  <script src="js/cite.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
