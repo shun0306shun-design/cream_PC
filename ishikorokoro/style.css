@@ -1,0 +1,185 @@
+/* 石ころころ */
+:root {
+  --ink: #3d352c;
+  --ink-soft: #7c7062;
+  --paper: #f7f0e3;
+  --paper-2: #efe5d3;
+  --wood: #c59b6c;
+  --wood-dark: #9c7246;
+  --accent: #c8683e;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: #1b2230; color: var(--ink);
+  font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", "Noto Sans CJK JP", system-ui, sans-serif;
+  font-size: 15px; line-height: 1.6;
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+button { font: inherit; color: inherit; border: 0; padding: 0; background: none; cursor: pointer; touch-action: manipulation; }
+[hidden] { display: none !important; }
+
+#app { position: fixed; top: 0; right: 0; bottom: 0; left: 0; margin: 0 auto; max-width: 520px; overflow: hidden; background: #9cc8ea; }
+#scene { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+/* ---- 上のひとこと ---- */
+#hud {
+  position: absolute; top: calc(var(--sat) + 10px); left: 16px; right: 16px;
+  display: flex; justify-content: space-between;
+  font-size: 12px; letter-spacing: .08em; color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 4px rgba(10, 40, 70, .55);
+  pointer-events: none;
+}
+
+/* ---- まるいボタン ---- */
+.fab {
+  position: absolute; bottom: calc(var(--sab) + 18px);
+  display: grid; place-items: center; border-radius: 50%;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 6px 18px rgba(30, 40, 30, .3), inset 0 0 0 1px rgba(255, 255, 255, .7);
+  transition: transform .12s;
+}
+.fab:active { transform: scale(.93); }
+.fab-l { right: 16px; width: 72px; height: 72px; }
+.fab-s { left: 16px; width: 48px; height: 48px; color: #5d5347; }
+.hand-l .fab-l { right: auto; left: 16px; }
+.hand-l .fab-s { left: auto; right: 16px; }
+.fab-s svg { width: 24px; height: 24px; }
+.fab-s .mute { display: none; }
+.fab-s.off { color: #a59a8c; }
+.fab-s.off .wave { display: none; }
+.fab-s.off .mute { display: block; }
+
+.fab-l .ring { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(90, 70, 40, .13); stroke-width: 5; }
+.ring-fg { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 201.06; stroke-dashoffset: 201.06; transition: stroke-dashoffset .25s linear; }
+.fab-l .ico { width: 36px; height: 36px; }
+.badge {
+  position: absolute; top: -4px; right: -4px; min-width: 26px; height: 26px; padding: 0 7px;
+  border-radius: 13px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; line-height: 26px; text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+}
+.hand-l .badge { right: auto; left: -4px; }
+.fab-l.bump { animation: bump .45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes bump { 0% { transform: scale(1); } 35% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* ---- お知らせ ---- */
+#toast { position: absolute; top: calc(var(--sat) + 40px); left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 5; }
+.toast-card {
+  display: flex; align-items: center; gap: 10px; padding: 8px 20px 8px 10px; max-width: 86%;
+  border-radius: 20px; background: rgba(255, 252, 245, .95);
+  box-shadow: 0 8px 26px rgba(20, 30, 40, .28);
+  opacity: 0; transform: translateY(-14px) scale(.96);
+  transition: opacity .3s, transform .3s cubic-bezier(.2, 1.3, .4, 1);
+}
+.toast-card.show { opacity: 1; transform: none; }
+.toast-card canvas { width: 56px; height: 56px; flex: none; }
+.toast-card small { display: block; font-size: 11px; letter-spacing: .1em; color: var(--ink-soft); line-height: 1.3; }
+.toast-card b { display: block; font-size: 17px; line-height: 1.35; }
+.toast-card.rare { background: linear-gradient(135deg, #fffdf2, #fff3cf); box-shadow: 0 0 0 2px #f1c95a, 0 10px 30px rgba(120, 80, 0, .35); }
+.toast-card.rare small { color: #a8741a; font-weight: 700; }
+.toast-card.cat-gem { box-shadow: 0 0 0 2px #b79cf0, 0 10px 30px rgba(70, 40, 140, .35); background: linear-gradient(135deg, #fdfbff, #efe6ff); }
+.toast-card.cat-gem small { color: #7650c4; }
+.toast-card.cat-meteor { box-shadow: 0 0 0 2px #f0a070, 0 10px 30px rgba(120, 50, 10, .35); background: linear-gradient(135deg, #fffaf5, #ffe7d4); }
+.toast-card.cat-meteor small { color: #b9571c; }
+
+/* ---- 棚（下からのシート） ---- */
+.sheet { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 20; display: flex; flex-direction: column; justify-content: flex-end; }
+.sheet-bg { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(22, 26, 38, 0); transition: background .26s; }
+.sheet.open .sheet-bg { background: rgba(22, 26, 38, .45); }
+.sheet-body {
+  position: relative; height: 92%; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--paper); border-radius: 24px 24px 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, .28);
+  transform: translateY(102%); transition: transform .3s cubic-bezier(.2, .85, .25, 1);
+}
+.sheet.open .sheet-body { transform: none; }
+.sheet-head { padding: 8px 20px 10px; text-align: center; border-bottom: 1px solid rgba(120, 90, 50, .14); }
+.grip { width: 40px; height: 4px; margin: 0 auto 8px; border-radius: 2px; background: rgba(90, 70, 40, .22); }
+.sheet-head h2 { margin: 0; font-size: 19px; letter-spacing: .14em; }
+.sheet-head p { margin: 2px 0 0; font-size: 12px; color: var(--ink-soft); }
+
+.pane { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 6px 14px 20px; }
+
+.shelf-sec h3 { margin: 16px 6px 2px; font-size: 13px; letter-spacing: .12em; color: var(--ink-soft); display: flex; justify-content: space-between; align-items: baseline; }
+.shelf-sec h3 small { font-size: 12px; font-weight: 400; }
+.shelf-row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 4px 0; }
+.shelf-row::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 66px; height: 12px; border-radius: 3px;
+  background: linear-gradient(#d2aa7b, var(--wood) 45%, var(--wood-dark));
+  box-shadow: 0 3px 0 #86603a, 0 9px 12px rgba(80, 50, 20, .22);
+}
+.cell { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 0; padding-bottom: 6px; }
+.cell img { position: relative; width: 68px; height: 68px; display: block; }
+.cell .nm { margin-top: 16px; font-size: 11px; line-height: 1.3; text-align: center; color: var(--ink); word-break: keep-all; overflow-wrap: anywhere; min-height: 2.6em; padding: 0 2px; }
+.cell .ct { position: absolute; top: 0; right: 4px; font-size: 10px; font-weight: 700; color: #fff; background: rgba(90, 70, 50, .78); padding: 0 6px; border-radius: 9px; line-height: 17px; }
+.cell.unknown .nm { color: #b3a793; letter-spacing: .1em; }
+.cell.unknown::after { content: "？"; position: absolute; top: 20px; left: 0; right: 0; text-align: center; font-size: 17px; font-weight: 700; color: rgba(86, 64, 42, .4); }
+.cell.rare.known img { filter: drop-shadow(0 0 6px rgba(255, 214, 110, .9)); }
+.cell:active img { transform: scale(.94); }
+
+/* ---- 石のくわしい説明 ---- */
+.detail { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 3; display: flex; align-items: flex-end; padding: 0 12px calc(var(--sab) + 86px); background: rgba(40, 30, 20, .22); }
+.detail-card { width: 100%; display: flex; gap: 12px; align-items: center; padding: 14px 16px 14px 10px; border-radius: 20px; background: #fffdf8; box-shadow: 0 12px 34px rgba(40, 25, 10, .32); animation: rise .22s cubic-bezier(.2, 1.2, .4, 1); }
+@keyframes rise { from { transform: translateY(16px); opacity: 0; } }
+.detail-card img { width: 108px; height: 108px; flex: none; }
+.detail-txt { min-width: 0; }
+.detail-txt h3 { margin: 4px 0 2px; font-size: 19px; line-height: 1.3; }
+.detail-txt p { margin: 0; font-size: 13px; line-height: 1.6; }
+#d-meta { margin-top: 6px; font-size: 11px; color: var(--ink-soft); }
+.chip { display: inline-block; padding: 0 10px; border-radius: 10px; font-size: 11px; font-weight: 700; line-height: 20px; letter-spacing: .1em; color: #fff; background: #9a8c78; }
+.chip.cat-gem { background: #8a63d2; }
+.chip.cat-fossil { background: #a2774a; }
+.chip.cat-meteor { background: #4e5b7c; }
+.chip.cat-gold { background: #d19a16; }
+
+/* ---- 下のバー ---- */
+.sheet-foot { display: flex; gap: 12px; align-items: center; padding: 10px 14px calc(var(--sab) + 12px); background: var(--paper-2); border-top: 1px solid rgba(120, 90, 50, .16); position: relative; z-index: 4; }
+.seg { display: flex; padding: 3px; border-radius: 16px; background: rgba(110, 85, 50, .14); }
+.seg button { min-width: 62px; height: 46px; padding: 0 14px; border-radius: 13px; font-size: 14px; font-weight: 700; color: var(--ink-soft); }
+.seg button.on { background: #fffdf8; color: var(--ink); box-shadow: 0 1px 4px rgba(60, 40, 10, .2); }
+.seg-mini button { min-width: 52px; height: 40px; }
+.btn-main { flex: 1; height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; letter-spacing: .14em; color: #fff; background: var(--ink); box-shadow: 0 3px 0 #1f1a15; }
+.btn-main:active { transform: translateY(2px); box-shadow: 0 1px 0 #1f1a15; }
+.btn-danger { height: 48px; padding: 0 18px; border-radius: 14px; font-size: 14px; font-weight: 700; color: #b0442e; background: rgba(176, 68, 46, .1); box-shadow: inset 0 0 0 1.5px rgba(176, 68, 46, .4); }
+
+/* ---- 設定 ---- */
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 8px 6px; border-bottom: 1px solid rgba(120, 90, 50, .14); font-weight: 700; }
+.set-row small { display: block; font-size: 11px; font-weight: 400; color: var(--ink-soft); }
+.switch { position: relative; width: 58px; height: 34px; border-radius: 17px; background: rgba(110, 85, 50, .25); transition: background .18s; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .25); transition: transform .18s; }
+.switch.on { background: #7fa86a; }
+.switch.on::after { transform: translateX(24px); }
+.set-note { padding: 4px 6px 8px; }
+.set-note h4 { margin: 18px 0 2px; font-size: 13px; letter-spacing: .1em; color: var(--ink-soft); }
+.set-note p { margin: 0; font-size: 13px; }
+#btn-reset { display: block; margin: 14px auto 6px; }
+
+/* ---- はじめの画面 ---- */
+.intro {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch;
+  padding: 24px 22px calc(var(--sab) + 30px); color: #fff; text-align: center;
+  background: linear-gradient(to top, rgba(18, 24, 38, .86), rgba(18, 24, 38, .5) 46%, rgba(18, 24, 38, 0) 78%);
+  transition: opacity .4s;
+}
+.intro.bye { opacity: 0; pointer-events: none; }
+.intro h1 { margin: 0; font-size: 38px; letter-spacing: .2em; text-indent: .2em; text-shadow: 0 3px 14px rgba(0, 0, 0, .45); }
+.intro p { margin: 10px 0 20px; font-size: 15px; line-height: 1.9; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
+.seg-intro { align-self: center; margin-bottom: 14px; background: rgba(255, 255, 255, .2); }
+.seg-intro button { min-width: 96px; color: rgba(255, 255, 255, .85); }
+.btn-big { flex: none; height: 58px; font-size: 18px; background: #fffdf8; color: var(--ink); box-shadow: 0 4px 0 rgba(0, 0, 0, .35); }
+.btn-big:active { box-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
+
+/* ---- たしかめ ---- */
+.confirm { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 40; display: flex; align-items: flex-end; padding: 0 16px calc(var(--sab) + 24px); background: rgba(22, 20, 18, .55); }
+.confirm-card { width: 100%; padding: 20px 18px 16px; border-radius: 22px; background: #fffdf8; text-align: center; box-shadow: 0 14px 40px rgba(0, 0, 0, .4); }
+.confirm-card p { margin: 0 0 16px; font-weight: 700; }
+.confirm-btns { display: flex; gap: 12px; }
+.confirm-btns .btn-danger { height: 52px; flex: none; }

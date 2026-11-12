@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>石ころころ</title>
+<meta name="description" content="石を指でころがすだけの、無心ひまつぶし。">
+<meta name="theme-color" content="#8fc0e6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="石ころころ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="scene" aria-label="石をころがす画面"></canvas>
+
+  <div id="hud" aria-hidden="true"><span id="hud-scene"></span><span id="hud-dist"></span></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <button id="btn-sound" class="fab fab-s" type="button" aria-label="音のオン・オフ">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/>
+      <path class="wave" d="M15 9a4.2 4.2 0 0 1 0 6M17.6 6.6a7.6 7.6 0 0 1 0 10.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path class="mute" d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <button id="btn-shelf" class="fab fab-l" type="button" aria-label="石の棚をひらく">
+    <svg class="ring" viewBox="0 0 72 72" aria-hidden="true">
+      <circle class="ring-bg" cx="36" cy="36" r="32"/>
+      <circle id="ring-fg" class="ring-fg" cx="36" cy="36" r="32"/>
+    </svg>
+    <svg class="ico" viewBox="0 0 32 32" aria-hidden="true">
+      <path d="M5 14.5h22M5 26h22" stroke="#8a6238" stroke-width="2.8" stroke-linecap="round"/>
+      <ellipse cx="11" cy="10" rx="4.2" ry="3.3" fill="#8d8a84"/>
+      <ellipse cx="21.2" cy="10.6" rx="3.3" ry="2.7" fill="#c3a57c"/>
+      <ellipse cx="16" cy="21.8" rx="4.6" ry="3.1" fill="#6f8291"/>
+    </svg>
+    <span id="shelf-count" class="badge">0</span>
+  </button>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-bg" id="sheet-bg"></div>
+    <div class="sheet-body" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <header class="sheet-head">
+        <div class="grip"></div>
+        <h2 id="sheet-title">石の棚</h2>
+        <p id="sheet-stats"></p>
+      </header>
+
+      <div id="pane-shelf" class="pane"><div id="shelf-list"></div></div>
+
+      <div id="pane-set" class="pane" hidden>
+        <div class="set-row">
+          <span>音</span>
+          <button id="sw-sound" class="switch" type="button" role="switch" aria-label="音"></button>
+        </div>
+        <div class="set-row" id="row-vib">
+          <span>振動<small>対応している端末のみ</small></span>
+          <button id="sw-vib" class="switch" type="button" role="switch" aria-label="振動"></button>
+        </div>
+        <div class="set-row">
+          <span>ボタンの位置<small>持つ手に合わせて</small></span>
+          <div class="seg seg-mini"><button id="hand-l" type="button">左</button><button id="hand-r" type="button">右</button></div>
+        </div>
+        <div class="set-note">
+          <h4>あそびかた</h4>
+          <p>石にさわって、ころがすだけ。はなれた場所をおさえると、石がそこへ寄ってきます。ころがした分だけ石がみがかれ、仕上がると棚にならびます。</p>
+          <h4>めずらしい石</h4>
+          <p id="rate-text"></p>
+          <h4>このアプリについて</h4>
+          <p>課金・広告・通信は一切ありません。集めた石は、この端末のブラウザの中だけに保存されます。</p>
+        </div>
+        <button id="btn-reset" class="btn-danger" type="button">集めた石をすべて消す</button>
+      </div>
+
+      <div id="detail" class="detail" hidden>
+        <div class="detail-card">
+          <img id="d-img" alt="">
+          <div class="detail-txt">
+            <span id="d-cat" class="chip"></span>
+            <h3 id="d-name"></h3>
+            <p id="d-desc"></p>
+            <p id="d-meta"></p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="sheet-foot">
+        <div class="seg" role="tablist">
+          <button id="tab-shelf" class="on" type="button" role="tab">棚</button>
+          <button id="tab-set" type="button" role="tab">設定</button>
+        </div>
+        <button id="btn-close" class="btn-main" type="button">とじる</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="intro" class="intro" hidden>
+    <h1>石ころころ</h1>
+    <p>石を指でころがすだけ。<br>ころがすうちに、たまに<br>めずらしい石に化けます。</p>
+    <div class="seg seg-intro" role="radiogroup" aria-label="音">
+      <button id="intro-on" class="on" type="button" role="radio">音あり</button>
+      <button id="intro-off" type="button" role="radio">音なし</button>
+    </div>
+    <button id="intro-go" class="btn-main btn-big" type="button">はじめる</button>
+  </div>
+
+  <div id="confirm" class="confirm" hidden>
+    <div class="confirm-card" role="alertdialog" aria-modal="true">
+      <p>集めた石と記録が、すべて消えます。<br>もとには戻せません。</p>
+      <div class="confirm-btns">
+        <button id="cf-no" class="btn-main" type="button">やめる</button>
+        <button id="cf-yes" class="btn-danger" type="button">消す</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="stones.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
