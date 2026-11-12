@@ -1,0 +1,16 @@
+{
+  "name": "砂時計タップ",
+  "short_name": "砂時計タップ",
+  "description": "タップで砂を落とすだけの、片手・無心の暇つぶし。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#15162c",
+  "theme_color": "#15162c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

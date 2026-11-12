@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#15162c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="砂時計タップ">
+<title>砂時計タップ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- 遊ぶ画面：ここ全体がタップ領域 -->
+  <main id="play" aria-label="タップして砂を落とす">
+    <header id="hud">
+      <div class="hud-l">
+        <i id="sandChip" class="sw"></i>
+        <div>
+          <b id="sandName">白砂</b>
+          <small>いまの砂</small>
+        </div>
+      </div>
+      <div class="hud-r">
+        <b id="tapCount">0</b>
+        <small><span id="glassNo">1</span>本目・タップ</small>
+      </div>
+    </header>
+
+    <div id="toasts" aria-live="polite"></div>
+
+    <div id="stage">
+      <div id="glow"></div>
+      <div id="glass">
+        <canvas id="sand"></canvas>
+        <svg id="glassSvg" aria-hidden="true"></svg>
+      </div>
+    </div>
+
+    <p id="hint">画面をタップで砂が落ちます<br><small>長押しでも流れつづけます</small></p>
+  </main>
+
+  <!-- 下のバー：親指で届く位置 -->
+  <nav id="bar">
+    <button id="btnBook" type="button">図鑑<span id="bookCount">0 / 44</span></button>
+    <button id="btnSound" type="button" aria-label="音のオン・オフ">♪</button>
+  </nav>
+
+  <!-- 図鑑シート -->
+  <div id="backdrop"></div>
+  <section id="sheet" aria-hidden="true">
+    <header class="sheet-head">
+      <h2 id="sheetTitle">砂の色</h2>
+      <span id="sheetCount"></span>
+    </header>
+    <div id="sheetBody" class="sheet-body"></div>
+    <div id="detail" class="detail"></div>
+    <footer class="sheet-foot">
+      <button class="tab on" type="button" data-tab="sands">砂の色</button>
+      <button class="tab" type="button" data-tab="relics">遺物</button>
+      <button class="tab" type="button" data-tab="stats">きろく</button>
+      <button id="btnClose" class="close" type="button">とじる</button>
+    </footer>
+  </section>
+
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
