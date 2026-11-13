@@ -7,7 +7,7 @@
 
 - タイトル画面（New Game / セーブがあれば Continue）
 - 村を歩く（十字キー、タイル単位の移動、壁・NPCとの衝突判定、カメラ追従）
-- NPC・看板と会話（A）、宿屋で全回復（10G）
+- NPC・看板と会話（A）、宿屋で全回復（10G）、宝箱（一度開けたら空。開封状態はセーブされる）
 - 南の門から外のフィールドへ（マップ間ワープ）
 - フィールドでランダムエンカウント → ターンベース戦闘（たたかう / まほう / どうぐ / にげる）
 - 素早さベースの行動順、攻撃・回復魔法・攻撃魔法・アイテム、経験値とレベルアップ、呪文習得
@@ -59,6 +59,7 @@ gba-rpg/
 │   ├── rpg_classes.h           職業データ（初期値・成長率・習得呪文）
 │   ├── rpg_enemies.h           敵データ、出現グループ
 │   ├── rpg_maps.h              タイル属性、マップ、イベント
+│   ├── rpg_flags.h             イベントフラグ（FlagId と固定サイズのビット集合）
 │   ├── rpg_party.h             パーティの実行時状態（HP/MP/Lv/所持品/ゴールド）
 │   ├── rpg_game_state.h        シーン間で共有する状態 + セーブ/ロード
 │   ├── rpg_ui.h                ウィンドウ / メニュー / メッセージボックス
@@ -115,11 +116,13 @@ gba-rpg/
 | 職業・初期パーティを変更 | `rpg_classes.cpp` / `Party::init_new_game()`（rpg_party.cpp） |
 | 町・ダンジョンを追加 | `MapId` に追加 → `rpg_maps.cpp` に ASCII レイアウト・イベント・`maps[]` の項目を書く → 既存マップに `warp` イベントを置いてつなぐ |
 | タイルの種類を追加 | `TileId` と `rpg_maps.cpp` の `tiles[]`（記号・通行可否・エンカウント倍率）、タイル画像を同じ順番で追加 |
-| イベントの種類を追加（店・宝箱など） | `EventType` に追加 → `FieldScene::_interact()` / `_on_step()` に処理を書く |
+| 宝箱を置く | `FlagId`（rpg_flags.h）に名前を追加 → マップの `events` に `EventType::chest`（`npc_graphics = 3`、`flag`、`item` + `item_amount` / `gold`）を書く |
+| フラグを追加（ボス撃破・イベント済みなど） | `FlagId` に追加し、`state.flags.get/set()` で読み書きする。セーブに自動で含まれる（最大64個、`max_flags`） |
+| イベントの種類を追加（店など） | `EventType` に追加 → `FieldScene::_interact()` / `_on_step()` に処理を書く |
 | 敵の AI | `BattleScene::_enemy_turn()` |
 | ダメージ計算式 | `roll_physical_damage()` / `roll_effect()`（rpg_party.cpp） |
 | 経験値カーブ | `exp_for_level()`（rpg_classes.cpp） |
-| セーブ内容を変更 | `SaveData`（rpg_game_state.cpp）。変更したら `save_version` を上げる |
+| セーブ内容を変更 | `SaveData`（rpg_game_state.cpp）。変更したら `save_version` を上げる（古いセーブは無視される）。フラグの `FlagId` は並べ替え・削除しない |
 
 マップは最大 32x32 タイル（512x512 px）です。それより大きいマップが必要になったら、Butano の big map 対応や
 マップのストリーミングに `FieldScene` を置き換えてください。
@@ -132,7 +135,7 @@ gba-rpg/
 | `field_tiles.bmp` / `field_palette.bmp` | マップタイル。幅16pxで、16x16タイルを `TileId` の順に縦に並べる |
 | `ui_tiles.bmp` / `ui_palette.bmp` | ウィンドウ枠（8x8 × 10枚の横並び） |
 | `player.bmp` | 16x16 × 8コマ（下・上・左・右 × 歩行2コマ） |
-| `npc.bmp` | 16x16 × N コマ。`MapEvent::npc_graphics` がコマ番号 |
+| `npc.bmp` | 16x16 × N コマ。`MapEvent::npc_graphics` がコマ番号（3 = 閉じた宝箱、4 = 開いた宝箱） |
 | `enemy_*.bmp` | 32x32 の敵グラフィック |
 | `cursor.bmp` | 8x8 のカーソル |
 
@@ -148,7 +151,7 @@ gba-rpg/
 
 ## 未実装（次に足すと良いもの）
 
-蘇生手段（現状は宿屋のみ）、装備、店、状態異常、防御コマンド、宝箱やフラグ管理、建物の内部マップ、歩くNPC、BGM/SE。
+蘇生手段（現状は宿屋のみ）、装備、店、状態異常、防御コマンド、建物の内部マップ、歩くNPC、BGM/SE。
 
 ## ライセンス表記
 

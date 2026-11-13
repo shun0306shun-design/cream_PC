@@ -425,11 +425,32 @@ def gen_player():
     write_json('player.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
 
 
+def chest(opened):
+    """16x16 treasure chest. Frame order in npc.bmp: closed, then open."""
+    c = canvas(16, 16)
+    rect(c, 2, 9, 13, 14, 5)                 # body
+    if opened:
+        rect(c, 2, 2, 13, 5, 13)             # lid, raised behind the chest
+        rect(c, 2, 6, 13, 8, 1)              # dark inside
+        rect(c, 4, 7, 11, 7, 6)              # gold glint
+    else:
+        rect(c, 2, 4, 13, 8, 13)             # lid
+        rect(c, 2, 8, 13, 8, 1)              # seam
+        rect(c, 7, 7, 8, 10, 6)              # lock
+        c[9][7] = 1
+    rect(c, 3, 9 if opened else 4, 3, 14, 6)    # metal bands
+    rect(c, 12, 9 if opened else 4, 12, 14, 6)
+    outline(c)
+    return c
+
+
 def gen_npcs():
     frames = [
         person('down', 0, hair=5, tunic=8, trim=6),     # 0 villager
         person('down', 0, hair=10, tunic=12, trim=9),   # 1 elder
         person('down', 0, hair=13, tunic=7, trim=9),    # 2 innkeeper
+        chest(False),                                   # 3 closed chest
+        chest(True),                                    # 4 open chest
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')

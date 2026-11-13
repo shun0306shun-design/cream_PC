@@ -123,6 +123,9 @@ namespace
         { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::sign, .x = 11, .y = 11, .pages = sign_pages },
         { .type = EventType::warp, .x = 8, .y = 19, .warp_map = MapId::field, .warp_x = 15, .warp_y = 11 },
+        // Chest with items (npc_graphics 3 = closed chest, 4 = open chest in graphics/npc.bmp).
+        { .type = EventType::chest, .x = 11, .y = 13, .npc_graphics = 3,
+          .flag = FlagId::chest_village_herbs, .item = ItemId::herb, .item_amount = 3 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -159,6 +162,9 @@ namespace
 
     constexpr MapEvent field_events[] = {
         { .type = EventType::warp, .x = 15, .y = 10, .warp_map = MapId::village, .warp_x = 8, .warp_y = 18 },
+        // Chest with gold.
+        { .type = EventType::chest, .x = 18, .y = 9, .npc_graphics = 3,
+          .flag = FlagId::chest_field_gold, .gold = 100 },
     };
 
     constexpr EncounterGroup field_encounters[] = {

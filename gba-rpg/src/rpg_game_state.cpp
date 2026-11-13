@@ -8,7 +8,7 @@ namespace rpg
 namespace
 {
     constexpr uint32_t save_magic = 0x47505242;     // "BRPG"
-    constexpr uint32_t save_version = 1;            // Bump it when SaveData changes: old saves are then ignored.
+    constexpr uint32_t save_version = 2;            // Bump it when SaveData changes: old saves are then ignored.
 
     /// What is stored in SRAM. Must stay trivially copyable.
     struct SaveData
@@ -16,6 +16,7 @@ namespace
         uint32_t magic = 0;
         uint32_t version = 0;
         Party party;
+        EventFlags flags;
         MapId map = start_map;
         uint8_t player_x = 0;
         uint8_t player_y = 0;
@@ -31,6 +32,7 @@ namespace
 void GameState::init_new_game()
 {
     party.init_new_game();
+    flags = EventFlags();
     return_to_start();
 }
 
@@ -48,6 +50,7 @@ void save_game(const GameState& state)
     data.magic = save_magic;
     data.version = save_version;
     data.party = state.party;
+    data.flags = state.flags;
     data.map = state.map;
     data.player_x = state.player_x;
     data.player_y = state.player_y;
@@ -66,6 +69,7 @@ bool load_game(GameState& state)
     }
 
     state.party = data.party;
+    state.flags = data.flags;
     state.map = data.map;
     state.player_x = data.player_x;
     state.player_y = data.player_y;

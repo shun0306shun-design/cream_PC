@@ -7,6 +7,7 @@
 
 #include "bn_random.h"
 
+#include "rpg_flags.h"
 #include "rpg_maps.h"
 #include "rpg_party.h"
 
@@ -16,6 +17,7 @@ namespace rpg
 struct GameState
 {
     Party party;
+    EventFlags flags;       //!< Opened chests and other world events (saved).
     MapId map = start_map;
     uint8_t player_x = start_x;
     uint8_t player_y = start_y;

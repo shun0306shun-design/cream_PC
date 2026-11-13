@@ -200,9 +200,17 @@ void FieldScene::_load_map()
         {
             BN_ASSERT(! _npcs.full(), "Too many NPCs in map: ", _map->name);
 
+            // A chest that was already opened starts with its "open" frame.
+            int graphics = event.npc_graphics;
+
+            if(event.type == EventType::chest && _state.flags.get(event.flag))
+            {
+                ++graphics;
+            }
+
             bn::sprite_ptr npc = bn::sprite_items::npc.create_sprite(
                         world(event.x * tile_size) + (tile_size / 2),
-                        world(event.y * tile_size) + (tile_size / 2), event.npc_graphics);
+                        world(event.y * tile_size) + (tile_size / 2), graphics);
             npc.set_camera(_camera);
             npc.set_bg_priority(scene_sprite_bg_priority);
             _npcs.push_back(bn::move(npc));
@@ -413,6 +421,10 @@ void FieldScene::_interact()
         _run_inn(*event);
         break;
 
+    case EventType::chest:
+        _open_chest(*event);
+        break;
+
     case EventType::warp:
     default:
         break;      // Warps are triggered by stepping on them, see _on_step().
@@ -455,6 +467,90 @@ void FieldScene::_run_inn(const MapEvent& event)
         _ui.wait(30);
         _ui.fade_in();
         box.say("The party is fully rested!");
+    }
+}
+
+int FieldScene::_npc_sprite_index(const MapEvent& event) const
+{
+    // _load_map() creates one sprite per event with graphics, in the same order as the events.
+    int index = 0;
+
+    for(const MapEvent& other : _map->events)
+    {
+        if(&other == &event)
+        {
+            return index;
+        }
+
+        if(other.npc_graphics >= 0)
+        {
+            ++index;
+        }
+    }
+
+    BN_ERROR("Event not found in map: ", _map->name);
+    return -1;
+}
+
+void FieldScene::_open_chest(const MapEvent& event)
+{
+    BN_ASSERT(event.flag != FlagId::none, "A chest needs a flag id");
+
+    Party& party = _state.party;
+    MessageBox box(_ui);
+
+    if(_state.flags.get(event.flag))
+    {
+        box.say("The chest is empty.");
+        return;
+    }
+
+    // Don't waste the contents: leave the chest closed if the bag can't take the items.
+    if(event.item_amount > 0 && party.item_amount(event.item) + event.item_amount > max_item_stack)
+    {
+        box.say("You can't carry any more\nof that item.");
+        return;
+    }
+
+    // Open it for good (the flag is saved with the game) and show the open sprite.
+    _state.flags.set(event.flag);
+
+    if(event.npc_graphics >= 0)
+    {
+        _npcs[_npc_sprite_index(event)].set_tiles(bn::sprite_items::npc.tiles_item(), event.npc_graphics + 1);
+    }
+
+    bn::string<64> text;
+
+    if(event.item_amount > 0)
+    {
+        party.add_item(event.item, event.item_amount);
+
+        bn::ostringstream stream(text);
+        stream << "Found " << item_data(event.item).name;
+
+        if(event.item_amount > 1)
+        {
+            stream << " x" << int(event.item_amount);
+        }
+
+        stream << "!";
+        box.say(text);
+    }
+
+    if(event.gold > 0)
+    {
+        party.gold += event.gold;
+
+        text.clear();
+        bn::ostringstream stream(text);
+        stream << "Found " << int(event.gold) << " gold!";
+        box.say(text);
+    }
+
+    if(event.item_amount == 0 && event.gold == 0)
+    {
+        box.say("It was empty...");
     }
 }
 

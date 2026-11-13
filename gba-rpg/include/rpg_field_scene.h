@@ -71,6 +71,10 @@ private:
     void _handle_movement_input();
     void _interact();
     void _run_inn(const MapEvent& event);
+    void _open_chest(const MapEvent& event);
+
+    /// Index in _npcs of the sprite of an event with graphics.
+    [[nodiscard]] int _npc_sprite_index(const MapEvent& event) const;
     void _warp(const MapEvent& event);
 
     /// Called when the player arrives to a new tile. Returns the encounter to fight, if any.
