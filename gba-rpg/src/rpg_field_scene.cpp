@@ -426,6 +426,10 @@ void FieldScene::_interact()
         _open_chest(*event);
         break;
 
+    case EventType::spring:
+        _use_spring(*event);
+        break;
+
     case EventType::shop:
         // The shop windows cover the top of the screen: the corner windows can't stay under them.
         _hide_hud();
@@ -476,6 +480,84 @@ void FieldScene::_run_inn(const MapEvent& event)
         _ui.fade_in();
         box.say("The party is fully rested!");
     }
+}
+
+void FieldScene::_use_spring(const MapEvent& event)
+{
+    static constexpr bn::string_view yes_no[] = { "Yes", "No" };
+
+    Party& party = _state.party;
+    MessageBox box(_ui);
+    box.say_pages(event.pages);
+
+    // The spring heals the living only: reviving is what the inn is for.
+    bool needs_healing = false;
+    bool has_fallen = false;
+
+    for(const PartyMember& member : party.members)
+    {
+        if(! member.alive())
+        {
+            has_fallen = true;
+        }
+        else
+        {
+            Stats stats = member.stats();
+            needs_healing = needs_healing || member.hp < stats.max_hp || member.mp < stats.max_mp;
+        }
+    }
+
+    if(! needs_healing)
+    {
+        box.say(has_fallen ? "The water can't revive\nfallen allies." : "Everyone is already in\ngood shape.");
+        return;
+    }
+
+    bn::string<64> question;
+    bn::ostringstream question_stream(question);
+    question_stream << "Drink from the spring?";
+
+    if(event.price > 0)
+    {
+        question_stream << "\nIt costs " << int(event.price) << " gold.";
+    }
+
+    box.show(question);
+
+    bool accepted;
+
+    {
+        // Same place as the inn's question menu.
+        int menu_rows = Window::rows_for_lines(2);
+        Menu menu(_ui, screen_columns - 8, screen_rows - MessageBox::box_rows - menu_rows, 8, yes_no);
+        accepted = menu.run() == 0;
+    }
+
+    if(! accepted)
+    {
+        return;
+    }
+
+    if(party.gold < event.price)
+    {
+        box.say("You don't have enough gold.");
+        return;
+    }
+
+    party.gold -= event.price;
+    _ui.fade_out();
+
+    for(PartyMember& member : party.members)
+    {
+        if(member.alive())
+        {
+            member.restore();       // Full HP and MP.
+        }
+    }
+
+    _ui.wait(20);
+    _ui.fade_in();
+    box.say(has_fallen ? "The party feels refreshed!\nBut the fallen stay down." : "The party feels refreshed!");
 }
 
 int FieldScene::_npc_sprite_index(const MapEvent& event) const

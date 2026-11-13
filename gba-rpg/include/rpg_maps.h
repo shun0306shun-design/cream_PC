@@ -34,6 +34,7 @@ enum class TileId : uint8_t
     tall_grass,
     bridge,
     gate,
+    spring,     //!< A spring or fountain: solid, put a EventType::spring event on it.
     count
 };
 
@@ -60,7 +61,8 @@ enum class EventType : uint8_t
     inn,        //!< NPC: shows `pages`, then offers to rest (full restore).
     warp,       //!< Triggered by stepping on the tile: moves to `warp_map` at (warp_x, warp_y).
     chest,      //!< Gives `item` x `item_amount` and/or `gold` once; `flag` remembers that it was opened.
-    shop        //!< NPC: shows `pages` as greeting, then opens an item shop selling `stock`.
+    shop,       //!< NPC: shows `pages` as greeting, then opens an item shop selling `stock`.
+    spring      //!< Healing spring: shows `pages`, then restores HP/MP of the living members for `price` gold.
 };
 
 struct MapEvent
@@ -84,6 +86,9 @@ struct MapEvent
 
     // --- Shop (EventType::shop) ---
     bn::span<const ItemId> stock = {};          //!< Items on sale (prices are in the item table).
+
+    // --- Spring (EventType::spring) ---
+    uint16_t price = 0;                         //!< Gold per use (0 = free).
 };
 
 constexpr int max_map_tiles = 32;       //!< Maximum map width/height in tiles (a 512x512 pixels background).

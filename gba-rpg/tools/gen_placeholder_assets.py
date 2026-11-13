@@ -272,9 +272,20 @@ def tile_gate():
     return c
 
 
+def tile_spring():
+    c = tile_grass(6)
+    ellipse(c, 7.5, 8, 7.5, 6.5, 10)        # stone rim
+    ellipse(c, 7.5, 8, 6.5, 5.5, 11)
+    ellipse(c, 7.5, 8, 5, 4, 8)             # water
+    rect(c, 4, 7, 6, 7, 9)
+    rect(c, 9, 9, 11, 9, 9)
+    c[6][8] = c[8][6] = c[9][10] = 12       # sparkles
+    return c
+
+
 FIELD_TILES = [
     tile_void, tile_grass, tile_path, tile_tree, tile_water, tile_wall, tile_roof,
-    tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate,
+    tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate, tile_spring,
 ]
 
 

@@ -8,6 +8,10 @@ namespace rpg
 namespace
 {
     // The order must match ItemId.
+    //
+    // Balance guide: a level 1 party member has 20-36 HP and 0-18 MP, so a Herb (25 HP) is almost a full heal early
+    // on and shops sell it for 8 G. Healing is the same Effect structure used by spells: `power` + [0, `variance`].
+    // Prices are the BUY price (selling pays sell_percent of it, see rpg_shop.h).
     constexpr ItemData items[] = {
         //  name            effect type           target                    power  variance   price
         { "Herb",         { EffectType::heal_hp, TargetType::one_ally,      25,    5 },       8 },

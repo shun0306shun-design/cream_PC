@@ -72,6 +72,7 @@ private:
     void _interact();
     void _run_inn(const MapEvent& event);
     void _open_chest(const MapEvent& event);
+    void _use_spring(const MapEvent& event);
 
     /// Index in _npcs of the sprite of an event with graphics.
     [[nodiscard]] int _npc_sprite_index(const MapEvent& event) const;

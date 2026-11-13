@@ -26,6 +26,7 @@ namespace
         { '"',      true,     3 },    // tall_grass
         { '=',      true,     0 },    // bridge
         { '>',      true,     0 },    // gate (use it with a warp event)
+        { 'F',      false,    0 },    // spring (use it with a spring event)
     };
 
     static_assert(sizeof(tiles) / sizeof(tiles[0]) == int(TileId::count), "Tile table doesn't match TileId");
@@ -81,7 +82,7 @@ namespace
         "T..^^^^.......^^^^^....T",    // 2
         "T..####.......#####....T",    // 3
         "T..#D##...,...##D##....T",    // 4
-        "T...:......,....:......T",    // 5
+        "T...:......,....:....F.T",    // 5
         "T...:::::::::::::......T",    // 6
         "T.......:.......~~~~...T",    // 7
         "T..,....:......~~~~~~..T",    // 8
@@ -117,6 +118,10 @@ namespace
         "START VILLAGE\nSouth: the fields",
     };
 
+    constexpr bn::string_view spring_pages[] = {
+        "Clear water wells up from\nthe ground. It looks\nrefreshing.",
+    };
+
     constexpr bn::string_view shopkeeper_pages[] = {
         "Welcome to the item shop!",
     };
@@ -134,6 +139,8 @@ namespace
         // Chest with items (npc_graphics 3 = closed chest, 4 = open chest in graphics/npc.bmp).
         { .type = EventType::chest, .x = 11, .y = 13, .npc_graphics = 3,
           .flag = FlagId::chest_village_herbs, .item = ItemId::herb, .item_amount = 3 },
+        // Healing spring on the 'F' tile: free, but unlike the inn it can't revive fallen members.
+        { .type = EventType::spring, .x = 21, .y = 5, .pages = spring_pages, .price = 0 },
         // Item shop (npc_graphics 5 = shopkeeper).
         { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
           .stock = village_shop_stock },
