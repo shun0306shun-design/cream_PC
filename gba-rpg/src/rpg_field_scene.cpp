@@ -240,8 +240,19 @@ void FieldScene::_load_map()
             {
                 BN_ASSERT(! _walkers.full(), "Too many walking NPCs in map: ", _map->name);
 
-                _walkers.push_back(Walker{ &event, sprite_index, event.x, event.y, event.x, event.y,
-                                           event.x * tile_size, event.y * tile_size, 0, 0, 0,
+                int spawn_x = event.x;
+                int spawn_y = event.y;
+                _find_spawn_tile(event, spawn_x, spawn_y);
+
+                if(spawn_x != event.x || spawn_y != event.y)
+                {
+                    // The sprite was created at the start tile: move it to where the NPC really is.
+                    _npcs[sprite_index].set_position(world(spawn_x * tile_size) + (tile_size / 2),
+                                                     world(spawn_y * tile_size) + (tile_size / 2));
+                }
+
+                _walkers.push_back(Walker{ &event, sprite_index, spawn_x, spawn_y, spawn_x, spawn_y,
+                                           spawn_x * tile_size, spawn_y * tile_size, 0, 0, 0,
                                            _state.random.get_int(npc_extra_wait) + 1 });
             }
 
@@ -424,6 +435,40 @@ bool FieldScene::_walker_blocks(int tile_x, int tile_y) const
     }
 
     return false;
+}
+
+void FieldScene::_find_spawn_tile(const MapEvent& event, int& spawn_x, int& spawn_y) const
+{
+    if(event.x != _state.player_x || event.y != _state.player_y)
+    {
+        return;     // The usual case: nobody is on its start tile.
+    }
+
+    // Look at the rings of tiles around the start tile, closest first, within its walking range.
+    for(int distance = 1; distance <= event.wander_radius; ++distance)
+    {
+        for(int dy = -distance; dy <= distance; ++dy)
+        {
+            for(int dx = -distance; dx <= distance; ++dx)
+            {
+                int tile_x = event.x + dx;
+                int tile_y = event.y + dy;
+
+                if(bn::max(bn::abs(dx), bn::abs(dy)) == distance &&
+                   _map->terrain_walkable(tile_x, tile_y) &&
+                   ! _event_at(tile_x, tile_y) &&               // Chests, signs, warps and other NPCs
+                   ! _walker_blocks(tile_x, tile_y) &&
+                   ! (tile_x == _state.player_x && tile_y == _state.player_y))
+                {
+                    spawn_x = tile_x;
+                    spawn_y = tile_y;
+                    return;
+                }
+            }
+        }
+    }
+
+    // No room at all (not in this game's maps): it starts on the player and walks off later.
 }
 
 void FieldScene::_update_walkers()

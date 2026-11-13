@@ -142,7 +142,8 @@ struct MapData
 
     /**
      * Returns true if the player can stand on the given tile *in the map data*: walkable terrain and no NPC or
-     * chest at its starting place. Used to check saved positions; FieldScene also considers NPCs that walked away.
+     * chest that stays in place there (walking NPCs are ignored). Used to check saved positions;
+     * FieldScene handles the walking ones.
      */
     [[nodiscard]] bool walkable(int x, int y) const;
 };

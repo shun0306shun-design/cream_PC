@@ -76,6 +76,9 @@ private:
     [[nodiscard]] const Walker* _walker_for(const MapEvent& event) const;
     [[nodiscard]] bool _walker_blocks(int tile_x, int tile_y) const;
 
+    /// Where a walking NPC starts: its place in the map data, or the closest free tile if the player is there.
+    void _find_spawn_tile(const MapEvent& event, int& spawn_x, int& spawn_y) const;
+
     void _show_map_name();
     void _update_map_name();
     void _update_minimap();

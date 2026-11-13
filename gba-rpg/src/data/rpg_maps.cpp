@@ -446,10 +446,11 @@ bool MapData::walkable(int x, int y) const
         return false;
     }
 
-    // Events with graphics (NPCs, chests, shopkeepers) are solid.
+    // Events with graphics (NPCs, chests, shopkeepers) are solid, except the ones that walk: they may have left
+    // their start tile, and FieldScene moves them away if the player is on it when the map is loaded.
     for(const MapEvent& event : events)
     {
-        if(event.x == x && event.y == y && event.npc_graphics >= 0)
+        if(event.x == x && event.y == y && event.npc_graphics >= 0 && event.movement == NpcMovement::stand)
         {
             return false;
         }

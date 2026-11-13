@@ -33,6 +33,11 @@ enum class ItemId : uint8_t
 
 constexpr int item_count = int(ItemId::count);
 
+/// Capacity of the bag, in kinds of items. It is part of the save data, so it doesn't change when items are added.
+constexpr int max_items = 32;
+
+static_assert(item_count <= max_items, "More items than the bag can hold: raise max_items (and save_version)");
+
 enum class ItemKind : uint8_t
 {
     consumable,     //!< Used from the item menus: `effect` applies.

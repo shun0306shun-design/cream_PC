@@ -82,7 +82,7 @@ enum class EquipResult : uint8_t
 struct Party
 {
     PartyMember members[max_party_size];
-    uint8_t items[item_count] = {};     //!< Amount owned of each item, indexed by ItemId.
+    uint8_t items[max_items] = {};      //!< Amount owned of each item, indexed by ItemId (the rest is unused).
     int32_t gold = 0;
 
     void init_new_game();

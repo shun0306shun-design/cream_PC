@@ -104,6 +104,7 @@ gba-rpg/
 - 装備品は `ItemData` の一種で、キャラごとの装備枠は `PartyMember::weapon/armor`。`PartyMember::stats()` が「職業+レベル+装備補正」を返し、戦闘も各メニューもこれを使います。
 - 歩くNPCの実行時の状態（`Walker`、最大4体）は `FieldScene` が固定容量で持ちます。プレイヤーと同じく「移動先を先に予約」し、1歩の間は元のマスも塞ぐので重なりません。AIは待ち時間が尽きたときだけ働くので、毎フレームの負荷はほぼカウントダウンだけです。
 - 「通れるか」の判定は `MapData::walkable()` の1か所だけ（移動・ミニマップ・セーブ読み込み時の位置チェックで共通）。
+- セーブデータの大きさは固定です（所持品は `max_items` = 32種分の枠、フラグは64個）。アイテムやフラグを足しても形式は変わりません。形式を変えるとビルド時の `static_assert`（`sizeof(SaveData)`）が止まるので、`save_version` を上げて数値を更新してください。
 - ロード時、保存位置がもう通れない場所なら（マップを書き換えた後など）開始位置に戻します。
 - フィールド右上のマップ名とミニマップは `FieldScene` が `bn::optional<Window>` で持ち、STARTメニューを開く間だけ閉じます（ウィンドウを重ねないため）。
 - 表示の重なり順: マップ背景(3) < プレイヤー・NPC・敵(2) < ウィンドウ(0) < 文字。
@@ -126,7 +127,7 @@ gba-rpg/
 | タイルの種類を追加 | `TileId` と `rpg_maps.cpp` の `tiles[]`（記号・通行可否・エンカウント倍率）、タイル画像を同じ順番で追加 |
 | 装備品を追加 | `ItemId` に追加 → `rpg_items.cpp` に1行（`kind` = weapon/armor、`classes` = 装備できる職業、`bonus` = 能力の加算値）。店の `stock`・宝箱の `item` にそのまま使える。装備は「アイテムの一種」なので所持数・売買・セーブの仕組みを共有する |
 | ダンジョンの階・町を追加 | `MapId` に追加 → `rpg_maps.cpp` に ASCII レイアウト・イベント・出現テーブルを書く。階段は `stairs_up`/`stairs_down` タイル（`u`/`d`）+ `warp` イベント。ワープ元・先が通れないタイルだとビルドエラーになる（`valid_events()`） |
-| NPCを歩かせる | その `MapEvent`（`npc_graphics` ありの会話・宿屋など。宝箱は不可）に `.movement = NpcMovement::wander, .wander_radius = 3` を足す。1マップに最大4体（`max_map_walkers`）。位置はセーブされず、マップを読み込むと元の場所に戻る |
+| NPCを歩かせる | その `MapEvent`（`npc_graphics` ありの会話・宿屋など。宝箱は不可）に `.movement = NpcMovement::wander, .wander_radius = 3` を足す。1マップに最大4体（`max_map_walkers`）。位置はセーブされず、マップを読み込むと元の場所に戻る（プレイヤーがその場所にいれば近くの空きマスに出る） |
 | 道具屋を置く | マップの `events` に `EventType::shop`（`npc_graphics = 5`、`pages` = あいさつ、`stock` = 売る `ItemId` の配列）を書く |
 | 回復の泉を置く | マップに `TileId::spring` のタイル（記号 `F`）を置き、同じ座標に `EventType::spring`（`pages` = 説明文、`price` = 1回の料金、0 なら無料）のイベントを書く。蘇生は宿屋だけ、という差をつけてある |
 | 回復アイテムの効果・価格を調整 | `rpg_items.cpp` の表（`power` + `variance`、`price`）。魔法も同じ `Effect` 形式なので `rpg_spells.cpp` で同様に調整できる |
