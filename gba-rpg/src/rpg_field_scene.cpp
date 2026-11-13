@@ -26,6 +26,12 @@ namespace
     constexpr int step_frames = tile_size / walk_speed;
     constexpr int safe_steps_after_battle = 4;
 
+    // --- Walking NPCs: slower than the player, and they rest between steps ---
+    constexpr int npc_walk_speed = 1;                       // Pixels per frame.
+    constexpr int npc_step_frames = tile_size / npc_walk_speed;
+    constexpr int npc_min_wait = 30;                        // Frames standing still between steps...
+    constexpr int npc_extra_wait = 90;                      // ...plus up to this many more (random).
+
     // --- Map name popup (top center) ---
     constexpr int name_frames = 105;        // About 1.75 seconds.
     constexpr int name_min_cols = 6;
@@ -181,6 +187,7 @@ const EncounterGroup& FieldScene::run()
             _handle_movement_input();
         }
 
+        _update_walkers();
         _update_view();
         _update_map_name();
         _update_minimap();
@@ -218,6 +225,27 @@ void FieldScene::_load_map()
             npc.set_camera(_camera);
             npc.set_bg_priority(scene_sprite_bg_priority);
             _npcs.push_back(bn::move(npc));
+        }
+    }
+
+    // Walking NPCs start at the place given in the map data (their position isn't saved).
+    _walkers.clear();
+    int sprite_index = 0;
+
+    for(const MapEvent& event : _map->events)
+    {
+        if(event.npc_graphics >= 0)
+        {
+            if(event.movement != NpcMovement::stand)
+            {
+                BN_ASSERT(! _walkers.full(), "Too many walking NPCs in map: ", _map->name);
+
+                _walkers.push_back(Walker{ &event, sprite_index, event.x, event.y, event.x, event.y,
+                                           event.x * tile_size, event.y * tile_size, 0, 0, 0,
+                                           _state.random.get_int(npc_extra_wait) + 1 });
+            }
+
+            ++sprite_index;
         }
     }
 
@@ -330,20 +358,148 @@ void FieldScene::_update_view()
 
 bool FieldScene::_can_walk(int tile_x, int tile_y) const
 {
-    return _map->walkable(tile_x, tile_y);
+    if(! _map->terrain_walkable(tile_x, tile_y) || _walker_blocks(tile_x, tile_y))
+    {
+        return false;
+    }
+
+    // NPCs and chests that stay in place are solid. The ones that walk are handled by _walker_blocks().
+    for(const MapEvent& event : _map->events)
+    {
+        if(event.npc_graphics >= 0 && event.movement == NpcMovement::stand && event.x == tile_x && event.y == tile_y)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 const MapEvent* FieldScene::_event_at(int tile_x, int tile_y) const
 {
     for(const MapEvent& event : _map->events)
     {
-        if(event.x == tile_x && event.y == tile_y)
+        // A walking NPC is where it is now, not where the map data says it started.
+        int event_x = event.x;
+        int event_y = event.y;
+
+        if(const Walker* walker = _walker_for(event))
+        {
+            event_x = walker->x;
+            event_y = walker->y;
+        }
+
+        if(event_x == tile_x && event_y == tile_y)
         {
             return &event;
         }
     }
 
     return nullptr;
+}
+
+const FieldScene::Walker* FieldScene::_walker_for(const MapEvent& event) const
+{
+    for(const Walker& walker : _walkers)
+    {
+        if(walker.event == &event)
+        {
+            return &walker;
+        }
+    }
+
+    return nullptr;
+}
+
+bool FieldScene::_walker_blocks(int tile_x, int tile_y) const
+{
+    for(const Walker& walker : _walkers)
+    {
+        // The tile it is going to and, while it's still moving, the tile it is leaving.
+        if((walker.x == tile_x && walker.y == tile_y) ||
+           (walker.frames_left > 0 && walker.prev_x == tile_x && walker.prev_y == tile_y))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void FieldScene::_update_walkers()
+{
+    // Cheap by design: most frames a walker only counts down; the decision is made when it stops waiting.
+    for(Walker& walker : _walkers)
+    {
+        if(walker.frames_left > 0)
+        {
+            walker.px += walker.dx * npc_walk_speed;
+            walker.py += walker.dy * npc_walk_speed;
+            _npcs[walker.sprite_index].set_position(world(walker.px) + (tile_size / 2),
+                                                    world(walker.py) + (tile_size / 2));
+
+            if(--walker.frames_left == 0)
+            {
+                walker.wait = npc_min_wait + _state.random.get_int(npc_extra_wait);
+
+                // It left the tile behind: if that is on the minimap, show it as free.
+                _minimap_dirty = _minimap_dirty ||
+                        (bn::abs(walker.prev_x - _state.player_x) <= minimap_radius_x &&
+                         bn::abs(walker.prev_y - _state.player_y) <= minimap_radius_y);
+            }
+        }
+        else if(--walker.wait <= 0)
+        {
+            _start_walker_step(walker);
+        }
+    }
+}
+
+void FieldScene::_start_walker_step(Walker& walker)
+{
+    // Try the four directions starting from a random one: the first that works is taken.
+    int first = _state.random.get_int(4);
+
+    for(int attempt = 0; attempt < 4; ++attempt)
+    {
+        int direction = (first + attempt) % 4;
+        int target_x = walker.x + direction_dx[direction];
+        int target_y = walker.y + direction_dy[direction];
+
+        if(bn::abs(target_x - walker.event->x) > walker.event->wander_radius ||
+           bn::abs(target_y - walker.event->y) > walker.event->wander_radius)
+        {
+            continue;       // Too far from home.
+        }
+
+        if(! _map->terrain_walkable(target_x, target_y) ||
+           _event_at(target_x, target_y) ||                 // Another NPC, a chest, a warp, a sign...
+           _walker_blocks(target_x, target_y))              // A walker is leaving that tile.
+        {
+            continue;
+        }
+
+        if(bn::abs(target_x - _state.player_x) <= 1 && bn::abs(target_y - _state.player_y) <= 1)
+        {
+            continue;       // Keep a tile away from the player: no overlapping sprites, nobody gets trapped.
+        }
+
+        // Reserve the destination now, like the player does: nobody else can walk into it.
+        walker.prev_x = walker.x;
+        walker.prev_y = walker.y;
+        walker.x = target_x;
+        walker.y = target_y;
+        walker.dx = direction_dx[direction];
+        walker.dy = direction_dy[direction];
+        walker.frames_left = npc_step_frames;
+
+        _minimap_dirty = _minimap_dirty ||
+                (bn::abs(target_x - _state.player_x) <= minimap_radius_x &&
+                 bn::abs(target_y - _state.player_y) <= minimap_radius_y);
+        return;
+    }
+
+    walker.wait = npc_min_wait / 2;     // Boxed in: look again soon.
 }
 
 void FieldScene::_handle_movement_input()

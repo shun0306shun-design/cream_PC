@@ -137,8 +137,10 @@ namespace
     };
 
     constexpr MapEvent village_events[] = {
-        { .type = EventType::talk, .x = 10, .y = 7, .npc_graphics = 0, .pages = villager_pages },
-        { .type = EventType::talk, .x = 17, .y = 5, .npc_graphics = 1, .pages = elder_pages },
+        { .type = EventType::talk, .x = 10, .y = 7, .npc_graphics = 0, .pages = villager_pages,
+          .movement = NpcMovement::wander, .wander_radius = 3 },
+        { .type = EventType::talk, .x = 17, .y = 5, .npc_graphics = 1, .pages = elder_pages,
+          .movement = NpcMovement::wander, .wander_radius = 2 },
         { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::sign, .x = 11, .y = 11, .pages = sign_pages },
         { .type = EventType::warp, .x = 8, .y = 19, .warp_map = MapId::field, .warp_x = 15, .warp_y = 11 },
@@ -391,6 +393,12 @@ namespace
                     return false;
                 }
 
+                // Only NPCs walk: they need a sprite, and chests stay where they are.
+                if(event.movement != NpcMovement::stand && (event.npc_graphics < 0 || event.type == EventType::chest))
+                {
+                    return false;
+                }
+
                 if(event.type == EventType::warp)
                 {
                     // You must be able to step on it, and to stand where it takes you.
@@ -426,14 +434,14 @@ TileId MapData::tile(int x, int y) const
     return TileId(tile_index_from_symbol(rows[y][x]));
 }
 
+bool MapData::terrain_walkable(int x, int y) const
+{
+    return x >= 0 && y >= 0 && x < width() && y < height() && tile_info(tile(x, y)).walkable;
+}
+
 bool MapData::walkable(int x, int y) const
 {
-    if(x < 0 || y < 0 || x >= width() || y >= height())
-    {
-        return false;
-    }
-
-    if(! tile_info(tile(x, y)).walkable)
+    if(! terrain_walkable(x, y))
     {
         return false;
     }

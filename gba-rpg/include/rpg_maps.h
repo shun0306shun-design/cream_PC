@@ -72,6 +72,13 @@ enum class EventType : uint8_t
     spring      //!< Healing spring: shows `pages`, then restores HP/MP of the living members for `price` gold.
 };
 
+/// How an NPC moves (only for events with graphics, never for chests).
+enum class NpcMovement : uint8_t
+{
+    stand,      //!< Stays where it is.
+    wander      //!< Walks around randomly, staying within `wander_radius` tiles of its place in the map data.
+};
+
 struct MapEvent
 {
     EventType type = EventType::talk;
@@ -96,10 +103,17 @@ struct MapEvent
 
     // --- Spring (EventType::spring) ---
     uint16_t price = 0;                         //!< Gold per use (0 = free).
+
+    // --- Walking NPCs (events with npc_graphics) ---
+    // x/y is where it starts (and the center of its walk). Its position is not saved: it returns there when the
+    // map is loaded again.
+    NpcMovement movement = NpcMovement::stand;
+    uint8_t wander_radius = 2;                  //!< Maximum distance from x/y, in tiles, for NpcMovement::wander.
 };
 
 constexpr int max_map_tiles = 32;       //!< Maximum map width/height in tiles (a 512x512 pixels background).
 constexpr int max_map_npcs = 8;
+constexpr int max_map_walkers = 4;     //!< NPCs that walk, per map.
 
 struct MapData
 {
@@ -123,9 +137,12 @@ struct MapData
     /// Returns the tile at the given position, or the border tile if it's outside the map.
     [[nodiscard]] TileId tile(int x, int y) const;
 
+    /// Returns true if the tile is inside the map and its terrain can be walked on (NPCs are not considered).
+    [[nodiscard]] bool terrain_walkable(int x, int y) const;
+
     /**
-     * Returns true if the player can stand on the given tile: inside the map, a walkable tile
-     * and not occupied by an NPC or a chest. Used by movement, the minimap and save validation.
+     * Returns true if the player can stand on the given tile *in the map data*: walkable terrain and no NPC or
+     * chest at its starting place. Used to check saved positions; FieldScene also considers NPCs that walked away.
      */
     [[nodiscard]] bool walkable(int x, int y) const;
 };
