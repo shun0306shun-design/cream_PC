@@ -35,6 +35,10 @@ enum class TileId : uint8_t
     bridge,
     gate,
     spring,     //!< A spring or fountain: solid, put a EventType::spring event on it.
+    cave_floor, //!< Dungeon floor: walkable, with random battles.
+    cave_wall,
+    stairs_up,  //!< Walkable, no battles: put a EventType::warp event on it.
+    stairs_down,
     count
 };
 
@@ -51,6 +55,9 @@ enum class MapId : uint8_t
 {
     village,
     field,
+    cave_1f,
+    cave_2f,
+    cave_3f,
     count
 };
 

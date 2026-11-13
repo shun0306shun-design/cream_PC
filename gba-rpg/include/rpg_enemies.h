@@ -21,6 +21,7 @@ enum class EnemyId : uint8_t
     slime,
     bat,
     goblin,
+    skeleton,
     count
 };
 

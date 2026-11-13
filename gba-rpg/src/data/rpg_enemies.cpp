@@ -5,6 +5,7 @@
 #include "bn_sprite_items_enemy_slime.h"
 #include "bn_sprite_items_enemy_bat.h"
 #include "bn_sprite_items_enemy_goblin.h"
+#include "bn_sprite_items_enemy_skeleton.h"
 
 namespace rpg
 {
@@ -17,6 +18,7 @@ namespace
         { "Slime",   &bn::sprite_items::enemy_slime,      { 12, 0, 10, 4,  4  }, 4,  3,    SpellId::fire, 0 },
         { "Bat",     &bn::sprite_items::enemy_bat,        { 16, 0, 13, 5,  12 }, 6,  5,    SpellId::fire, 20 },
         { "Goblin",  &bn::sprite_items::enemy_goblin,     { 28, 0, 18, 8,  6  }, 12, 10,   SpellId::fire, 0 },
+        { "Skeleton", &bn::sprite_items::enemy_skeleton,    { 34, 0, 22, 10, 8  }, 18, 16,   SpellId::fire, 0 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

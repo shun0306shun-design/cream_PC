@@ -283,9 +283,57 @@ def tile_spring():
     return c
 
 
+def tile_cave_floor():
+    c = canvas(16, 16, 10)
+    for y in range(16):
+        for x in range(16):
+            n = noise(x, y, 11)
+            if n < 22:
+                c[y][x] = 11
+            elif n > 238:
+                c[y][x] = 1
+    return c
+
+
+def tile_cave_wall():
+    c = canvas(16, 16, 1)
+    for y in range(16):
+        for x in range(16):
+            n = noise(x, y, 12)
+            if n < 55:
+                c[y][x] = 7
+            elif n > 236:
+                c[y][x] = 10
+    ellipse(c, 4, 4, 3.5, 2.5, 7)
+    ellipse(c, 11.5, 10, 4, 3, 7)
+    rect(c, 3, 3, 4, 3, 10)
+    rect(c, 10, 9, 12, 9, 10)
+    return c
+
+
+def tile_stairs_down():
+    c = tile_cave_floor()
+    rect(c, 2, 2, 13, 13, 1)                # dark opening
+    rect(c, 3, 4, 12, 4, 11)                # steps getting smaller as they go down
+    rect(c, 4, 7, 11, 7, 11)
+    rect(c, 5, 10, 10, 10, 11)
+    return c
+
+
+def tile_stairs_up():
+    c = tile_cave_floor()
+    rect(c, 2, 2, 13, 13, 10)
+    rect(c, 3, 11, 12, 12, 11)              # light steps, bigger near the bottom
+    rect(c, 4, 8, 11, 9, 12)
+    rect(c, 5, 5, 10, 6, 11)
+    rect(c, 6, 3, 9, 3, 12)
+    return c
+
+
 FIELD_TILES = [
     tile_void, tile_grass, tile_path, tile_tree, tile_water, tile_wall, tile_roof,
     tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate, tile_spring,
+    tile_cave_floor, tile_cave_wall, tile_stairs_up, tile_stairs_down,
 ]
 
 
@@ -536,6 +584,31 @@ def gen_enemies():
     write_json('enemy_goblin.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
 
 
+def gen_skeleton():
+    c = canvas(32, 32)
+    ellipse(c, 16, 8, 7, 7, 9)              # skull
+    rect(c, 11, 13, 20, 16, 9)              # jaw
+    rect(c, 11, 7, 14, 10, 1)               # eye sockets
+    rect(c, 18, 7, 21, 10, 1)
+    c[12][16] = c[13][16] = 1               # nose
+    rect(c, 12, 16, 20, 16, 10)             # teeth
+    for x in (13, 15, 17, 19):
+        c[16][x] = 1
+    rect(c, 15, 17, 16, 27, 9)              # spine
+    for y in (18, 21, 24):                  # ribs
+        rect(c, 10, y, 21, y + 1, 9)
+        rect(c, 12, y, 19, y, 10)
+    rect(c, 6, 18, 8, 27, 9)                # arms
+    rect(c, 23, 18, 25, 27, 9)
+    rect(c, 11, 27, 13, 31, 9)              # legs
+    rect(c, 18, 27, 20, 31, 9)
+    rect(c, 4, 2, 5, 22, 10)                # a rusty sword
+    rect(c, 2, 20, 7, 21, 5)
+    outline(c)
+    write_bmp('enemy_skeleton.bmp', c, SPRITE_PALETTE)
+    write_json('enemy_skeleton.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
+
+
 if __name__ == '__main__':
     os.makedirs(OUT_DIR, exist_ok=True)
     gen_field()
@@ -544,4 +617,5 @@ if __name__ == '__main__':
     gen_npcs()
     gen_cursor()
     gen_enemies()
+    gen_skeleton()
     print('Placeholder assets written to', os.path.normpath(OUT_DIR))

@@ -26,6 +26,7 @@ enum class ItemId : uint8_t
     oak_staff,
     leather_armor,
     chain_mail,
+    steel_sword,
     count,
     none = 0xFF         //!< "Nothing": an empty equipment slot.
 };
