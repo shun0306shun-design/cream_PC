@@ -68,8 +68,9 @@ bool PartyMember::valid() const
         return false;
     }
 
-    Stats current_stats = stats();
-    return hp >= 0 && hp <= current_stats.max_hp && mp >= 0 && mp <= current_stats.max_mp;
+    // Too much HP/MP is not an error: load_game() rounds it down to the maximum (for example after the
+    // equipment bonuses were rebalanced). Negative values can't come from the game.
+    return hp >= 0 && mp >= 0;
 }
 
 void PartyMember::clamp_to_stats()

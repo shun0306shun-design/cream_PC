@@ -94,7 +94,7 @@ namespace
 
             const PartyMember& member = state.party.members[index];
             Stats stats = member.stats();
-            Window window(ui, sub_col, 0, sub_cols, Window::rows_for_lines(5));
+            Window window(ui, sub_col, 0, sub_cols, Window::rows_for_lines(6));
             Label line;
 
             {
@@ -117,14 +117,18 @@ namespace
             {
                 line.clear();
                 bn::ostringstream stream(line);
-                stream << "EXP " << member.exp;
+                stream << "EXP " << member.exp << "   Next " << member.exp_to_next_level();
                 window.print(3, line);
             }
+
+            // Equipment: the item names, or "-" for an empty slot (same style as the equipment menu).
+            for(int slot = 0; slot < 2; ++slot)
             {
+                ItemId worn = member.equipped(slot == 0 ? ItemKind::weapon : ItemKind::armor);
                 line.clear();
                 bn::ostringstream stream(line);
-                stream << "Next level in " << member.exp_to_next_level();
-                window.print(4, line);
+                stream << (slot == 0 ? "W: " : "A: ") << (worn == ItemId::none ? "-" : item_data(worn).name);
+                window.print(4 + slot, line);
             }
 
             ui.wait_for_a();
