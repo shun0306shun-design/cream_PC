@@ -13,6 +13,7 @@
 #include "rpg_enemies.h"
 #include "rpg_flags.h"
 #include "rpg_items.h"
+#include "rpg_story.h"
 
 namespace rpg
 {
@@ -39,6 +40,9 @@ enum class TileId : uint8_t
     cave_wall,
     stairs_up,  //!< Walkable, no battles: put a EventType::warp event on it.
     stairs_down,
+    ash,        //!< Burnt ground: walkable, no battles.
+    rubble,     //!< What is left of a burnt house: solid.
+    grave,      //!< Solid: put a EventType::sign event on it.
     count
 };
 
@@ -58,6 +62,8 @@ enum class MapId : uint8_t
     cave_1f,
     cave_2f,
     cave_3f,
+    berg,       //!< T02: post town.
+    fort,       //!< D02: ruined fort on the highway.
     count
 };
 
@@ -69,7 +75,9 @@ enum class EventType : uint8_t
     warp,       //!< Triggered by stepping on the tile: moves to `warp_map` at (warp_x, warp_y).
     chest,      //!< Gives `item` x `item_amount` and/or `gold` once; `flag` remembers that it was opened.
     shop,       //!< NPC: shows `pages` as greeting, then opens an item shop selling `stock`.
-    spring      //!< Healing spring: shows `pages`, then restores HP/MP of the living members for `price` gold.
+    spring,     //!< Healing spring: shows `pages`, then restores HP/MP of the living members for `price` gold.
+    story,      //!< Scripted scene `story` (rpg_story.h), started by pressing A in front of it (NPC or solid tile).
+    trigger     //!< Scripted scene `story`, started by stepping on the tile.
 };
 
 /// How an NPC moves (only for events with graphics, never for chests).
@@ -109,6 +117,34 @@ struct MapEvent
     // map is loaded again.
     NpcMovement movement = NpcMovement::stand;
     uint8_t wander_radius = 2;                  //!< Maximum distance from x/y, in tiles, for NpcMovement::wander.
+
+    // --- Story (see rpg_story.h) ---
+    // The event only exists while min_progress <= GameState::story_progress <= max_progress.
+    // If several events share a tile, the first one that exists wins.
+    uint8_t min_progress = 0;
+    uint8_t max_progress = 0xFF;
+    StoryId story = StoryId::none;              //!< Scene of EventType::story and EventType::trigger.
+
+    /// talk / sign: if not empty, it replaces `pages` with one set of pages per chapter, indexed by
+    /// chapter_index(story_progress). Later chapters reuse the last set.
+    bn::span<const bn::span<const bn::string_view>> chapter_pages = {};
+
+    [[nodiscard]] constexpr bool active(int story_progress) const
+    {
+        return story_progress >= min_progress && story_progress <= max_progress;
+    }
+
+    /// The pages of a talk / sign event for the given story progress.
+    [[nodiscard]] constexpr bn::span<const bn::string_view> pages_for(int story_progress) const
+    {
+        if(chapter_pages.empty())
+        {
+            return pages;
+        }
+
+        int chapter = chapter_index(story_progress);
+        return chapter_pages[chapter < chapter_pages.size() ? chapter : chapter_pages.size() - 1];
+    }
 };
 
 constexpr int max_map_tiles = 32;       //!< Maximum map width/height in tiles (a 512x512 pixels background).
@@ -143,14 +179,28 @@ struct MapData
     /**
      * Returns true if the player can stand on the given tile *in the map data*: walkable terrain and no NPC or
      * chest that stays in place there (walking NPCs are ignored). Used to check saved positions;
-     * FieldScene handles the walking ones.
+     * FieldScene handles the walking ones. Only the events that exist at `story_progress` count.
      */
-    [[nodiscard]] bool walkable(int x, int y) const;
+    [[nodiscard]] bool walkable(int x, int y, int story_progress) const;
 };
 
-[[nodiscard]] const MapData& map_data(MapId id);
+/**
+ * Returns the map as it is at the given story progress. Most maps never change, but some have several states
+ * with their own layout (the home village: peaceful / burnt). All the states of a map have the same size.
+ */
+[[nodiscard]] const MapData& map_data(MapId id, int story_progress);
 
-// Where a new game starts and where the party wakes up after being defeated.
+/// Where the party wakes up after being defeated: the last safe town the story reached.
+struct RespawnPoint
+{
+    MapId map;
+    uint8_t x;
+    uint8_t y;
+};
+
+[[nodiscard]] RespawnPoint respawn_point(int story_progress);
+
+// Where a new game starts.
 constexpr MapId start_map = MapId::village;
 constexpr int start_x = 8;
 constexpr int start_y = 16;

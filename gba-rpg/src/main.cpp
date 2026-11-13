@@ -71,13 +71,22 @@ int main()
         rpg::BattleResult result;
 
         {
-            rpg::BattleScene battle(state, ui, *encounter);
+            // Story battles (started by a scene, see rpg_story.h) can't be escaped.
+            bool story_battle = state.story_battle != rpg::StoryId::none;
+            rpg::BattleScene battle(state, ui, *encounter, ! story_battle);
             result = battle.run();
+        }
+
+        if(result != rpg::BattleResult::victory)
+        {
+            // Lost a story battle: the scene that started it can be tried again.
+            // After a victory, the next FieldScene shows what follows (rpg::run_story_victory).
+            state.story_battle = rpg::StoryId::none;
         }
 
         if(result == rpg::BattleResult::defeat)
         {
-            // Classic penalty: wake up in the village with half the gold.
+            // Classic penalty: wake up in the last safe town with half the gold.
             state.party.restore_all();
             state.party.gold /= 2;
             state.return_to_start();

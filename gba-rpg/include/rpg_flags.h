@@ -1,5 +1,6 @@
 /*
- * Event flags: persistent yes/no facts about the game world ("this chest was opened", "boss defeated"...).
+ * Event flags: persistent yes/no facts about the game world ("this chest was opened", an optional event...).
+ * The main story does NOT use flags: it is one number, GameState::story_progress (see rpg_story.h).
  *
  * To add a flag: add a name to FlagId and use it from map data (MapEvent::flag) or from code.
  * Flags live in GameState and are saved with the game. Never reorder or remove existing ids once
@@ -25,6 +26,7 @@ enum class FlagId : uint8_t
     chest_cave_1f,
     chest_cave_2f,
     chest_cave_3f,
+    chest_fort,
     // Add new flags here.
     count,
     none = 0xFF         //!< "No flag": the default of MapEvent::flag.

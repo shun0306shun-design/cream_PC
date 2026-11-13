@@ -31,7 +31,7 @@ namespace
         Label labels[max_party_size];
         bn::string_view options[max_party_size];
 
-        for(int index = 0; index < max_party_size; ++index)
+        for(int index = 0; index < party.size; ++index)
         {
             const PartyMember& member = party.members[index];
             bn::ostringstream stream(labels[index]);
@@ -39,7 +39,7 @@ namespace
             options[index] = labels[index];
         }
 
-        Menu menu(ui, sub_col, 0, sub_cols, options);
+        Menu menu(ui, sub_col, 0, sub_cols, bn::span<const bn::string_view>(options, party.size));
         return menu.run();
     }
 
@@ -56,7 +56,7 @@ namespace
 
         if(effect.targets_all())
         {
-            for(PartyMember& member : party.members)
+            for(PartyMember& member : party.active())
             {
                 total += apply_heal(effect, member, state.random);
             }

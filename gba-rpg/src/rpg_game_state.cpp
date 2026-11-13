@@ -8,7 +8,7 @@ namespace rpg
 namespace
 {
     constexpr uint32_t save_magic = 0x47505242;     // "BRPG"
-    constexpr uint32_t save_version = 4;            // Bump it when SaveData changes: old saves are then ignored.
+    constexpr uint32_t save_version = 5;            // Bump it when SaveData changes: old saves are then ignored.
 
     /// What is stored in SRAM. Must stay trivially copyable.
     struct SaveData
@@ -21,6 +21,7 @@ namespace
         uint8_t player_x = 0;
         uint8_t player_y = 0;
         Direction facing = Direction::down;
+        uint8_t story_progress = 0;
 
         [[nodiscard]] bool valid() const
         {
@@ -30,36 +31,34 @@ namespace
             }
 
             // Garbage that happens to have the right header must not crash the game later.
-            for(const PartyMember& member : party.members)
-            {
-                if(! member.valid())
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return party.valid();
         }
     };
 
     // Any change to what is saved (a new field, a bigger array...) moves the data of existing saves.
     // If this fails: update the number below AND bump save_version, so old saves are ignored instead of misread.
     // (Adding items or flags doesn't change the size: the bag and EventFlags have fixed capacities.)
-    static_assert(sizeof(SaveData) == 120, "SaveData changed: bump save_version and update this size");
+    static_assert(sizeof(SaveData) == 128, "SaveData changed: bump save_version and update this size");
 }
 
 void GameState::init_new_game()
 {
     party.init_new_game();
     flags = EventFlags();
-    return_to_start();
+    story_progress = progress::ch1_start;
+    story_battle = StoryId::none;
+    map = start_map;
+    player_x = start_x;
+    player_y = start_y;
+    facing = Direction::down;
 }
 
 void GameState::return_to_start()
 {
-    map = start_map;
-    player_x = start_x;
-    player_y = start_y;
+    RespawnPoint point = respawn_point(story_progress);
+    map = point.map;
+    player_x = point.x;
+    player_y = point.y;
     facing = Direction::down;
 }
 
@@ -74,6 +73,7 @@ void save_game(const GameState& state)
     data.player_x = state.player_x;
     data.player_y = state.player_y;
     data.facing = state.facing;
+    data.story_progress = state.story_progress;
     bn::sram::write(data);
 }
 
@@ -93,16 +93,18 @@ bool load_game(GameState& state)
     state.player_x = data.player_x;
     state.player_y = data.player_y;
     state.facing = data.facing;
+    state.story_progress = data.story_progress;
+    state.story_battle = StoryId::none;
 
     // Equipment or class data may have changed since the save: keep HP/MP within the current maximums.
-    for(PartyMember& member : state.party.members)
+    for(PartyMember& member : state.party.active())
     {
         member.clamp_to_stats();
     }
 
     // The map data may have changed since the game was saved (a wall, an NPC or a chest can now be on that
     // tile): never start the player somewhere it can't stand. Same rule as walking and the minimap.
-    if(! map_data(state.map).walkable(state.player_x, state.player_y))
+    if(! map_data(state.map, state.story_progress).walkable(state.player_x, state.player_y, state.story_progress))
     {
         state.return_to_start();
     }

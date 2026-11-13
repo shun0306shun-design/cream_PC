@@ -189,11 +189,14 @@ int PartyMember::add_exp(int amount)
 
 void Party::init_new_game()
 {
-    // Starting party: edit here to change the line-up.
+    // The hero starts alone: the others join with the story (see Party::join() and rpg_story.cpp).
+    for(PartyMember& member : members)
+    {
+        member = PartyMember();
+    }
+
     members[0].init(ClassId::hero, 1);
-    members[1].init(ClassId::samurai, 1);
-    members[2].init(ClassId::priest, 1);
-    members[3].init(ClassId::mage, 1);
+    size = 1;
 
     for(uint8_t& item : items)
     {
@@ -206,9 +209,48 @@ void Party::init_new_game()
     gold = 50;
 }
 
+bool Party::join(ClassId class_id, int level)
+{
+    if(size >= max_party_size)
+    {
+        return false;
+    }
+
+    for(const PartyMember& member : active())
+    {
+        if(member.class_id == class_id)
+        {
+            return false;
+        }
+    }
+
+    members[size] = PartyMember();
+    members[size].init(class_id, level);
+    ++size;
+    return true;
+}
+
+bool Party::valid() const
+{
+    if(size < 1 || size > max_party_size)
+    {
+        return false;
+    }
+
+    for(const PartyMember& member : active())
+    {
+        if(! member.valid())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool Party::all_dead() const
 {
-    for(const PartyMember& member : members)
+    for(const PartyMember& member : active())
     {
         if(member.alive())
         {
@@ -221,7 +263,7 @@ bool Party::all_dead() const
 
 void Party::restore_all()
 {
-    for(PartyMember& member : members)
+    for(PartyMember& member : active())
     {
         member.restore();
     }

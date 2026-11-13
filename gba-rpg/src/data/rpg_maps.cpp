@@ -2,6 +2,8 @@
 
 #include "bn_assert.h"
 
+#include "rpg_names.h"
+
 namespace rpg
 {
 
@@ -31,6 +33,9 @@ namespace
         { '%',      false,    0 },    // cave_wall
         { 'u',      true,     0 },    // stairs_up (use it with a warp event)
         { 'd',      true,     0 },    // stairs_down (use it with a warp event)
+        { 'a',      true,     0 },    // ash
+        { 'x',      false,    0 },    // rubble
+        { '+',      false,    0 },    // grave (use it with a sign event)
     };
 
     static_assert(sizeof(tiles) / sizeof(tiles[0]) == int(TileId::count), "Tile table doesn't match TileId");
@@ -76,7 +81,8 @@ namespace
     }
 
     // ---------------------------------------------------------------------------------------------------------------
-    // Village
+    // T01: the hero's home village. Two layouts of the same size: peaceful (before the attack, and again once the
+    // game is cleared) and burnt (from progress::ch1_ashes on). Both share the event list below.
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view village_rows[] = {
         //         1111111111222
@@ -105,14 +111,43 @@ namespace
 
     static_assert(valid_layout(village_rows), "Invalid village layout");
 
+    constexpr bn::string_view village_burnt_rows[] = {
+        "TTTTTTTTTTTTTTTTTTTTTTTT",    // 0
+        "Taaaaaaaaaaaaaaaaaaaaa.T",    // 1
+        "TaaxxxxaaaaaaaxxxxxaaaaT",    // 2
+        "TaaxxxxaaaaaaaxxxxxaaaaT",    // 3
+        "Taaxxxxaaa.aaaxxxxxaaaaT",    // 4
+        "Taaa:aaaaaaaaaaa:aaaaFaT",    // 5
+        "Taaa:::::::::::::aaaaaaT",    // 6
+        "Taaaaaaa:aaaaaaa~~~~aaaT",    // 7
+        "Taaaaaaa:a++aaa~~~~~~aaT",    // 8
+        "Taaxxxaa:aaaaaa~~~~~~aaT",    // 9
+        "Taaxxxaa:aaaaaaa~~~~aaaT",    // 10
+        "Taaxxxaa:aaSaaaaaaaaaaaT",    // 11
+        "Taaa:aaa:aaaaaaaaaaaaaaT",    // 12
+        "Taaa:::::aaaaaaaaaaxaaaT",    // 13
+        "Taaaaaaa:aaaaaaaaaxxxaaT",    // 14
+        "Taaaaaaa:aaaaaaaaaaxaaaT",    // 15
+        "Taaaaaaa:aaaaaaaaaaaaa.T",    // 16
+        "Taaaaaaa:aaaaa,aaaaaaaaT",    // 17
+        "Taaaaaaa:aaaaaaaaaaaaaaT",    // 18
+        "TTTTTTTT>TTTTTTTTTTTTTTT",    // 19
+    };
+
+    static_assert(valid_layout(village_burnt_rows), "Invalid burnt village layout");
+
     constexpr bn::string_view villager_pages[] = {
-        "Welcome to Start Village!",
+        "Welcome to " RPG_NAME_VILLAGE " Village!",
         "Monsters roam the fields\noutside the south gate.\nBe careful out there.",
-        "They say there is a cave in\nthe rocks of the fields.\nTreasure sleeps down there.",
+        "The old Watch Cave lies in\nthe rocks to the south.\nNobody goes there anymore.",
     };
 
     constexpr bn::string_view elder_pages[] = {
         "Press START to open the menu.\nYou can check your party,\nuse items and save there.",
+    };
+
+    constexpr bn::string_view mother_pages[] = {
+        "Mother: Good morning,\n" RPG_NAME_HERO ". Your father is\nby the south gate.",
     };
 
     constexpr bn::string_view innkeeper_pages[] = {
@@ -120,7 +155,7 @@ namespace
     };
 
     constexpr bn::string_view sign_pages[] = {
-        "START VILLAGE\nSouth: the fields",
+        RPG_NAME_VILLAGE " VILLAGE\nSouth: the fields",
     };
 
     constexpr bn::string_view spring_pages[] = {
@@ -131,30 +166,92 @@ namespace
         "Welcome to the item shop!",
     };
 
-    constexpr ItemId village_shop_stock[] = {
-        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
-        ItemId::oak_staff, ItemId::leather_armor, ItemId::chain_mail,
+    constexpr bn::string_view grave_pages[] = {
+        "Two fresh graves.\nFather and Mother\nrest here.",
     };
 
+    // NPC lines that change with the chapter: one set per chapter_index() (0 = chapter 1), the last one stays.
+    constexpr bn::string_view elder_ch1_pages[] = {
+        "Elder: The Watch Cave is in\nthe rocks south of here.\nBe careful, " RPG_NAME_HERO ".",
+    };
+
+    constexpr bn::string_view elder_ch2_pages[] = {
+        "Elder: The crest of the\n" RPG_NAME_CULT "... So it was\nthem. " RPG_NAME_TOWN " lies to the east.",
+    };
+
+    constexpr bn::string_view elder_ch3_pages[] = {
+        "Elder: You travel with a\nfriend now? Good. Ash is\ntoo heavy to carry alone.",
+    };
+
+    constexpr bn::span<const bn::string_view> elder_chapter_pages[] = {
+        elder_ch1_pages, elder_ch2_pages, elder_ch3_pages,
+    };
+
+    constexpr bn::string_view survivor_ch1_pages[] = {
+        "They came at dawn, with\ntorches. I hid in the well.\nI'm sorry... I'm so sorry.",
+    };
+
+    constexpr bn::string_view survivor_ch2_pages[] = {
+        "We will rebuild " RPG_NAME_VILLAGE ".\nIt won't be the same.\nBut we will.",
+    };
+
+    constexpr bn::span<const bn::string_view> survivor_chapter_pages[] = {
+        survivor_ch1_pages, survivor_ch2_pages,
+    };
+
+    constexpr ItemId village_shop_stock[] = {
+        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb, ItemId::leather_armor,
+    };
+
+    constexpr uint8_t last_peaceful = progress::ch1_ashes - 1;
+
     constexpr MapEvent village_events[] = {
+        // --- Before the attack ---
         { .type = EventType::talk, .x = 10, .y = 7, .npc_graphics = 0, .pages = villager_pages,
-          .movement = NpcMovement::wander, .wander_radius = 3 },
+          .movement = NpcMovement::wander, .wander_radius = 3, .max_progress = last_peaceful },
         { .type = EventType::talk, .x = 17, .y = 5, .npc_graphics = 1, .pages = elder_pages,
-          .movement = NpcMovement::wander, .wander_radius = 2 },
-        { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages },
+          .movement = NpcMovement::wander, .wander_radius = 2, .max_progress = last_peaceful },
+        { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages,
+          .max_progress = last_peaceful },
+        { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
+          .stock = village_shop_stock, .max_progress = last_peaceful },
+        { .type = EventType::talk, .x = 5, .y = 5, .npc_graphics = 0, .pages = mother_pages,
+          .max_progress = last_peaceful },
+        { .type = EventType::story, .x = 9, .y = 17, .npc_graphics = 1,
+          .max_progress = last_peaceful, .story = StoryId::ch1_father },
+        // Fetching the water starts the attack. It comes before the spring event of the same tile on purpose.
+        { .type = EventType::story, .x = 21, .y = 5,
+          .min_progress = progress::ch1_errand, .max_progress = progress::ch1_errand, .story = StoryId::ch1_attack },
+
+        // --- After the attack ---
+        { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch1_ashes, .story = StoryId::ch1_elder },
+        { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1,
+          .min_progress = progress::ch1_departed, .max_progress = progress::game_clear - 1,
+          .chapter_pages = elder_chapter_pages },
+        { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1,
+          .chapter_pages = survivor_chapter_pages },
+        { .type = EventType::sign, .x = 10, .y = 8, .pages = grave_pages,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1 },
+        { .type = EventType::sign, .x = 11, .y = 8, .pages = grave_pages,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1 },
+
+        // --- Always ---
         { .type = EventType::sign, .x = 11, .y = 11, .pages = sign_pages },
-        { .type = EventType::warp, .x = 8, .y = 19, .warp_map = MapId::field, .warp_x = 15, .warp_y = 11 },
+        // The gate stays closed until the elder sends the hero away.
+        { .type = EventType::trigger, .x = 8, .y = 19,
+          .max_progress = progress::ch1_departed - 1, .story = StoryId::ch1_gate },
+        { .type = EventType::warp, .x = 8, .y = 19, .warp_map = MapId::field, .warp_x = 15, .warp_y = 11,
+          .min_progress = progress::ch1_departed },
         // Chest with items (npc_graphics 3 = closed chest, 4 = open chest in graphics/npc.bmp).
         { .type = EventType::chest, .x = 11, .y = 13, .npc_graphics = 3,
           .flag = FlagId::chest_village_herbs, .item = ItemId::herb, .item_amount = 3 },
-        // Chest with a weapon.
+        // Chest with armor (the flag keeps its old name: flag ids are never renamed or reordered).
         { .type = EventType::chest, .x = 13, .y = 15, .npc_graphics = 3,
-          .flag = FlagId::chest_village_sword, .item = ItemId::bronze_sword, .item_amount = 1 },
+          .flag = FlagId::chest_village_sword, .item = ItemId::leather_armor, .item_amount = 1 },
         // Healing spring on the 'F' tile: free, but unlike the inn it can't revive fallen members.
         { .type = EventType::spring, .x = 21, .y = 5, .pages = spring_pages, .price = 0 },
-        // Item shop (npc_graphics 5 = shopkeeper).
-        { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
-          .stock = village_shop_stock },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -174,7 +271,7 @@ namespace
         "M...........:..>:.......\"\"\"\"...M",    // 10
         "M...........:.:::......\"\"\"\"\"\"..M",    // 11
         "M......,....:.:.........\"\"\"\"...M",    // 12
-        "M...........:::................M",    // 13
+        "M...........:::::::::::::::::>.M",    // 13
         "M..~~~.......:.................M",    // 14
         "M.~~~~~......:.......,.........M",    // 15
         "M..~~~.......:.................M",    // 16
@@ -191,6 +288,11 @@ namespace
 
     constexpr MapEvent field_events[] = {
         { .type = EventType::warp, .x = 15, .y = 10, .warp_map = MapId::village, .warp_x = 8, .warp_y = 18 },
+        // The road east to the post town is closed until chapter 2.
+        { .type = EventType::trigger, .x = 29, .y = 13,
+          .max_progress = progress::ch2_start - 1, .story = StoryId::ch2_road },
+        { .type = EventType::warp, .x = 29, .y = 13, .warp_map = MapId::berg, .warp_x = 1, .warp_y = 6,
+          .min_progress = progress::ch2_start },
         // Cave entrance: the gate in the rocks.
         { .type = EventType::warp, .x = 21, .y = 19, .warp_map = MapId::cave_1f, .warp_x = 9, .warp_y = 11 },
         // Chest with gold.
@@ -212,7 +314,7 @@ namespace
     };
 
     // ---------------------------------------------------------------------------------------------------------------
-    // Cave (3 floors). The stairs are warp events; the walls hold "carved" signs (events on wall tiles).
+    // D01: the Watch Cave (3 floors). The stairs are warp events; the walls hold "carved" signs (events on wall tiles).
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view cave_1f_rows[] = {
         "%%%%%%%%%%%%%%%%%%%%",    // 0
@@ -272,7 +374,7 @@ namespace
     static_assert(valid_layout(cave_3f_rows), "Invalid cave_3f layout");
 
     constexpr bn::string_view cave_1f_sign_pages[] = {
-        "Carved into the wall:\n\"Turn back now, or seek\nthe treasure below.\"",
+        "Carved into the wall:\n\"Watchmen of " RPG_NAME_VILLAGE ",\nkeep the fire burning.\"",
     };
 
     constexpr bn::string_view cave_3f_sign_pages[] = {
@@ -297,6 +399,10 @@ namespace
     constexpr MapEvent cave_3f_events[] = {
         { .type = EventType::warp, .x = 2, .y = 12, .warp_map = MapId::cave_2f, .warp_x = 16, .warp_y = 11 },
         { .type = EventType::sign, .x = 10, .y = 6, .pages = cave_3f_sign_pages },
+        // The cult scout (npc_graphics 7) blocks the corridor to the treasure room during chapter 1.
+        { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 7,
+          .min_progress = progress::ch1_departed, .max_progress = progress::ch2_start - 1,
+          .story = StoryId::ch1_scout },
         { .type = EventType::chest, .x = 12, .y = 1, .npc_graphics = 3,
           .flag = FlagId::chest_cave_3f, .item = ItemId::steel_sword, .item_amount = 1 },
     };
@@ -325,11 +431,128 @@ namespace
     };
 
     // ---------------------------------------------------------------------------------------------------------------
+    // T02: post town. First real shop and inn; where the partner is met in chapter 2.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view berg_rows[] = {
+        "TTTTTTTTTTTTTTTTTTTTTT",    // 0
+        "T....................T",    // 1
+        "T..^^^^.....^^^^^....T",    // 2
+        "T..####.....#####....T",    // 3
+        "T..#D##.....##D##....T",    // 4
+        "T...:.........:...S..T",    // 5
+        ">::::::::::::::::::::>",    // 6
+        "T.........:..........T",    // 7
+        "T..,......:....^^^...T",    // 8
+        "T.........:....###...T",    // 9
+        "T....F....:....#D#...T",    // 10
+        "T.........:.....:....T",    // 11
+        "T.........:::::::....T",    // 12
+        "TTTTTTTTTTTTTTTTTTTTTT",    // 13
+    };
+
+    static_assert(valid_layout(berg_rows), "Invalid berg layout");
+
+    constexpr bn::string_view berg_sign_pages[] = {
+        RPG_NAME_TOWN " - POST TOWN\nWest: the fields\nEast: the old highway fort",
+    };
+
+    constexpr bn::string_view berg_shop_pages[] = {
+        "Welcome! Travelers get\nthe best prices in " RPG_NAME_TOWN ".",
+    };
+
+    constexpr ItemId berg_shop_stock[] = {
+        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
+        ItemId::bronze_sword, ItemId::steel_sword, ItemId::iron_spear, ItemId::leather_armor, ItemId::chain_mail,
+    };
+
+    constexpr bn::string_view berg_townsman_ch1_pages[] = {
+        "This is " RPG_NAME_TOWN ", where the\nhighways meet.",
+    };
+
+    constexpr bn::string_view berg_townsman_ch2_pages[] = {
+        "Men in ash-gray armor took\nthe old fort to the east.\nTheir general is a monster.",
+        "A bounty hunter with a\nspear was asking about\nhim, too.",
+    };
+
+    constexpr bn::string_view berg_townsman_ch3_pages[] = {
+        "The fort is quiet again.\nWas that your doing?\n" RPG_NAME_TOWN " owes you a drink.",
+    };
+
+    constexpr bn::span<const bn::string_view> berg_townsman_chapter_pages[] = {
+        berg_townsman_ch1_pages, berg_townsman_ch2_pages, berg_townsman_ch3_pages,
+    };
+
+    constexpr MapEvent berg_events[] = {
+        { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::field, .warp_x = 28, .warp_y = 13 },
+        // The highway opens once the partner has said where the general is.
+        { .type = EventType::trigger, .x = 21, .y = 6,
+          .max_progress = progress::ch2_rivals - 1, .story = StoryId::ch2_east_gate },
+        { .type = EventType::warp, .x = 21, .y = 6, .warp_map = MapId::fort, .warp_x = 8, .warp_y = 11,
+          .min_progress = progress::ch2_rivals },
+        { .type = EventType::inn, .x = 5, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 15, .y = 5, .npc_graphics = 5, .pages = berg_shop_pages,
+          .stock = berg_shop_stock },
+        { .type = EventType::sign, .x = 18, .y = 5, .pages = berg_sign_pages },
+        { .type = EventType::spring, .x = 5, .y = 10, .pages = spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 7, .y = 9, .npc_graphics = 0,
+          .movement = NpcMovement::wander, .wander_radius = 2, .chapter_pages = berg_townsman_chapter_pages },
+        // The partner (npc_graphics 6) waits here until the quarrel.
+        { .type = EventType::story, .x = 13, .y = 8, .npc_graphics = 6,
+          .min_progress = progress::ch2_start, .max_progress = progress::ch2_start,
+          .story = StoryId::ch2_partner_town },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D02: ruined fort on the highway. The general (npc_graphics 8) holds the north-east hall.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view fort_rows[] = {
+        "####################",    // 0
+        "#______#####_______#",    // 1
+        "#______#####_______#",    // 2
+        "#__##______________#",    // 3
+        "#__##__#####_##____#",    // 4
+        "#______#####_##____#",    // 5
+        "###_####___####_####",    // 6
+        "###_####___####_####",    // 7
+        "#_______________####",    // 8
+        "#__##_______##__####",    // 9
+        "#__##_______##__####",    // 10
+        "#_______________####",    // 11
+        "########>###########",    // 12
+        "####################",    // 13
+    };
+
+    static_assert(valid_layout(fort_rows), "Invalid fort layout");
+
+    constexpr bn::string_view fort_sign_pages[] = {
+        "A banner hangs here:\na crown wreathed in ash.",
+    };
+
+    constexpr MapEvent fort_events[] = {
+        { .type = EventType::warp, .x = 8, .y = 12, .warp_map = MapId::berg, .warp_x = 20, .warp_y = 6 },
+        { .type = EventType::sign, .x = 9, .y = 5, .pages = fort_sign_pages },
+        { .type = EventType::chest, .x = 8, .y = 6, .npc_graphics = 3,
+          .flag = FlagId::chest_fort, .item = ItemId::herb, .item_amount = 3 },
+        // Talking to either of them starts the scene. Both leave when chapter 2 ends.
+        { .type = EventType::story, .x = 16, .y = 2, .npc_graphics = 6,
+          .min_progress = progress::ch2_rivals, .max_progress = progress::ch2_rivals, .story = StoryId::ch2_fort },
+        { .type = EventType::story, .x = 17, .y = 1, .npc_graphics = 8,
+          .min_progress = progress::ch2_rivals, .max_progress = progress::ch2_allied, .story = StoryId::ch2_fort },
+    };
+
+    constexpr EncounterGroup fort_encounters[] = {
+        { { EnemyId::cult_soldier }, 1 },
+        { { EnemyId::skeleton }, 1 },
+        { { EnemyId::cult_soldier, EnemyId::goblin }, 2 },
+        { { EnemyId::skeleton, EnemyId::bat }, 2 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
     // Map table. The order must match MapId.
     // ---------------------------------------------------------------------------------------------------------------
     constexpr MapData maps[] = {
         {
-            .name = "Start Village",
+            .name = RPG_NAME_VILLAGE " Village",
             .rows = village_rows,
             .events = village_events,
             .border = TileId::tree,
@@ -343,7 +566,7 @@ namespace
             .border = TileId::rock,
         },
         {
-            .name = "Cave 1F",
+            .name = "Watch Cave 1F",
             .rows = cave_1f_rows,
             .events = cave_1f_events,
             .encounters = cave_1f_encounters,
@@ -351,7 +574,7 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Cave 2F",
+            .name = "Watch Cave 2F",
             .rows = cave_2f_rows,
             .events = cave_2f_events,
             .encounters = cave_2f_encounters,
@@ -359,16 +582,60 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Cave 3F",
+            .name = "Watch Cave 3F",
             .rows = cave_3f_rows,
             .events = cave_3f_events,
             .encounters = cave_3f_encounters,
             .encounter_rate = 16,
             .border = TileId::cave_wall,
         },
+        {
+            .name = RPG_NAME_TOWN,
+            .rows = berg_rows,
+            .events = berg_events,
+            .border = TileId::tree,
+        },
+        {
+            .name = "Ruined Fort",
+            .rows = fort_rows,
+            .events = fort_events,
+            .encounters = fort_encounters,
+            .encounter_rate = 12,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Map states: a different layout of a map while the story progress is in a range. Outside of every range, the
+    // map of the table above is used (so the village looks peaceful again after game_clear: the "rebuilt" state).
+    // ---------------------------------------------------------------------------------------------------------------
+    struct MapState
+    {
+        MapId id;
+        uint8_t min_progress;
+        uint8_t max_progress;
+        MapData data;
+    };
+
+    constexpr MapState map_states[] = {
+        {
+            MapId::village, progress::ch1_ashes, progress::game_clear - 1,
+            {
+                .name = RPG_NAME_VILLAGE " Ruins",
+                .rows = village_burnt_rows,
+                .events = village_events,
+                .border = TileId::tree,
+            },
+        },
+    };
+
+    // Where the party wakes up after a defeat, by chapter_index(). Later chapters use the last one.
+    constexpr RespawnPoint respawn_points[] = {
+        { start_map, start_x, start_y },    // Chapter 1: home.
+        { MapId::berg, 4, 6 },              // Chapter 2 on: in front of the inn of the post town.
+    };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)
     {
@@ -381,12 +648,53 @@ namespace
     }
 
     /// Compile time check of the events: a typo in a coordinate becomes a build error instead of a stuck player.
-    [[nodiscard]] constexpr bool valid_events()
+    [[nodiscard]] constexpr bool walkable_in_every_state(MapId id, int x, int y)
     {
-        for(const MapData& map : maps)
+        if(! walkable_tile(maps[int(id)].rows, x, y))
+        {
+            return false;
+        }
+
+        for(const MapState& state : map_states)
+        {
+            if(state.id == id && ! walkable_tile(state.data.rows, x, y))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// Checks the events of one layout that can exist while the story progress is in [min_progress, max_progress].
+    [[nodiscard]] constexpr bool valid_events(const MapData& map, int min_progress, int max_progress)
+    {
         {
             for(const MapEvent& event : map.events)
             {
+                if(event.min_progress > event.max_progress)
+                {
+                    return false;
+                }
+
+                if(event.max_progress < min_progress || event.min_progress > max_progress)
+                {
+                    continue;       // Never seen in this layout.
+                }
+
+                // Scenes need a script, and only scenes have one.
+                bool scripted = event.type == EventType::story || event.type == EventType::trigger;
+
+                if(scripted != (event.story != StoryId::none))
+                {
+                    return false;
+                }
+
+                if(event.type == EventType::trigger && ! walkable_tile(map.rows, event.x, event.y))
+                {
+                    return false;
+                }
+
                 // NPCs and chests stand on walkable tiles (signs and springs are on solid ones, on purpose).
                 if(event.npc_graphics >= 0 && ! walkable_tile(map.rows, event.x, event.y))
                 {
@@ -403,7 +711,7 @@ namespace
                 {
                     // You must be able to step on it, and to stand where it takes you.
                     if(! walkable_tile(map.rows, event.x, event.y) ||
-                       ! walkable_tile(maps[int(event.warp_map)].rows, event.warp_x, event.warp_y))
+                       ! walkable_in_every_state(event.warp_map, event.warp_x, event.warp_y))
                     {
                         return false;
                     }
@@ -414,7 +722,38 @@ namespace
         return true;
     }
 
-    static_assert(valid_events(), "An event is on a solid tile, or a warp leads to a solid tile");
+    [[nodiscard]] constexpr bool valid_events()
+    {
+        for(const MapData& map : maps)
+        {
+            if(! valid_events(map, 0, 0xFF))
+            {
+                return false;
+            }
+        }
+
+        for(const MapState& state : map_states)
+        {
+            // All the states of a map are interchangeable: same size.
+            if(state.data.width() != maps[int(state.id)].width() || state.data.height() != maps[int(state.id)].height() ||
+               ! valid_events(state.data, state.min_progress, state.max_progress))
+            {
+                return false;
+            }
+        }
+
+        for(const RespawnPoint& point : respawn_points)
+        {
+            if(! walkable_in_every_state(point.map, point.x, point.y))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static_assert(valid_events(), "An event is on a solid tile, a warp leads to a solid tile or a scene has no script");
 }
 
 const TileInfo& tile_info(TileId id)
@@ -439,7 +778,7 @@ bool MapData::terrain_walkable(int x, int y) const
     return x >= 0 && y >= 0 && x < width() && y < height() && tile_info(tile(x, y)).walkable;
 }
 
-bool MapData::walkable(int x, int y) const
+bool MapData::walkable(int x, int y, int story_progress) const
 {
     if(! terrain_walkable(x, y))
     {
@@ -450,7 +789,8 @@ bool MapData::walkable(int x, int y) const
     // their start tile, and FieldScene moves them away if the player is on it when the map is loaded.
     for(const MapEvent& event : events)
     {
-        if(event.x == x && event.y == y && event.npc_graphics >= 0 && event.movement == NpcMovement::stand)
+        if(event.x == x && event.y == y && event.npc_graphics >= 0 && event.movement == NpcMovement::stand &&
+           event.active(story_progress))
         {
             return false;
         }
@@ -459,11 +799,26 @@ bool MapData::walkable(int x, int y) const
     return true;
 }
 
-const MapData& map_data(MapId id)
+const MapData& map_data(MapId id, int story_progress)
 {
     BN_ASSERT(id < MapId::count, "Invalid map id: ", int(id));
 
+    for(const MapState& state : map_states)
+    {
+        if(state.id == id && story_progress >= state.min_progress && story_progress <= state.max_progress)
+        {
+            return state.data;
+        }
+    }
+
     return maps[int(id)];
+}
+
+RespawnPoint respawn_point(int story_progress)
+{
+    int count = sizeof(respawn_points) / sizeof(respawn_points[0]);
+    int chapter = chapter_index(story_progress);
+    return respawn_points[chapter < count ? chapter : count - 1];
 }
 
 }

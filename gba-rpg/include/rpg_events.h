@@ -37,8 +37,8 @@ constexpr int yes_no_row = screen_rows - MessageBox::box_rows - yes_no_rows;
  */
 [[nodiscard]] bool ask_yes_no(Ui& ui);
 
-/// EventType::talk and EventType::sign: shows the pages.
-void run_talk(Ui& ui, const MapEvent& event);
+/// EventType::talk and EventType::sign: shows the pages (the ones of the current chapter, if it has them).
+void run_talk(const GameState& state, Ui& ui, const MapEvent& event);
 
 /// EventType::inn: asks, charges and fully restores the party (it also revives fallen members).
 void run_inn(GameState& state, Ui& ui, const MapEvent& event);

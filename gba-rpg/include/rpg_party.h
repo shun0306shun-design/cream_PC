@@ -6,6 +6,7 @@
 #ifndef RPG_PARTY_H
 #define RPG_PARTY_H
 
+#include "bn_span.h"
 #include "bn_vector.h"
 
 #include "rpg_classes.h"
@@ -81,11 +82,29 @@ enum class EquipResult : uint8_t
 
 struct Party
 {
-    PartyMember members[max_party_size];
+    PartyMember members[max_party_size];    //!< Only the first `size` are in the party.
+    uint8_t size = 1;                       //!< Members in the party (1..max_party_size). They join with the story.
     uint8_t items[max_items] = {};      //!< Amount owned of each item, indexed by ItemId (the rest is unused).
     int32_t gold = 0;
 
     void init_new_game();
+
+    /// The members that are in the party.
+    [[nodiscard]] bn::span<PartyMember> active()
+    {
+        return bn::span<PartyMember>(members, size);
+    }
+
+    [[nodiscard]] bn::span<const PartyMember> active() const
+    {
+        return bn::span<const PartyMember>(members, size);
+    }
+
+    /// Adds a member with full HP/MP. Returns false if the party is full or that class is already in it.
+    bool join(ClassId class_id, int level);
+
+    /// Checks that the data (for example loaded from a save) can't make the game crash.
+    [[nodiscard]] bool valid() const;
 
     [[nodiscard]] bool all_dead() const;
 

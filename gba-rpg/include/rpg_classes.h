@@ -1,5 +1,6 @@
 /*
- * Character class database (hero, samurai, priest, mage).
+ * Character class database (hero, samurai, priest, mage, lancer).
+ * Story characters are classes too: the hero class is the hero, the lancer is the partner (names in rpg_names.h).
  *
  * Stats are never stored per character: they are always computed from class + level,
  * so rebalancing only needs a table edit and save files stay tiny.
@@ -21,6 +22,7 @@ enum class ClassId : uint8_t
     samurai,
     priest,
     mage,
+    lancer,     //!< The partner: fast spear fighter.
     count
 };
 

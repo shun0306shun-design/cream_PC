@@ -128,7 +128,7 @@ namespace
 FieldScene::FieldScene(GameState& state, Ui& ui) :
     _state(state),
     _ui(ui),
-    _map(&map_data(state.map)),
+    _map(&map_data(state.map, state.story_progress)),
     _camera(bn::camera_ptr::create(0, 0)),
     _map_item(field_cells[0], bn::size(bg_cells, bg_cells)),
     _bg(create_bg(*_map, _map_item)),
@@ -147,6 +147,33 @@ FieldScene::FieldScene(GameState& state, Ui& ui) :
 const EncounterGroup& FieldScene::run()
 {
     _ui.fade_in();
+
+    // Story scenes that don't wait for the player: what follows a boss battle that was just won,
+    // and the opening of a new game.
+    StoryId start_story = StoryId::none;
+
+    if(_state.story_battle != StoryId::none)
+    {
+        StoryId won = _state.story_battle;
+        uint8_t old_progress = _state.story_progress;
+        _state.story_battle = StoryId::none;
+        run_story_victory(won, _state, _ui);
+
+        if(_state.story_progress != old_progress)
+        {
+            _spawn_npcs();      // The boss is gone, allies may have appeared...
+        }
+    }
+    else if(_state.story_progress == progress::ch1_start)
+    {
+        start_story = StoryId::ch1_opening;
+    }
+
+    if(const EncounterGroup* encounter = _run_story(start_story))
+    {
+        _ui.fade_out();
+        return *encounter;
+    }
 
     while(true)
     {
@@ -173,7 +200,12 @@ const EncounterGroup& FieldScene::run()
         }
         else if(bn::keypad::a_pressed())
         {
-            _interact();
+            if(const EncounterGroup* encounter = _interact())
+            {
+                _update_view();
+                _ui.fade_out();
+                return *encounter;
+            }
         }
         else if(bn::keypad::start_pressed())
         {
@@ -197,17 +229,32 @@ const EncounterGroup& FieldScene::run()
 
 void FieldScene::_load_map()
 {
-    _map = &map_data(_state.map);
+    _map = &map_data(_state.map, _state.story_progress);
 
     fill_cells(*_map, _map_item);
     _bg_map.reload_cells_ref();
 
-    // One sprite per event with graphics.
+    _pixel_x = _state.player_x * tile_size;
+    _pixel_y = _state.player_y * tile_size;
+    _move_frames = 0;
+    _update_view();
+    _spawn_npcs();
+
+    // Called at scene start and after every warp, since both go through here.
+    _show_map_name();
+}
+
+void FieldScene::_spawn_npcs()
+{
+    int story_progress = _state.story_progress;
+
+    // One sprite per event with graphics (only the events that exist at this point of the story).
+    _walkers.clear();
     _npcs.clear();
 
     for(const MapEvent& event : _map->events)
     {
-        if(event.npc_graphics >= 0)
+        if(event.npc_graphics >= 0 && event.active(story_progress))
         {
             BN_ASSERT(! _npcs.full(), "Too many NPCs in map: ", _map->name);
 
@@ -229,12 +276,11 @@ void FieldScene::_load_map()
     }
 
     // Walking NPCs start at the place given in the map data (their position isn't saved).
-    _walkers.clear();
     int sprite_index = 0;
 
     for(const MapEvent& event : _map->events)
     {
-        if(event.npc_graphics >= 0)
+        if(event.npc_graphics >= 0 && event.active(story_progress))
         {
             if(event.movement != NpcMovement::stand)
             {
@@ -260,13 +306,6 @@ void FieldScene::_load_map()
         }
     }
 
-    _pixel_x = _state.player_x * tile_size;
-    _pixel_y = _state.player_y * tile_size;
-    _move_frames = 0;
-    _update_view();
-
-    // Called at scene start and after every warp, since both go through here.
-    _show_map_name();
     _minimap_dirty = true;
 }
 
@@ -377,7 +416,8 @@ bool FieldScene::_can_walk(int tile_x, int tile_y) const
     // NPCs and chests that stay in place are solid. The ones that walk are handled by _walker_blocks().
     for(const MapEvent& event : _map->events)
     {
-        if(event.npc_graphics >= 0 && event.movement == NpcMovement::stand && event.x == tile_x && event.y == tile_y)
+        if(event.npc_graphics >= 0 && event.movement == NpcMovement::stand && event.x == tile_x &&
+           event.y == tile_y && event.active(_state.story_progress))
         {
             return false;
         }
@@ -390,6 +430,11 @@ const MapEvent* FieldScene::_event_at(int tile_x, int tile_y) const
 {
     for(const MapEvent& event : _map->events)
     {
+        if(! event.active(_state.story_progress))
+        {
+            continue;       // It doesn't exist at this point of the story.
+        }
+
         // A walking NPC is where it is now, not where the map data says it started.
         int event_x = event.x;
         int event_y = event.y;
@@ -587,7 +632,7 @@ void FieldScene::_handle_movement_input()
     }
 }
 
-void FieldScene::_interact()
+const EncounterGroup* FieldScene::_interact()
 {
     int target_x = _state.player_x + direction_dx[int(_state.facing)];
     int target_y = _state.player_y + direction_dy[int(_state.facing)];
@@ -595,7 +640,7 @@ void FieldScene::_interact()
 
     if(! event)
     {
-        return;
+        return nullptr;
     }
 
     // To add a new kind of event (shop, chest, cutscene...): add an EventType and handle it here.
@@ -604,7 +649,7 @@ void FieldScene::_interact()
 
     case EventType::talk:
     case EventType::sign:
-        run_talk(_ui, *event);
+        run_talk(_state, _ui, *event);
         break;
 
     case EventType::inn:
@@ -630,10 +675,58 @@ void FieldScene::_interact()
         _show_hud();
         break;
 
+    case EventType::story:
+        return _run_story(event->story);
+
     case EventType::warp:
+    case EventType::trigger:
     default:
-        break;      // Warps are triggered by stepping on them, see _on_step().
+        break;      // Warps and triggers are started by stepping on them, see _on_step().
     }
+
+    return nullptr;
+}
+
+const EncounterGroup* FieldScene::_run_story(StoryId id)
+{
+    while(id != StoryId::none)
+    {
+        uint8_t old_progress = _state.story_progress;
+        StoryResult result = run_story(id, _state, _ui);
+
+        if(result.step_back)
+        {
+            // A closed way: back to the tile the player came from, without turning around.
+            _state.player_x = uint8_t(_state.player_x - direction_dx[int(_state.facing)]);
+            _state.player_y = uint8_t(_state.player_y - direction_dy[int(_state.facing)]);
+            _pixel_x = _state.player_x * tile_size;
+            _pixel_y = _state.player_y * tile_size;
+            _minimap_dirty = true;
+        }
+
+        if(result.reload_map)
+        {
+            // The scene faded the screen out: the map state and the player position may have changed.
+            _load_map();
+            _update_minimap();
+            _ui.update();
+            _ui.fade_in();
+        }
+        else if(_state.story_progress != old_progress)
+        {
+            _spawn_npcs();      // People come and go with the story.
+        }
+
+        if(result.battle)
+        {
+            _state.story_battle = id;
+            return result.battle;
+        }
+
+        id = result.next;
+    }
+
+    return nullptr;
 }
 
 int FieldScene::_npc_sprite_index(const MapEvent& event) const
@@ -648,7 +741,7 @@ int FieldScene::_npc_sprite_index(const MapEvent& event) const
             return index;
         }
 
-        if(other.npc_graphics >= 0)
+        if(other.npc_graphics >= 0 && other.active(_state.story_progress))
         {
             ++index;
         }
@@ -678,6 +771,11 @@ const EncounterGroup* FieldScene::_on_step()
     {
         _warp(*event);
         return nullptr;
+    }
+
+    if(event && event->type == EventType::trigger)
+    {
+        return _run_story(event->story);
     }
 
     // Random encounter roll.

@@ -24,10 +24,10 @@ bool ask_yes_no(Ui& ui)
     return menu.run() == 0;
 }
 
-void run_talk(Ui& ui, const MapEvent& event)
+void run_talk(const GameState& state, Ui& ui, const MapEvent& event)
 {
     MessageBox box(ui);
-    box.say_pages(event.pages);
+    box.say_pages(event.pages_for(state.story_progress));
 }
 
 void run_inn(GameState& state, Ui& ui, const MapEvent& event)
@@ -69,7 +69,7 @@ void use_spring(GameState& state, Ui& ui, const MapEvent& event)
     bool needs_healing = false;
     bool has_fallen = false;
 
-    for(const PartyMember& member : party.members)
+    for(const PartyMember& member : party.active())
     {
         if(! member.alive())
         {
@@ -113,7 +113,7 @@ void use_spring(GameState& state, Ui& ui, const MapEvent& event)
     party.gold -= event.price;
     ui.fade_out();
 
-    for(PartyMember& member : party.members)
+    for(PartyMember& member : party.active())
     {
         if(member.alive())
         {

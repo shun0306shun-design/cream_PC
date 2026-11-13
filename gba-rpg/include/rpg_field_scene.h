@@ -69,6 +69,9 @@ private:
     int _minimap_y = -1;
 
     void _load_map();
+
+    /// (Re)creates the NPC sprites and walkers of the events that exist at the current story progress.
+    void _spawn_npcs();
     void _update_view();
 
     void _update_walkers();
@@ -91,7 +94,11 @@ private:
     [[nodiscard]] const MapEvent* _event_at(int tile_x, int tile_y) const;
 
     void _handle_movement_input();
-    void _interact();
+    /// Returns the story battle to fight, if the event started one.
+    [[nodiscard]] const EncounterGroup* _interact();
+
+    /// Runs a scripted scene and applies its result. Returns the boss battle to fight, if any.
+    [[nodiscard]] const EncounterGroup* _run_story(StoryId id);
 
     /// Index in _npcs of the sprite of an event with graphics.
     [[nodiscard]] int _npc_sprite_index(const MapEvent& event) const;

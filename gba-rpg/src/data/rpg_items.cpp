@@ -24,8 +24,9 @@ namespace
         { "Katana",           {},     120,   ItemKind::weapon, class_bit(ClassId::samurai),                              { 0, 0, 9,  0,  1 } },
         { "Oak Staff",        {},     40,    ItemKind::weapon, class_bit(ClassId::priest) | class_bit(ClassId::mage),    { 0, 0, 3,  0,  0 } },
         { "Leather Armor",    {},     40,    ItemKind::armor,  all_classes,                                              { 0, 0, 0,  4,  0 } },
-        { "Chain Mail",       {},     100,   ItemKind::armor,  class_bit(ClassId::hero) | class_bit(ClassId::samurai),   { 0, 0, 0,  8,  0 } },
+        { "Chain Mail",       {},     100,   ItemKind::armor,  class_bit(ClassId::hero) | class_bit(ClassId::samurai) | class_bit(ClassId::lancer), { 0, 0, 0, 8, 0 } },
         { "Steel Sword",      {},     150,   ItemKind::weapon, class_bit(ClassId::hero) | class_bit(ClassId::samurai),   { 0, 0, 8,  0,  0 } },
+        { "Iron Spear",       {},     110,   ItemKind::weapon, class_bit(ClassId::lancer),                               { 0, 0, 6,  0,  2 } },
     };
 
     static_assert(sizeof(items) / sizeof(items[0]) == item_count, "Item table doesn't match ItemId");

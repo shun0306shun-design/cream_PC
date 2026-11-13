@@ -22,6 +22,9 @@ enum class EnemyId : uint8_t
     bat,
     goblin,
     skeleton,
+    cult_soldier,
+    cult_scout,     //!< Boss of chapter 1.
+    drake,          //!< Boss of chapter 2 (Ash General).
     count
 };
 

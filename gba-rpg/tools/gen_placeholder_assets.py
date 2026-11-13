@@ -330,10 +330,48 @@ def tile_stairs_up():
     return c
 
 
+def tile_ash():
+    c = canvas(16, 16, 10)
+    for y in range(16):
+        for x in range(16):
+            n = noise(x, y, 21)
+            if n < 70:
+                c[y][x] = 1
+            elif n > 225:
+                c[y][x] = 11
+            elif n > 215:
+                c[y][x] = 14            # embers
+    return c
+
+
+def tile_rubble():
+    c = tile_ash()
+    rect(c, 1, 9, 14, 15, 1)                # collapsed wall
+    rect(c, 2, 10, 6, 14, 5)
+    rect(c, 8, 11, 13, 14, 10)
+    rect(c, 3, 2, 4, 9, 1)                  # charred beams
+    rect(c, 10, 4, 11, 10, 1)
+    rect(c, 3, 2, 4, 3, 13)                 # still glowing
+    c[4][10] = c[4][11] = 13
+    return c
+
+
+def tile_grave():
+    c = tile_ash()
+    rect(c, 7, 2, 8, 13, 5)                 # wooden cross
+    rect(c, 4, 5, 11, 6, 5)
+    rect(c, 3, 13, 12, 15, 1)               # fresh mound
+    rect(c, 4, 13, 11, 14, 5)
+    c[13][6] = 12                           # a flower
+    c[13][7] = 15
+    return c
+
+
 FIELD_TILES = [
     tile_void, tile_grass, tile_path, tile_tree, tile_water, tile_wall, tile_roof,
     tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate, tile_spring,
     tile_cave_floor, tile_cave_wall, tile_stairs_up, tile_stairs_down,
+    tile_ash, tile_rubble, tile_grave,
 ]
 
 
@@ -511,6 +549,9 @@ def gen_npcs():
         chest(False),                                   # 3 closed chest
         chest(True),                                    # 4 open chest
         person('down', 0, hair=5, tunic=13, trim=9),    # 5 shopkeeper
+        person('down', 0, hair=12, tunic=4, trim=14),   # 6 the partner (spearman)
+        person('down', 0, hair=11, tunic=11, trim=7),   # 7 cultist
+        person('down', 0, hair=7, tunic=7, trim=6),     # 8 Ash General
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
@@ -609,6 +650,49 @@ def gen_skeleton():
     write_json('enemy_skeleton.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
 
 
+def gen_cult():
+    # Cultist: a hooded figure in ash-gray with a torch. Used by the soldiers and by the scout.
+    c = canvas(32, 32)
+    triangle(c, (16, 2), (6, 30), (26, 30), 11)     # robe
+    rect(c, 8, 26, 24, 30, 11)
+    ellipse(c, 16, 9, 6, 6, 11)                     # hood
+    ellipse(c, 16, 10, 4, 4, 1)                     # shadowed face
+    rect(c, 13, 9, 14, 10, 7)                       # red eyes
+    rect(c, 18, 9, 19, 10, 7)
+    rect(c, 14, 17, 18, 18, 10)                     # crest: a crown...
+    c[16][14] = c[16][16] = c[16][18] = 10
+    rect(c, 13, 20, 19, 20, 7)                      # ...wreathed in ash
+    rect(c, 26, 10, 27, 26, 5)                      # torch
+    triangle(c, (26, 3), (23, 10), (30, 10), 13)
+    triangle(c, (26, 6), (25, 10), (28, 10), 6)
+    outline(c)
+    write_bmp('enemy_cultist.bmp', c, SPRITE_PALETTE)
+    write_json('enemy_cultist.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
+
+    # Ash General: red plate armor, horned helmet, flaming greatsword.
+    c = canvas(32, 32)
+    rect(c, 9, 12, 22, 25, 7)                       # torso
+    rect(c, 9, 18, 22, 19, 6)                       # belt
+    rect(c, 5, 12, 8, 22, 7)                        # arms
+    rect(c, 23, 12, 26, 22, 7)
+    rect(c, 4, 10, 9, 13, 11)                       # pauldrons
+    rect(c, 22, 10, 27, 13, 11)
+    rect(c, 10, 26, 14, 31, 11)                     # legs
+    rect(c, 17, 26, 21, 31, 11)
+    ellipse(c, 15.5, 7, 5, 5, 11)                   # helmet
+    triangle(c, (11, 5), (6, 0), (12, 8), 9)        # horns
+    triangle(c, (20, 5), (25, 0), (19, 8), 9)
+    rect(c, 12, 7, 19, 8, 1)                        # visor
+    rect(c, 13, 7, 14, 7, 13)
+    rect(c, 17, 7, 18, 7, 13)
+    rect(c, 28, 2, 29, 24, 13)                      # flaming blade
+    rect(c, 29, 4, 30, 20, 6)
+    rect(c, 26, 22, 31, 23, 10)                     # hilt
+    outline(c)
+    write_bmp('enemy_drake.bmp', c, SPRITE_PALETTE)
+    write_json('enemy_drake.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
+
+
 if __name__ == '__main__':
     os.makedirs(OUT_DIR, exist_ok=True)
     gen_field()
@@ -618,4 +702,5 @@ if __name__ == '__main__':
     gen_cursor()
     gen_enemies()
     gen_skeleton()
+    gen_cult()
     print('Placeholder assets written to', os.path.normpath(OUT_DIR))

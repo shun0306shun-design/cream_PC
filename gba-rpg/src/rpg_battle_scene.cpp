@@ -28,11 +28,12 @@ namespace
     constexpr int enemy_y = (((status_rows + bottom_row) * 8) / 2) - (screen_height / 2);
 }
 
-BattleScene::BattleScene(GameState& state, Ui& ui, const EncounterGroup& group) :
+BattleScene::BattleScene(GameState& state, Ui& ui, const EncounterGroup& group, bool can_escape) :
     _state(state),
     _ui(ui),
     _party(state.party),
-    _status_window(ui, 0, 0, screen_columns, status_rows)
+    _status_window(ui, 0, 0, screen_columns, status_rows),
+    _can_escape(can_escape)
 {
     BN_ASSERT(group.count >= 1 && group.count <= max_enemies, "Invalid enemies count: ", group.count);
 
@@ -138,7 +139,7 @@ void BattleScene::_refresh_status()
 {
     _status_window.clear_text();
 
-    for(int index = 0; index < max_party_size; ++index)
+    for(int index = 0; index < _party.size; ++index)
     {
         const PartyMember& member = _party.members[index];
         int x = index * status_column_width;
@@ -173,7 +174,7 @@ bool BattleScene::_select_commands()
 
     int member_index = 0;
 
-    while(member_index < max_party_size)
+    while(member_index < _party.size)
     {
         if(! _party.members[member_index].alive())
         {
@@ -413,12 +414,12 @@ int BattleScene::_choose_ally()
 {
     bn::string_view options[max_party_size];
 
-    for(int index = 0; index < max_party_size; ++index)
+    for(int index = 0; index < _party.size; ++index)
     {
         options[index] = _party.members[index].name();
     }
 
-    Menu menu(_ui, sub_col, bottom_row, sub_cols, options);
+    Menu menu(_ui, sub_col, bottom_row, sub_cols, bn::span<const bn::string_view>(options, _party.size));
     return menu.run();
 }
 
@@ -439,7 +440,7 @@ void BattleScene::_execute_round(MessageBox& box)
     bn::vector<Turn, max_party_size + max_enemies> turns;
     bn::random& random = _state.random;
 
-    for(int index = 0; index < max_party_size; ++index)
+    for(int index = 0; index < _party.size; ++index)
     {
         const PartyMember& member = _party.members[index];
 
@@ -602,7 +603,7 @@ void BattleScene::_apply_party_effect(const Effect& effect, int target, MessageB
     {
         if(effect.targets_all())
         {
-            for(int index = 0; index < max_party_size; ++index)
+            for(int index = 0; index < _party.size; ++index)
             {
                 if(_party.members[index].alive())
                 {
@@ -663,7 +664,7 @@ void BattleScene::_apply_enemy_effect(const Effect& effect, int enemy_index, Mes
     }
     else if(effect.targets_all())
     {
-        for(int index = 0; index < max_party_size; ++index)
+        for(int index = 0; index < _party.size; ++index)
         {
             if(_party.members[index].alive())
             {
@@ -762,6 +763,12 @@ bool BattleScene::_try_escape(MessageBox& box)
 {
     box.say_timed("The party tries to run away...");
 
+    if(! _can_escape)
+    {
+        box.say_timed("There is no escape\nfrom this fight!");
+        return false;
+    }
+
     if(_state.random.get_int(100) < 60)
     {
         box.say("Got away safely!");
@@ -793,7 +800,7 @@ void BattleScene::_victory(MessageBox& box)
     }
 
     // Every survivor gets the full experience.
-    for(PartyMember& member : _party.members)
+    for(PartyMember& member : _party.active())
     {
         if(! member.alive())
         {
@@ -863,7 +870,7 @@ int BattleScene::_random_alive_member() const
 {
     bn::vector<int, max_party_size> indexes;
 
-    for(int index = 0; index < max_party_size; ++index)
+    for(int index = 0; index < _party.size; ++index)
     {
         if(_party.members[index].alive())
         {

@@ -6,6 +6,10 @@
 #include "bn_sprite_items_enemy_bat.h"
 #include "bn_sprite_items_enemy_goblin.h"
 #include "bn_sprite_items_enemy_skeleton.h"
+#include "bn_sprite_items_enemy_cultist.h"
+#include "bn_sprite_items_enemy_drake.h"
+
+#include "rpg_names.h"
 
 namespace rpg
 {
@@ -19,6 +23,10 @@ namespace
         { "Bat",     &bn::sprite_items::enemy_bat,        { 16, 0, 13, 5,  12 }, 6,  5,    SpellId::fire, 20 },
         { "Goblin",  &bn::sprite_items::enemy_goblin,     { 28, 0, 18, 8,  6  }, 12, 10,   SpellId::fire, 0 },
         { "Skeleton", &bn::sprite_items::enemy_skeleton,    { 34, 0, 22, 10, 8  }, 18, 16,   SpellId::fire, 0 },
+        { "Cultist", &bn::sprite_items::enemy_cultist,    { 40, 0, 24, 9,  9  }, 22, 20,   SpellId::fire, 15 },
+        // Story bosses (see rpg_story.cpp). The scout is fought alone, the general by two.
+        { "Cult Scout", &bn::sprite_items::enemy_cultist, { 70, 0, 26, 8,  9  }, 45, 40,   SpellId::fire, 25 },
+        { RPG_NAME_GENERAL_1, &bn::sprite_items::enemy_drake, { 170, 0, 36, 12, 12 }, 120, 150, SpellId::blizzard, 30 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

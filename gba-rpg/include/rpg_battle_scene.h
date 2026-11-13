@@ -29,7 +29,8 @@ class BattleScene
 {
 
 public:
-    BattleScene(GameState& state, Ui& ui, const EncounterGroup& group);
+    /// @param can_escape false for story battles: the "Run" command always fails.
+    BattleScene(GameState& state, Ui& ui, const EncounterGroup& group, bool can_escape = true);
 
     /// Runs the whole battle (blocks until it ends).
     [[nodiscard]] BattleResult run();
@@ -84,6 +85,7 @@ private:
     bn::vector<Enemy, max_enemies> _enemies;
     Window _status_window;
     Action _actions[max_party_size];
+    bool _can_escape;
 
     [[nodiscard]] BattleResult _run_battle();
     void _refresh_status();

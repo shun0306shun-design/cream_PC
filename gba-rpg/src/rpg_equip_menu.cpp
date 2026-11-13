@@ -48,12 +48,12 @@ namespace
     {
         bn::string_view options[max_party_size];
 
-        for(int index = 0; index < max_party_size; ++index)
+        for(int index = 0; index < party.size; ++index)
         {
             options[index] = party.members[index].name();
         }
 
-        Menu menu(ui, sub_col, 0, sub_cols, options);
+        Menu menu(ui, sub_col, 0, sub_cols, bn::span<const bn::string_view>(options, party.size));
         return menu.run();
     }
 
