@@ -74,6 +74,14 @@ bool load_game(GameState& state)
     state.player_x = data.player_x;
     state.player_y = data.player_y;
     state.facing = data.facing;
+
+    // The map data may have changed since the game was saved (a wall, an NPC or a chest can now be on that
+    // tile): never start the player somewhere it can't stand. Same rule as walking and the minimap.
+    if(! map_data(state.map).walkable(state.player_x, state.player_y))
+    {
+        state.return_to_start();
+    }
+
     return true;
 }
 

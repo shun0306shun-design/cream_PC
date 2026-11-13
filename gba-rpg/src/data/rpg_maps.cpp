@@ -235,6 +235,30 @@ TileId MapData::tile(int x, int y) const
     return TileId(tile_index_from_symbol(rows[y][x]));
 }
 
+bool MapData::walkable(int x, int y) const
+{
+    if(x < 0 || y < 0 || x >= width() || y >= height())
+    {
+        return false;
+    }
+
+    if(! tile_info(tile(x, y)).walkable)
+    {
+        return false;
+    }
+
+    // Events with graphics (NPCs, chests, shopkeepers) are solid.
+    for(const MapEvent& event : events)
+    {
+        if(event.x == x && event.y == y && event.npc_graphics >= 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 const MapData& map_data(MapId id)
 {
     BN_ASSERT(id < MapId::count, "Invalid map id: ", int(id));

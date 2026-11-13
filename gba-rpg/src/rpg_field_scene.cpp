@@ -2,7 +2,6 @@
 
 #include "bn_keypad.h"
 #include "bn_string.h"
-#include "bn_sstream.h"
 #include "bn_bg_tiles.h"
 #include "bn_regular_bg_item.h"
 #include "bn_regular_bg_map_cell_info.h"
@@ -13,6 +12,7 @@
 #include "bn_regular_bg_tiles_items_field_tiles.h"
 
 #include "rpg_ui.h"
+#include "rpg_events.h"
 #include "rpg_field_menu.h"
 #include "rpg_game_state.h"
 #include "rpg_shop.h"
@@ -25,7 +25,6 @@ namespace
     constexpr int walk_speed = 2;                           // Pixels per frame.
     constexpr int step_frames = tile_size / walk_speed;
     constexpr int safe_steps_after_battle = 4;
-    constexpr int inn_price = 10;
 
     // --- Map name popup (top center) ---
     constexpr int name_frames = 105;        // About 1.75 seconds.
@@ -43,6 +42,10 @@ namespace
 
     // Windows must not overlap (see rpg_ui.h): the widest map name has to end before the minimap starts.
     static_assert(((screen_columns - name_max_cols) / 2) + name_max_cols <= minimap_col, "Name window overlaps minimap");
+
+    // The Yes/No menu of the events (inn, spring) opens while the minimap stays on screen: the bottom of
+    // the minimap must be at or above the first row of that menu.
+    static_assert(minimap_rows <= yes_no_row, "Minimap overlaps the Yes/No menu");
 
     // The map background is 64x64 cells (512x512 pixels): enough for max_map_tiles x max_map_tiles tiles.
     // 8 KB that live in EWRAM, never in the stack.
@@ -327,19 +330,7 @@ void FieldScene::_update_view()
 
 bool FieldScene::_can_walk(int tile_x, int tile_y) const
 {
-    if(tile_x < 0 || tile_y < 0 || tile_x >= _map->width() || tile_y >= _map->height())
-    {
-        return false;
-    }
-
-    if(! tile_info(_map->tile(tile_x, tile_y)).walkable)
-    {
-        return false;
-    }
-
-    // NPCs are solid.
-    const MapEvent* event = _event_at(tile_x, tile_y);
-    return ! event || event->npc_graphics < 0;
+    return _map->walkable(tile_x, tile_y);
 }
 
 const MapEvent* FieldScene::_event_at(int tile_x, int tile_y) const
@@ -412,22 +403,23 @@ void FieldScene::_interact()
 
     case EventType::talk:
     case EventType::sign:
-        {
-            MessageBox box(_ui);
-            box.say_pages(event->pages);
-        }
+        run_talk(_ui, *event);
         break;
 
     case EventType::inn:
-        _run_inn(*event);
+        run_inn(_state, _ui, *event);
         break;
 
     case EventType::chest:
-        _open_chest(*event);
+        {
+            // The chest sprite is switched to its open frame by the handler (npc_graphics + 1).
+            bn::sprite_ptr* sprite = event->npc_graphics >= 0 ? &_npcs[_npc_sprite_index(*event)] : nullptr;
+            open_chest(_state, _ui, *event, sprite);
+        }
         break;
 
     case EventType::spring:
-        _use_spring(*event);
+        use_spring(_state, _ui, *event);
         break;
 
     case EventType::shop:
@@ -441,123 +433,6 @@ void FieldScene::_interact()
     default:
         break;      // Warps are triggered by stepping on them, see _on_step().
     }
-}
-
-void FieldScene::_run_inn(const MapEvent& event)
-{
-    static constexpr bn::string_view yes_no[] = { "Yes", "No" };
-
-    MessageBox box(_ui);
-    box.say_pages(event.pages);
-
-    bn::string<64> question;
-    bn::ostringstream question_stream(question);
-    question_stream << "A night costs " << inn_price << " gold.\nDo you want to rest?";
-    box.show(question);
-
-    bool accepted;
-
-    {
-        int menu_rows = Window::rows_for_lines(2);
-        Menu menu(_ui, screen_columns - 8, screen_rows - MessageBox::box_rows - menu_rows, 8, yes_no);
-        accepted = menu.run() == 0;
-    }
-
-    if(! accepted)
-    {
-        box.say("Come back any time.");
-    }
-    else if(_state.party.gold < inn_price)
-    {
-        box.say("You don't have enough gold.");
-    }
-    else
-    {
-        _state.party.gold -= inn_price;
-        _ui.fade_out();
-        _state.party.restore_all();
-        _ui.wait(30);
-        _ui.fade_in();
-        box.say("The party is fully rested!");
-    }
-}
-
-void FieldScene::_use_spring(const MapEvent& event)
-{
-    static constexpr bn::string_view yes_no[] = { "Yes", "No" };
-
-    Party& party = _state.party;
-    MessageBox box(_ui);
-    box.say_pages(event.pages);
-
-    // The spring heals the living only: reviving is what the inn is for.
-    bool needs_healing = false;
-    bool has_fallen = false;
-
-    for(const PartyMember& member : party.members)
-    {
-        if(! member.alive())
-        {
-            has_fallen = true;
-        }
-        else
-        {
-            Stats stats = member.stats();
-            needs_healing = needs_healing || member.hp < stats.max_hp || member.mp < stats.max_mp;
-        }
-    }
-
-    if(! needs_healing)
-    {
-        box.say(has_fallen ? "The water can't revive\nfallen allies." : "Everyone is already in\ngood shape.");
-        return;
-    }
-
-    bn::string<64> question;
-    bn::ostringstream question_stream(question);
-    question_stream << "Drink from the spring?";
-
-    if(event.price > 0)
-    {
-        question_stream << "\nIt costs " << int(event.price) << " gold.";
-    }
-
-    box.show(question);
-
-    bool accepted;
-
-    {
-        // Same place as the inn's question menu.
-        int menu_rows = Window::rows_for_lines(2);
-        Menu menu(_ui, screen_columns - 8, screen_rows - MessageBox::box_rows - menu_rows, 8, yes_no);
-        accepted = menu.run() == 0;
-    }
-
-    if(! accepted)
-    {
-        return;
-    }
-
-    if(party.gold < event.price)
-    {
-        box.say("You don't have enough gold.");
-        return;
-    }
-
-    party.gold -= event.price;
-    _ui.fade_out();
-
-    for(PartyMember& member : party.members)
-    {
-        if(member.alive())
-        {
-            member.restore();       // Full HP and MP.
-        }
-    }
-
-    _ui.wait(20);
-    _ui.fade_in();
-    box.say(has_fallen ? "The party feels refreshed!\nBut the fallen stay down." : "The party feels refreshed!");
 }
 
 int FieldScene::_npc_sprite_index(const MapEvent& event) const
@@ -580,68 +455,6 @@ int FieldScene::_npc_sprite_index(const MapEvent& event) const
 
     BN_ERROR("Event not found in map: ", _map->name);
     return -1;
-}
-
-void FieldScene::_open_chest(const MapEvent& event)
-{
-    BN_ASSERT(event.flag != FlagId::none, "A chest needs a flag id");
-
-    Party& party = _state.party;
-    MessageBox box(_ui);
-
-    if(_state.flags.get(event.flag))
-    {
-        box.say("The chest is empty.");
-        return;
-    }
-
-    // Don't waste the contents: leave the chest closed if the bag can't take the items.
-    if(event.item_amount > 0 && party.item_amount(event.item) + event.item_amount > max_item_stack)
-    {
-        box.say("You can't carry any more\nof that item.");
-        return;
-    }
-
-    // Open it for good (the flag is saved with the game) and show the open sprite.
-    _state.flags.set(event.flag);
-
-    if(event.npc_graphics >= 0)
-    {
-        _npcs[_npc_sprite_index(event)].set_tiles(bn::sprite_items::npc.tiles_item(), event.npc_graphics + 1);
-    }
-
-    bn::string<64> text;
-
-    if(event.item_amount > 0)
-    {
-        party.add_item(event.item, event.item_amount);
-
-        bn::ostringstream stream(text);
-        stream << "Found " << item_data(event.item).name;
-
-        if(event.item_amount > 1)
-        {
-            stream << " x" << int(event.item_amount);
-        }
-
-        stream << "!";
-        box.say(text);
-    }
-
-    if(event.gold > 0)
-    {
-        party.gold += event.gold;
-
-        text.clear();
-        bn::ostringstream stream(text);
-        stream << "Found " << int(event.gold) << " gold!";
-        box.say(text);
-    }
-
-    if(event.item_amount == 0 && event.gold == 0)
-    {
-        box.say("It was empty...");
-    }
 }
 
 void FieldScene::_warp(const MapEvent& event)

@@ -115,6 +115,12 @@ struct MapData
 
     /// Returns the tile at the given position, or the border tile if it's outside the map.
     [[nodiscard]] TileId tile(int x, int y) const;
+
+    /**
+     * Returns true if the player can stand on the given tile: inside the map, a walkable tile
+     * and not occupied by an NPC or a chest. Used by movement, the minimap and save validation.
+     */
+    [[nodiscard]] bool walkable(int x, int y) const;
 };
 
 [[nodiscard]] const MapData& map_data(MapId id);

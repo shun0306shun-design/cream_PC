@@ -65,6 +65,7 @@ gba-rpg/
 │   ├── rpg_ui.h                ウィンドウ / メニュー / メッセージボックス
 │   ├── rpg_field_scene.h       マップ探索シーン
 │   ├── rpg_field_menu.h        フィールドメニュー
+│   ├── rpg_events.h            マップイベントの処理（会話・宿屋・宝箱・泉、共通の ask_yes_no）
 │   ├── rpg_shop.h              道具屋（購入・売却メニュー、売値の割合）
 │   ├── rpg_battle_scene.h      戦闘シーン
 │   ├── common_variable_8x16_sprite_font.h   Butano 付属フォント定義（zlib License）
@@ -98,6 +99,8 @@ gba-rpg/
 - `Window` / `Menu` / `MessageBox` は RAII で、スコープを抜けると枠と文字が消えます。
 - `Menu::run()` などはブロッキング（内部で毎フレーム `Ui::update()` を呼ぶ）なので、会話や戦闘の流れを上から下へ素直に書けます。
 - 固定幅フォント（`Ui::fixed_text_generator()` / `Window::print_fixed()`）は、桁を揃えたい表示（ミニマップ）用です。
+- 「通れるか」の判定は `MapData::walkable()` の1か所だけ（移動・ミニマップ・セーブ読み込み時の位置チェックで共通）。
+- ロード時、保存位置がもう通れない場所なら（マップを書き換えた後など）開始位置に戻します。
 - フィールド右上のマップ名とミニマップは `FieldScene` が `bn::optional<Window>` で持ち、STARTメニューを開く間だけ閉じます（ウィンドウを重ねないため）。
 - 表示の重なり順: マップ背景(3) < プレイヤー・NPC・敵(2) < ウィンドウ(0) < 文字。
 
@@ -123,7 +126,7 @@ gba-rpg/
 | 価格を変更 | 購入価格は `rpg_items.cpp` の `price`。売値は購入価格の何%かを `sell_percent`（rpg_shop.h）で一括変更 |
 | 宝箱を置く | `FlagId`（rpg_flags.h）に名前を追加 → マップの `events` に `EventType::chest`（`npc_graphics = 3`、`flag`、`item` + `item_amount` / `gold`）を書く |
 | フラグを追加（ボス撃破・イベント済みなど） | `FlagId` に追加し、`state.flags.get/set()` で読み書きする。セーブに自動で含まれる（最大64個、`max_flags`） |
-| イベントの種類を追加（店など） | `EventType` に追加 → `FieldScene::_interact()` / `_on_step()` に処理を書く |
+| イベントの種類を追加（店など） | `EventType` に追加 → 処理を `rpg_events.cpp` に書き（はい/いいえは `ask_yes_no()`）、`FieldScene::_interact()` から呼ぶ。踏んで発動するものは `_on_step()` |
 | 敵の AI | `BattleScene::_enemy_turn()` |
 | ダメージ計算式 | `roll_physical_damage()` / `roll_effect()`（rpg_party.cpp） |
 | 経験値カーブ | `exp_for_level()`（rpg_classes.cpp） |

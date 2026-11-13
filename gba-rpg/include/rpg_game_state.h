@@ -33,7 +33,10 @@ struct GameState
 /// Writes the game to SRAM.
 void save_game(const GameState& state);
 
-/// Reads the game from SRAM. Returns false (leaving `state` untouched) if there's no valid save.
+/**
+ * Reads the game from SRAM. Returns false (leaving `state` untouched) if there's no valid save.
+ * If the saved position is no longer walkable, the player is moved back to the start (see GameState::return_to_start).
+ */
 [[nodiscard]] bool load_game(GameState& state);
 
 [[nodiscard]] bool has_saved_game();
