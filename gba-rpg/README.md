@@ -11,6 +11,7 @@
 - 南の門から外のフィールドへ（マップ間ワープ）
 - フィールドでランダムエンカウント → ターンベース戦闘（たたかう / まほう / どうぐ / にげる）
 - 素早さベースの行動順、攻撃・回復魔法・攻撃魔法・アイテム、経験値とレベルアップ、呪文習得
+- マップ名の一時表示（シーン開始時・ワープ時に画面上部中央へ約1.75秒）と、右上の常時ミニマップ（`@`=自分 / `#`=通れない / `.`=通れる）
 - フィールドメニュー（START）：ステータス / 道具 / 魔法 / セーブ（SRAM）
 
 | ボタン | フィールド | メニュー・戦闘 |
@@ -64,7 +65,8 @@ gba-rpg/
 │   ├── rpg_field_scene.h       マップ探索シーン
 │   ├── rpg_field_menu.h        フィールドメニュー
 │   ├── rpg_battle_scene.h      戦闘シーン
-│   └── common_variable_8x16_sprite_font.h   Butano 付属フォント定義（zlib License）
+│   ├── common_variable_8x16_sprite_font.h   Butano 付属フォント定義（zlib License）
+│   └── common_fixed_8x16_sprite_font.h      同・固定幅フォント（ミニマップ用）
 └── src/
     ├── main.cpp                エントリポイント、シーン遷移（タイトル → フィールド ⇔ 戦闘）
     ├── rpg_*.cpp               上記ヘッダーの実装
@@ -93,6 +95,8 @@ gba-rpg/
 - ウィンドウ枠は動的な背景レイヤー（`bn::regular_bg_map_item`）に描き、文字は `bn::sprite_text_generator` のスプライトです。
 - `Window` / `Menu` / `MessageBox` は RAII で、スコープを抜けると枠と文字が消えます。
 - `Menu::run()` などはブロッキング（内部で毎フレーム `Ui::update()` を呼ぶ）なので、会話や戦闘の流れを上から下へ素直に書けます。
+- 固定幅フォント（`Ui::fixed_text_generator()` / `Window::print_fixed()`）は、桁を揃えたい表示（ミニマップ）用です。
+- フィールド右上のマップ名とミニマップは `FieldScene` が `bn::optional<Window>` で持ち、STARTメニューを開く間だけ閉じます（ウィンドウを重ねないため）。
 - 表示の重なり順: マップ背景(3) < プレイヤー・NPC・敵(2) < ウィンドウ(0) < 文字。
 
 ### GBA のメモリ制約への配慮
@@ -148,5 +152,5 @@ gba-rpg/
 
 ## ライセンス表記
 
-`graphics/common_variable_8x16_font.*` と `include/common_variable_8x16_sprite_font.h` は Butano（zlib License,
+`graphics/common_*_8x16_font.*` と `include/common_*_8x16_sprite_font.h` は Butano（zlib License,
 Copyright (c) 2020-2026 Gustavo Valiente）の `common` フォルダからのコピーです。

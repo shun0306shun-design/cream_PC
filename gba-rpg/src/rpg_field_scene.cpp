@@ -26,6 +26,23 @@ namespace
     constexpr int safe_steps_after_battle = 4;
     constexpr int inn_price = 10;
 
+    // --- Map name popup (top center) ---
+    constexpr int name_frames = 105;        // About 1.75 seconds.
+    constexpr int name_min_cols = 6;
+    constexpr int name_max_cols = 14;       // Longer names would run into the minimap.
+
+    // --- Minimap (top right): the tiles around the player as text, one character per tile ---
+    constexpr int minimap_radius_x = 2;
+    constexpr int minimap_radius_y = 1;
+    constexpr int minimap_chars = (minimap_radius_x * 2) + 1;
+    constexpr int minimap_lines = (minimap_radius_y * 2) + 1;
+    constexpr int minimap_cols = ((minimap_chars * 8) + 16 + 7) / 8;    // Text + margins, in cells.
+    constexpr int minimap_col = screen_columns - minimap_cols;
+    constexpr int minimap_rows = Window::rows_for_lines(minimap_lines);
+
+    // Windows must not overlap (see rpg_ui.h): the widest map name has to end before the minimap starts.
+    static_assert(((screen_columns - name_max_cols) / 2) + name_max_cols <= minimap_col, "Name window overlaps minimap");
+
     // The map background is 64x64 cells (512x512 pixels): enough for max_map_tiles x max_map_tiles tiles.
     // 8 KB that live in EWRAM, never in the stack.
     constexpr int bg_cells = max_map_tiles * 2;
@@ -114,6 +131,7 @@ FieldScene::FieldScene(GameState& state, Ui& ui) :
     _player.set_camera(_camera);
     _player.set_bg_priority(scene_sprite_bg_priority);
     _load_map();
+    _show_hud();
 }
 
 const EncounterGroup& FieldScene::run()
@@ -149,7 +167,10 @@ const EncounterGroup& FieldScene::run()
         }
         else if(bn::keypad::start_pressed())
         {
+            // The menu uses the top of the screen: the corner windows can't stay under it.
+            _hide_hud();
             open_field_menu(_state, _ui);
+            _show_hud();
         }
         else
         {
@@ -157,6 +178,8 @@ const EncounterGroup& FieldScene::run()
         }
 
         _update_view();
+        _update_map_name();
+        _update_minimap();
         _ui.update();
     }
 }
@@ -190,6 +213,94 @@ void FieldScene::_load_map()
     _pixel_y = _state.player_y * tile_size;
     _move_frames = 0;
     _update_view();
+
+    // Called at scene start and after every warp, since both go through here.
+    _show_map_name();
+    _minimap_dirty = true;
+}
+
+void FieldScene::_show_map_name()
+{
+    const bn::string_view name = _map->name;
+
+    // Fit the window to the text (names use the proportional font), centered at the top of the screen.
+    int cols = (_ui.text_generator().width(name) + 16 + 7) / 8;
+    cols = cols < name_min_cols ? name_min_cols : (cols > name_max_cols ? name_max_cols : cols);
+
+    _name_window.reset();   // Erase the previous name first, if it's still there.
+    _name_window.emplace(_ui, (screen_columns - cols) / 2, 0, cols, Window::rows_for_lines(1));
+    _name_window->print_centered(0, name);
+    _name_frames = name_frames;
+}
+
+void FieldScene::_update_map_name()
+{
+    // The player can keep walking while the name is shown: it's just a timer.
+    if(_name_frames > 0 && --_name_frames == 0)
+    {
+        _name_window.reset();
+    }
+}
+
+void FieldScene::_update_minimap()
+{
+    if(! _minimap)
+    {
+        return;
+    }
+
+    // Redraw only when the player enters another tile (or the map changed): text sprites aren't free.
+    int player_x = _state.player_x;
+    int player_y = _state.player_y;
+
+    if(! _minimap_dirty && player_x == _minimap_x && player_y == _minimap_y)
+    {
+        return;
+    }
+
+    _minimap_dirty = false;
+    _minimap_x = player_x;
+    _minimap_y = player_y;
+    _minimap->clear_text();
+
+    for(int line = 0; line < minimap_lines; ++line)
+    {
+        bn::string<minimap_chars> text;
+
+        for(int column = 0; column < minimap_chars; ++column)
+        {
+            int dx = column - minimap_radius_x;
+            int dy = line - minimap_radius_y;
+
+            if(dx == 0 && dy == 0)
+            {
+                text.push_back('@');
+            }
+            else
+            {
+                // Same rule as the movement: out of the map, walls and NPCs block the way.
+                text.push_back(_can_walk(player_x + dx, player_y + dy) ? '.' : '#');
+            }
+        }
+
+        _minimap->print_fixed(line, text);
+    }
+}
+
+void FieldScene::_hide_hud()
+{
+    _name_window.reset();
+    _name_frames = 0;
+    _minimap.reset();
+}
+
+void FieldScene::_show_hud()
+{
+    if(! _minimap)
+    {
+        _minimap.emplace(_ui, minimap_col, 0, minimap_cols, minimap_rows);
+        _minimap_dirty = true;
+    }
 }
 
 void FieldScene::_update_view()

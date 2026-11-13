@@ -64,6 +64,12 @@ public:
         return _text_generator;
     }
 
+    /// Fixed width font (8 pixels per character): for text that must line up in columns, like the minimap.
+    [[nodiscard]] const bn::sprite_text_generator& fixed_text_generator() const
+    {
+        return _fixed_text_generator;
+    }
+
     /// Uploads pending window changes and waits for the next frame. Call this instead of bn::core::update().
     void update();
 
@@ -81,6 +87,7 @@ public:
 
 private:
     bn::sprite_text_generator _text_generator;
+    bn::sprite_text_generator _fixed_text_generator;
     bn::regular_bg_map_item _map_item;
     bn::regular_bg_ptr _bg;
     bn::regular_bg_map_ptr _map;
@@ -111,6 +118,9 @@ public:
 
     /// Prints one line of text. `x_offset` is in pixels from the left margin.
     void print(int line, const bn::string_view& text, int x_offset = 0);
+
+    /// Like print(), but with the fixed width font.
+    void print_fixed(int line, const bn::string_view& text, int x_offset = 0);
 
     /// Prints one line of text, horizontally centered in the window.
     void print_centered(int line, const bn::string_view& text);

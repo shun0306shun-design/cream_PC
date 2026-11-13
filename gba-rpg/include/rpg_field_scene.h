@@ -6,6 +6,7 @@
 #define RPG_FIELD_SCENE_H
 
 #include "bn_vector.h"
+#include "bn_optional.h"
 #include "bn_camera_ptr.h"
 #include "bn_sprite_ptr.h"
 #include "bn_regular_bg_ptr.h"
@@ -13,11 +14,11 @@
 #include "bn_regular_bg_map_item.h"
 
 #include "rpg_maps.h"
+#include "rpg_ui.h"
 
 namespace rpg
 {
 
-class Ui;
 struct GameState;
 
 class FieldScene
@@ -45,8 +46,24 @@ private:
     int _walk_counter = 0;
     int _safe_steps = 0;        //!< Steps without encounters left.
 
+    // Convenience UI. Both are optional so they can be closed while other windows need that space.
+    bn::optional<Window> _name_window;      //!< Map name, shown for a moment after entering a map.
+    int _name_frames = 0;                   //!< Frames left before the map name disappears.
+    bn::optional<Window> _minimap;          //!< Always visible, top-right corner.
+    bool _minimap_dirty = true;
+    int _minimap_x = -1;                    //!< Player position the minimap was last drawn for.
+    int _minimap_y = -1;
+
     void _load_map();
     void _update_view();
+
+    void _show_map_name();
+    void _update_map_name();
+    void _update_minimap();
+
+    /// Closes the corner windows and reopens them later: needed before opening bigger windows.
+    void _hide_hud();
+    void _show_hud();
 
     [[nodiscard]] bool _can_walk(int tile_x, int tile_y) const;
     [[nodiscard]] const MapEvent* _event_at(int tile_x, int tile_y) const;

@@ -14,6 +14,7 @@
 #include "bn_bg_palette_items_ui_palette.h"
 #include "bn_regular_bg_tiles_items_ui_tiles.h"
 
+#include "common_fixed_8x16_sprite_font.h"
 #include "common_variable_8x16_sprite_font.h"
 
 namespace rpg
@@ -73,12 +74,15 @@ namespace
 
 Ui::Ui() :
     _text_generator(common::variable_8x16_sprite_font),
+    _fixed_text_generator(common::fixed_8x16_sprite_font),
     _map_item(ui_cells[0], bn::size(map_columns, map_rows)),
     _bg(create_bg(_map_item)),
     _map(_bg.map())
 {
     _text_generator.set_bg_priority(ui_bg_priority);
     _text_generator.set_left_alignment();
+    _fixed_text_generator.set_bg_priority(ui_bg_priority);
+    _fixed_text_generator.set_left_alignment();
 }
 
 void Ui::draw_frame(int col, int row, int cols, int rows)
@@ -220,6 +224,11 @@ void Window::print(int line, const bn::string_view& text, int x_offset)
 {
     // The "top_left" methods of Butano use screen coordinates with the origin in the top-left corner.
     _ui.text_generator().generate_top_left(_text_x() + x_offset, _text_y(line), text, _sprites);
+}
+
+void Window::print_fixed(int line, const bn::string_view& text, int x_offset)
+{
+    _ui.fixed_text_generator().generate_top_left(_text_x() + x_offset, _text_y(line), text, _sprites);
 }
 
 void Window::print_centered(int line, const bn::string_view& text)
