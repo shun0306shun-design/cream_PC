@@ -451,6 +451,7 @@ def gen_npcs():
         person('down', 0, hair=13, tunic=7, trim=9),    # 2 innkeeper
         chest(False),                                   # 3 closed chest
         chest(True),                                    # 4 open chest
+        person('down', 0, hair=5, tunic=13, trim=9),    # 5 shopkeeper
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')

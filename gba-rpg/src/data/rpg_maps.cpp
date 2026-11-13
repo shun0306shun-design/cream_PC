@@ -117,6 +117,14 @@ namespace
         "START VILLAGE\nSouth: the fields",
     };
 
+    constexpr bn::string_view shopkeeper_pages[] = {
+        "Welcome to the item shop!",
+    };
+
+    constexpr ItemId village_shop_stock[] = {
+        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
+    };
+
     constexpr MapEvent village_events[] = {
         { .type = EventType::talk, .x = 10, .y = 7, .npc_graphics = 0, .pages = villager_pages },
         { .type = EventType::talk, .x = 17, .y = 5, .npc_graphics = 1, .pages = elder_pages },
@@ -126,6 +134,9 @@ namespace
         // Chest with items (npc_graphics 3 = closed chest, 4 = open chest in graphics/npc.bmp).
         { .type = EventType::chest, .x = 11, .y = 13, .npc_graphics = 3,
           .flag = FlagId::chest_village_herbs, .item = ItemId::herb, .item_amount = 3 },
+        // Item shop (npc_graphics 5 = shopkeeper).
+        { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
+          .stock = village_shop_stock },
     };
 
     // ---------------------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@
 #include "rpg_ui.h"
 #include "rpg_field_menu.h"
 #include "rpg_game_state.h"
+#include "rpg_shop.h"
 
 namespace rpg
 {
@@ -423,6 +424,13 @@ void FieldScene::_interact()
 
     case EventType::chest:
         _open_chest(*event);
+        break;
+
+    case EventType::shop:
+        // The shop windows cover the top of the screen: the corner windows can't stay under them.
+        _hide_hud();
+        open_shop(_state, _ui, event->stock, event->pages);
+        _show_hud();
         break;
 
     case EventType::warp:

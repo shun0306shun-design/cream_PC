@@ -26,7 +26,7 @@ struct ItemData
 {
     bn::string_view name;
     Effect effect;
-    int16_t price;      //!< For a future shop.
+    int16_t price;      //!< Buy price in shops. The sell price is a percentage of it (rpg_shop.h).
 };
 
 [[nodiscard]] const ItemData& item_data(ItemId id);

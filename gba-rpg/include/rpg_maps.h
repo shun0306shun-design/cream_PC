@@ -59,7 +59,8 @@ enum class EventType : uint8_t
     sign,       //!< Like talk, but without sprite (placed over a solid tile like a sign).
     inn,        //!< NPC: shows `pages`, then offers to rest (full restore).
     warp,       //!< Triggered by stepping on the tile: moves to `warp_map` at (warp_x, warp_y).
-    chest       //!< Gives `item` x `item_amount` and/or `gold` once; `flag` remembers that it was opened.
+    chest,      //!< Gives `item` x `item_amount` and/or `gold` once; `flag` remembers that it was opened.
+    shop        //!< NPC: shows `pages` as greeting, then opens an item shop selling `stock`.
 };
 
 struct MapEvent
@@ -80,6 +81,9 @@ struct MapEvent
     ItemId item = ItemId::herb;                 //!< Item inside (ignored if item_amount is 0).
     uint8_t item_amount = 0;
     uint16_t gold = 0;                          //!< Gold inside (0 = none). A chest can hold both.
+
+    // --- Shop (EventType::shop) ---
+    bn::span<const ItemId> stock = {};          //!< Items on sale (prices are in the item table).
 };
 
 constexpr int max_map_tiles = 32;       //!< Maximum map width/height in tiles (a 512x512 pixels background).

@@ -7,7 +7,7 @@
 
 - タイトル画面（New Game / セーブがあれば Continue）
 - 村を歩く（十字キー、タイル単位の移動、壁・NPCとの衝突判定、カメラ追従）
-- NPC・看板と会話（A）、宿屋で全回復（10G）、宝箱（一度開けたら空。開封状態はセーブされる）
+- NPC・看板と会話（A）、宿屋で全回復（10G）、宝箱（一度開けたら空。開封状態はセーブされる）、道具屋（購入・売却）
 - 南の門から外のフィールドへ（マップ間ワープ）
 - フィールドでランダムエンカウント → ターンベース戦闘（たたかう / まほう / どうぐ / にげる）
 - 素早さベースの行動順、攻撃・回復魔法・攻撃魔法・アイテム、経験値とレベルアップ、呪文習得
@@ -65,6 +65,7 @@ gba-rpg/
 │   ├── rpg_ui.h                ウィンドウ / メニュー / メッセージボックス
 │   ├── rpg_field_scene.h       マップ探索シーン
 │   ├── rpg_field_menu.h        フィールドメニュー
+│   ├── rpg_shop.h              道具屋（購入・売却メニュー、売値の割合）
 │   ├── rpg_battle_scene.h      戦闘シーン
 │   ├── common_variable_8x16_sprite_font.h   Butano 付属フォント定義（zlib License）
 │   └── common_fixed_8x16_sprite_font.h      同・固定幅フォント（ミニマップ用）
@@ -116,6 +117,8 @@ gba-rpg/
 | 職業・初期パーティを変更 | `rpg_classes.cpp` / `Party::init_new_game()`（rpg_party.cpp） |
 | 町・ダンジョンを追加 | `MapId` に追加 → `rpg_maps.cpp` に ASCII レイアウト・イベント・`maps[]` の項目を書く → 既存マップに `warp` イベントを置いてつなぐ |
 | タイルの種類を追加 | `TileId` と `rpg_maps.cpp` の `tiles[]`（記号・通行可否・エンカウント倍率）、タイル画像を同じ順番で追加 |
+| 道具屋を置く | マップの `events` に `EventType::shop`（`npc_graphics = 5`、`pages` = あいさつ、`stock` = 売る `ItemId` の配列）を書く |
+| 価格を変更 | 購入価格は `rpg_items.cpp` の `price`。売値は購入価格の何%かを `sell_percent`（rpg_shop.h）で一括変更 |
 | 宝箱を置く | `FlagId`（rpg_flags.h）に名前を追加 → マップの `events` に `EventType::chest`（`npc_graphics = 3`、`flag`、`item` + `item_amount` / `gold`）を書く |
 | フラグを追加（ボス撃破・イベント済みなど） | `FlagId` に追加し、`state.flags.get/set()` で読み書きする。セーブに自動で含まれる（最大64個、`max_flags`） |
 | イベントの種類を追加（店など） | `EventType` に追加 → `FieldScene::_interact()` / `_on_step()` に処理を書く |
@@ -135,7 +138,7 @@ gba-rpg/
 | `field_tiles.bmp` / `field_palette.bmp` | マップタイル。幅16pxで、16x16タイルを `TileId` の順に縦に並べる |
 | `ui_tiles.bmp` / `ui_palette.bmp` | ウィンドウ枠（8x8 × 10枚の横並び） |
 | `player.bmp` | 16x16 × 8コマ（下・上・左・右 × 歩行2コマ） |
-| `npc.bmp` | 16x16 × N コマ。`MapEvent::npc_graphics` がコマ番号（3 = 閉じた宝箱、4 = 開いた宝箱） |
+| `npc.bmp` | 16x16 × N コマ。`MapEvent::npc_graphics` がコマ番号（3 = 閉じた宝箱、4 = 開いた宝箱、5 = 道具屋） |
 | `enemy_*.bmp` | 32x32 の敵グラフィック |
 | `cursor.bmp` | 8x8 のカーソル |
 
@@ -151,7 +154,7 @@ gba-rpg/
 
 ## 未実装（次に足すと良いもの）
 
-蘇生手段（現状は宿屋のみ）、装備、店、状態異常、防御コマンド、建物の内部マップ、歩くNPC、BGM/SE。
+蘇生手段（現状は宿屋のみ）、装備、武具屋、まとめ買い（数量指定）、状態異常、防御コマンド、建物の内部マップ、歩くNPC、BGM/SE。
 
 ## ライセンス表記
 

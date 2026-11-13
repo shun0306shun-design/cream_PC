@@ -116,6 +116,11 @@ public:
 
     ~Window();
 
+    [[nodiscard]] Ui& ui() const
+    {
+        return _ui;
+    }
+
     /// Prints one line of text. `x_offset` is in pixels from the left margin.
     void print(int line, const bn::string_view& text, int x_offset = 0);
 
