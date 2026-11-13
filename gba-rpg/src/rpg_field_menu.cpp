@@ -4,6 +4,7 @@
 #include "bn_sstream.h"
 
 #include "rpg_ui.h"
+#include "rpg_equip_menu.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -145,7 +146,7 @@ namespace
             {
                 ItemId id = ItemId(index);
 
-                if(int amount = party.item_amount(id))
+                if(int amount = party.item_amount(id); amount > 0 && item_data(id).kind == ItemKind::consumable)
                 {
                     bn::ostringstream stream(labels[ids.size()]);
                     stream << item_data(id).name << "  x" << amount;
@@ -255,9 +256,9 @@ namespace
 
 void open_field_menu(GameState& state, Ui& ui)
 {
-    static constexpr bn::string_view options[] = { "Status", "Items", "Magic", "Save" };
+    static constexpr bn::string_view options[] = { "Status", "Items", "Magic", "Equip", "Save" };
 
-    Menu menu(ui, 0, 0, main_cols, options);
+    Menu menu(ui, 0, 0, main_cols, options, 5);
 
     while(true)
     {
@@ -266,7 +267,7 @@ void open_field_menu(GameState& state, Ui& ui)
         {
             // The gold window is only shown while the main menu has the focus,
             // because the message box needs that space.
-            Window gold_window(ui, 0, Window::rows_for_lines(4), main_cols, Window::rows_for_lines(1));
+            Window gold_window(ui, 0, Window::rows_for_lines(5), main_cols, Window::rows_for_lines(1));
             Label gold_text;
             bn::ostringstream gold_stream(gold_text);
             gold_stream << state.party.gold << " G";
@@ -291,6 +292,10 @@ void open_field_menu(GameState& state, Ui& ui)
             break;
 
         case 3:
+            open_equip_menu(state, ui);
+            break;
+
+        case 4:
             save_game(state);
             say(ui, "Game saved.");
             break;

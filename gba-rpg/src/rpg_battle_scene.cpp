@@ -332,7 +332,7 @@ bool BattleScene::_choose_item(Action& action)
     {
         ItemId id = ItemId(index);
 
-        if(int amount = _party.item_amount(id))
+        if(int amount = _party.item_amount(id); amount > 0 && item_data(id).kind == ItemKind::consumable)
         {
             bn::ostringstream stream(labels[ids.size()]);
             stream << item_data(id).name << "  x" << amount;

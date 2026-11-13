@@ -24,6 +24,14 @@ enum class ClassId : uint8_t
     count
 };
 
+/// Bit of a class in a "which classes" mask (see ItemData::classes).
+[[nodiscard]] constexpr uint8_t class_bit(ClassId id)
+{
+    return uint8_t(1 << int(id));
+}
+
+constexpr uint8_t all_classes = uint8_t((1 << int(ClassId::count)) - 1);
+
 struct SpellLearn
 {
     uint8_t level;      //!< Level at which the spell is learned.

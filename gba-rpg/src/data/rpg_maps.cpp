@@ -128,6 +128,7 @@ namespace
 
     constexpr ItemId village_shop_stock[] = {
         ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
+        ItemId::oak_staff, ItemId::leather_armor, ItemId::chain_mail,
     };
 
     constexpr MapEvent village_events[] = {
@@ -139,6 +140,9 @@ namespace
         // Chest with items (npc_graphics 3 = closed chest, 4 = open chest in graphics/npc.bmp).
         { .type = EventType::chest, .x = 11, .y = 13, .npc_graphics = 3,
           .flag = FlagId::chest_village_herbs, .item = ItemId::herb, .item_amount = 3 },
+        // Chest with a weapon.
+        { .type = EventType::chest, .x = 13, .y = 15, .npc_graphics = 3,
+          .flag = FlagId::chest_village_sword, .item = ItemId::bronze_sword, .item_amount = 1 },
         // Healing spring on the 'F' tile: free, but unlike the inn it can't revive fallen members.
         { .type = EventType::spring, .x = 21, .y = 5, .pages = spring_pages, .price = 0 },
         // Item shop (npc_graphics 5 = shopkeeper).
@@ -183,6 +187,9 @@ namespace
         // Chest with gold.
         { .type = EventType::chest, .x = 18, .y = 9, .npc_graphics = 3,
           .flag = FlagId::chest_field_gold, .gold = 100 },
+        // Chest with a rare weapon.
+        { .type = EventType::chest, .x = 24, .y = 5, .npc_graphics = 3,
+          .flag = FlagId::chest_field_katana, .item = ItemId::katana, .item_amount = 1 },
     };
 
     constexpr EncounterGroup field_encounters[] = {

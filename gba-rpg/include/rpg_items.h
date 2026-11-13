@@ -1,5 +1,8 @@
 /*
  * Item database. To add an item: add an id here and a row in src/data/rpg_items.cpp.
+ *
+ * Equipment (weapons and armor) are items too: they are bought, sold, found in chests and counted in the
+ * bag like any other item. Equipping one moves it from the bag to a slot of a party member (rpg_party.h).
  */
 
 #ifndef RPG_ITEMS_H
@@ -7,6 +10,7 @@
 
 #include "bn_string_view.h"
 
+#include "rpg_classes.h"
 #include "rpg_common.h"
 
 namespace rpg
@@ -17,16 +21,39 @@ enum class ItemId : uint8_t
     herb,
     magic_water,
     fire_bomb,
-    count
+    bronze_sword,
+    katana,
+    oak_staff,
+    leather_armor,
+    chain_mail,
+    count,
+    none = 0xFF         //!< "Nothing": an empty equipment slot.
 };
 
 constexpr int item_count = int(ItemId::count);
+
+enum class ItemKind : uint8_t
+{
+    consumable,     //!< Used from the item menus: `effect` applies.
+    weapon,         //!< Equipment slot 1.
+    armor           //!< Equipment slot 2.
+};
 
 struct ItemData
 {
     bn::string_view name;
     Effect effect;
     int16_t price;      //!< Buy price in shops. The sell price is a percentage of it (rpg_shop.h).
+
+    // --- Equipment only (kind != consumable) ---
+    ItemKind kind = ItemKind::consumable;
+    uint8_t classes = 0;        //!< Classes that can equip it, as a mask of class_bit() values.
+    Stats bonus = {};           //!< Added to the wearer's stats (attack, defense, agility, max HP/MP).
+
+    [[nodiscard]] constexpr bool is_equipment() const
+    {
+        return kind != ItemKind::consumable;
+    }
 };
 
 [[nodiscard]] const ItemData& item_data(ItemId id);

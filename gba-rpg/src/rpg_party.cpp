@@ -27,6 +27,66 @@ int roll_physical_damage(int attack, int defense, bn::random& random)
     return damage < 1 ? 1 : damage;
 }
 
+Stats PartyMember::stats() const
+{
+    Stats result = stats_for_level(class_id, level);
+
+    for(ItemId id : { weapon, armor })
+    {
+        if(id != ItemId::none)
+        {
+            const Stats& bonus = item_data(id).bonus;
+            result.max_hp = int16_t(result.max_hp + bonus.max_hp);
+            result.max_mp = int16_t(result.max_mp + bonus.max_mp);
+            result.attack = int16_t(result.attack + bonus.attack);
+            result.defense = int16_t(result.defense + bonus.defense);
+            result.agility = int16_t(result.agility + bonus.agility);
+        }
+    }
+
+    return result;
+}
+
+ItemId PartyMember::equipped(ItemKind slot) const
+{
+    BN_ASSERT(slot != ItemKind::consumable, "Not an equipment slot");
+
+    return slot == ItemKind::weapon ? weapon : armor;
+}
+
+bool PartyMember::valid() const
+{
+    // Equipment ids must exist and be in the right slot: item_data() would assert otherwise.
+    auto slot_valid = [](ItemId id, ItemKind slot)
+    {
+        return id == ItemId::none || (id < ItemId::count && item_data(id).kind == slot);
+    };
+
+    if(class_id >= ClassId::count || level < 1 || level > max_level ||
+       ! slot_valid(weapon, ItemKind::weapon) || ! slot_valid(armor, ItemKind::armor))
+    {
+        return false;
+    }
+
+    Stats current_stats = stats();
+    return hp >= 0 && hp <= current_stats.max_hp && mp >= 0 && mp <= current_stats.max_mp;
+}
+
+void PartyMember::clamp_to_stats()
+{
+    Stats current_stats = stats();
+
+    if(hp > current_stats.max_hp)
+    {
+        hp = current_stats.max_hp;
+    }
+
+    if(mp > current_stats.max_mp)
+    {
+        mp = current_stats.max_mp;
+    }
+}
+
 void PartyMember::init(ClassId new_class_id, int new_level)
 {
     BN_ASSERT(new_level >= 1 && new_level <= max_level, "Invalid level: ", new_level);
@@ -181,6 +241,61 @@ bool Party::remove_item(ItemId id)
 
     --items[int(id)];
     return true;
+}
+
+EquipResult Party::equip(PartyMember& member, ItemId id)
+{
+    const ItemData& data = item_data(id);
+
+    if(! data.is_equipment() || ! (data.classes & class_bit(member.class_id)))
+    {
+        return EquipResult::not_allowed;
+    }
+
+    if(item_amount(id) == 0)
+    {
+        return EquipResult::not_owned;
+    }
+
+    ItemId& slot = data.kind == ItemKind::weapon ? member.weapon : member.armor;
+    ItemId old_item = slot;
+
+    // Check before changing anything: the old item has to fit in the bag.
+    if(old_item != ItemId::none && old_item != id && item_amount(old_item) >= max_item_stack)
+    {
+        return EquipResult::bag_full;
+    }
+
+    remove_item(id);
+
+    if(old_item != ItemId::none)
+    {
+        add_item(old_item);
+    }
+
+    slot = id;
+    member.clamp_to_stats();
+    return EquipResult::ok;
+}
+
+EquipResult Party::unequip(PartyMember& member, ItemKind slot_kind)
+{
+    ItemId& slot = slot_kind == ItemKind::weapon ? member.weapon : member.armor;
+
+    if(slot == ItemId::none)
+    {
+        return EquipResult::ok;
+    }
+
+    if(item_amount(slot) >= max_item_stack)
+    {
+        return EquipResult::bag_full;
+    }
+
+    add_item(slot);
+    slot = ItemId::none;
+    member.clamp_to_stats();
+    return EquipResult::ok;
 }
 
 int apply_heal(const Effect& effect, PartyMember& target, bn::random& random)
