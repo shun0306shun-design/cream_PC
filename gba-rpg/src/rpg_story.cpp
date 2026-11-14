@@ -22,6 +22,8 @@ namespace
     #define HERO RPG_NAME_HERO
     #define PARTNER RPG_NAME_PARTNER
     #define GENERAL RPG_NAME_GENERAL_1
+    #define SEER RPG_NAME_SEER
+    #define GATE RPG_NAME_GATE
 
     void say_pages(Ui& ui, bn::span<const bn::string_view> pages)
     {
@@ -137,23 +139,87 @@ namespace
         PARTNER ": I owe you one, and\nI hate owing. I'm coming\nalong until it's repaid.",
         HERO ": ...Do as you like.",
         PARTNER " joined the party!",
-        "- Chapter 3 -",
+        "- Chapter 3 -\nThe Star-Reader Girl",
     };
 
     constexpr EncounterGroup fort_battle = { { EnemyId::drake, EnemyId::cult_soldier }, 2 };
 
-    constexpr int partner_min_level = 4;
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 3 "The Star-Reader Girl"
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view seer_road_pages[] = {
+        "A mountain path climbs\nnorth. Nothing calls you\nthat way yet.",
+    };
 
-    /// The partner joins at the hero's level, already armed.
-    void join_partner(Party& party)
+    constexpr bn::string_view seer_village_pages[] = {
+        "A girl looks up from a\nbowl of still water.",
+        "???: One of ash, one of\nsteel. The stars said\nyou would come.",
+        PARTNER ": She means us?\nI'm not paying for a\nfortune.",
+        SEER ": I am " SEER ". I read\nthe stars for " RPG_NAME_SEER_TOWN ".",
+        SEER ": The one you hunt went\nnorth, past the " GATE ".\nIt is shut to all.",
+        HERO ": Then how do we\ncross it?",
+        SEER ": The stars above it\nwent dark. The mirror in\nthe Star Ruins can see.",
+        SEER ": Take me there. I\nmust know why my sky\nis going out.",
+        SEER " joined the party!",
+    };
+
+    constexpr bn::string_view ruins_gate_pages[] = {
+        "A stone path climbs to\nold ruins. The villagers\nkeep away from it.",
+    };
+
+    constexpr bn::string_view altar_pages[] = {
+        "A mirror of black glass\nlies on the altar.\nIt shows no stars.",
+        SEER ": Something woke.\nIt guards the mirror!",
+    };
+
+    constexpr bn::string_view altar_victory_pages[] = {
+        "The guardian crumbles.\nStarlight fills the\nmirror.",
+        SEER ": I see the " GATE "...\nand under it, water. An\nold waterway. A way through.",
+        SEER ": And I see why the\nstars fade. Ash. It is\nrising to the sky itself.",
+        "The mirror cracks. A shard\nshaped like a star stays\nin " SEER "'s hand.",
+        "Got the Star Sigil!",
+        PARTNER ": A sewer. Great.\nLead on, stargazer.",
+        SEER ": The sluice is by the\nlake, in the east of\nthe fields.",
+    };
+
+    constexpr bn::string_view sluice_pages[] = {
+        "An old sluice gate by\nthe lake. Its lock is\nshaped like a star.",
+    };
+
+    constexpr bn::string_view warden_pages[] = {
+        "Warden: Halt. None pass\nunder the " GATE ". By order\nof General " GENERAL ".",
+        HERO ": Then he is on\nthe other side.",
+        "Warden: And you never\nwill be. Drown them!",
+    };
+
+    constexpr bn::string_view warden_victory_pages[] = {
+        "The warden falls. Behind\nhim, stairs climb toward\ndaylight.",
+        SEER ": The " GATE " is\nabove us. We are through.",
+        HERO ": " GENERAL ". " RPG_NAME_EMPEROR ".\nI'm coming.",
+        SEER ": Your star burns very\nhot, " HERO ". Do not let\nit burn you up.",
+        "- Chapter 4 -",
+    };
+
+    constexpr bn::string_view beyond_pages[] = {
+        "The stairs lead up,\nbeyond the " GATE ".\n(To be continued.)",
+    };
+
+    constexpr EncounterGroup altar_battle = { { EnemyId::star_guardian }, 1 };
+    constexpr EncounterGroup warden_battle = { { EnemyId::warden, EnemyId::cult_soldier }, 2 };
+
+    constexpr int partner_min_level = 4;
+    constexpr int seer_min_level = 6;
+
+    /// A story character joins at the hero's level (or `min_level` if that is higher), already armed.
+    void join_member(Party& party, ClassId class_id, int min_level, ItemId weapon)
     {
         int level = party.members[0].level;
 
-        if(party.join(ClassId::lancer, level < partner_min_level ? partner_min_level : level))
+        if(party.join(class_id, level < min_level ? min_level : level))
         {
-            PartyMember& partner = party.members[party.size - 1];
-            partner.weapon = ItemId::iron_spear;
-            partner.restore();
+            PartyMember& member = party.members[party.size - 1];
+            member.weapon = weapon;
+            member.restore();
         }
     }
 }
@@ -249,7 +315,7 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         if(story_progress < progress::ch2_allied)
         {
             say_pages(ui, fort_pages);
-            join_partner(state.party);
+            join_member(state.party, ClassId::lancer, partner_min_level, ItemId::iron_spear);
             story_progress = progress::ch2_allied;
         }
         else
@@ -258,6 +324,42 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         }
 
         result.battle = &fort_battle;
+        break;
+
+    case StoryId::ch3_seer_road:
+        say_pages(ui, seer_road_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch3_seer_village:
+        say_pages(ui, seer_village_pages);
+        join_member(state.party, ClassId::mage, seer_min_level, ItemId::oak_staff);
+        story_progress = progress::ch3_seer;
+        break;
+
+    case StoryId::ch3_ruins_gate:
+        say_pages(ui, ruins_gate_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch3_altar:
+        say_pages(ui, altar_pages);
+        result.battle = &altar_battle;
+        break;
+
+    case StoryId::ch3_sluice:
+        say_pages(ui, sluice_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch3_warden:
+        say_pages(ui, warden_pages);
+        result.battle = &warden_battle;
+        break;
+
+    case StoryId::ch3_beyond:
+        say_pages(ui, beyond_pages);
+        result.step_back = true;
         break;
 
     default:
@@ -282,6 +384,18 @@ void run_story_victory(StoryId id, GameState& state, Ui& ui)
         // The general is only driven off. The partner, who fought as a guest, stays for good.
         say_pages(ui, fort_victory_pages);
         state.story_progress = progress::ch3_start;
+        break;
+
+    case StoryId::ch3_altar:
+        // The key item that opens the sluice of the waterway (the trigger there checks the progress).
+        say_pages(ui, altar_victory_pages);
+        state.party.add_item(ItemId::star_sigil);
+        state.story_progress = progress::ch3_sigil;
+        break;
+
+    case StoryId::ch3_warden:
+        say_pages(ui, warden_victory_pages);
+        state.story_progress = progress::ch4_start;
         break;
 
     default:

@@ -27,6 +27,7 @@ namespace
         { "Chain Mail",       {},     100,   ItemKind::armor,  class_bit(ClassId::hero) | class_bit(ClassId::samurai) | class_bit(ClassId::lancer), { 0, 0, 0, 8, 0 } },
         { "Steel Sword",      {},     150,   ItemKind::weapon, class_bit(ClassId::hero) | class_bit(ClassId::samurai),   { 0, 0, 8,  0,  0 } },
         { "Iron Spear",       {},     110,   ItemKind::weapon, class_bit(ClassId::lancer),                               { 0, 0, 6,  0,  2 } },
+        { "Star Sigil",       {},     0,     ItemKind::key },
     };
 
     static_assert(sizeof(items) / sizeof(items[0]) == item_count, "Item table doesn't match ItemId");

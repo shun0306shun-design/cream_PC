@@ -36,6 +36,7 @@ namespace
         { 'a',      true,     0 },    // ash
         { 'x',      false,    0 },    // rubble
         { '+',      false,    0 },    // grave (use it with a sign event)
+        { 'A',      false,    0 },    // altar (use it with a story or sign event)
     };
 
     static_assert(sizeof(tiles) / sizeof(tiles[0]) == int(TileId::count), "Tile table doesn't match TileId");
@@ -259,10 +260,10 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view field_rows[] = {
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM",    // 0
-        "M..............\"\"\"\"......~~~~~~M",    // 1
+        "M........>.....\"\"\"\"......~~~~~~M",    // 1
         "M....TT........\"\"\"\".....~~~~~~~M",    // 2
         "M...TTTT.................~~~~~~M",    // 3
-        "M....TT.....,.............~~~~.M",    // 4
+        "M....TT.....,.............~~~~>M",    // 4
         "M..............................M",    // 5
         "M..\"\"\"\".............TTT........M",    // 6
         "M..\"\"\"\"\"...........TTTTT.......M",    // 7
@@ -293,6 +294,16 @@ namespace
           .max_progress = progress::ch2_start - 1, .story = StoryId::ch2_road },
         { .type = EventType::warp, .x = 29, .y = 13, .warp_map = MapId::berg, .warp_x = 1, .warp_y = 6,
           .min_progress = progress::ch2_start },
+        // The mountain path north to the seer's village opens in chapter 3.
+        { .type = EventType::trigger, .x = 9, .y = 1,
+          .max_progress = progress::ch3_start - 1, .story = StoryId::ch3_seer_road },
+        { .type = EventType::warp, .x = 9, .y = 1, .warp_map = MapId::lunaris, .warp_x = 10, .warp_y = 12,
+          .min_progress = progress::ch3_start },
+        // The sluice by the lake: the way into the waterway, sealed until the Star Sigil is found.
+        { .type = EventType::trigger, .x = 30, .y = 4,
+          .max_progress = progress::ch3_sigil - 1, .story = StoryId::ch3_sluice },
+        { .type = EventType::warp, .x = 30, .y = 4, .warp_map = MapId::waterway, .warp_x = 2, .warp_y = 10,
+          .min_progress = progress::ch3_sigil },
         // Cave entrance: the gate in the rocks.
         { .type = EventType::warp, .x = 21, .y = 19, .warp_map = MapId::cave_1f, .warp_x = 9, .warp_y = 11 },
         // Chest with gold.
@@ -475,11 +486,17 @@ namespace
     };
 
     constexpr bn::string_view berg_townsman_ch3_pages[] = {
-        "The fort is quiet again.\nWas that your doing?\n" RPG_NAME_TOWN " owes you a drink.",
+        "The fort is quiet again.\nThey say the general fled\nnorth, past the " RPG_NAME_GATE ".",
+        "The gate is shut to all.\nAsk the seer of " RPG_NAME_SEER_TOWN ", up\nthe path north of the fields.",
+    };
+
+    constexpr bn::string_view berg_townsman_ch4_pages[] = {
+        "You got past the " RPG_NAME_GATE "?\n" RPG_NAME_TOWN " owes you a drink\nwhen you come back.",
     };
 
     constexpr bn::span<const bn::string_view> berg_townsman_chapter_pages[] = {
         berg_townsman_ch1_pages, berg_townsman_ch2_pages, berg_townsman_ch3_pages,
+        berg_townsman_ch4_pages,
     };
 
     constexpr MapEvent berg_events[] = {
@@ -548,6 +565,157 @@ namespace
     };
 
     // ---------------------------------------------------------------------------------------------------------------
+    // T03: village of fortune tellers, up the mountain path. The seer (npc_graphics 9) joins here in chapter 3.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view lunaris_rows[] = {
+        "TTTTTTTTTT>TTTTTTTTTTT",    // 0
+        "T.........:..........T",    // 1
+        "T..^^^^...:...^^^^...T",    // 2
+        "T..####...:...####...T",    // 3
+        "T..#D##...:...#D##...T",    // 4
+        "T...:.....:....:..,..T",    // 5
+        "T...:::::::::::::....T",    // 6
+        "T.........:..........T",    // 7
+        "T..,..F...:....S.....T",    // 8
+        "T.........:..........T",    // 9
+        "T.........:......,...T",    // 10
+        "T.........:..........T",    // 11
+        "T.........:..........T",    // 12
+        "TTTTTTTTTT>TTTTTTTTTTT",    // 13
+    };
+
+    static_assert(valid_layout(lunaris_rows), "Invalid lunaris layout");
+
+    constexpr bn::string_view lunaris_sign_pages[] = {
+        RPG_NAME_SEER_TOWN "\nNorth: the Star Ruins\nSouth: the fields",
+    };
+
+    constexpr bn::string_view lunaris_shop_pages[] = {
+        "Charms, herbs and staves.\nThe stars favor a\nprepared traveler.",
+    };
+
+    constexpr ItemId lunaris_shop_stock[] = {
+        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
+        ItemId::oak_staff, ItemId::steel_sword, ItemId::iron_spear, ItemId::chain_mail,
+    };
+
+    constexpr bn::string_view lunaris_villager_ch3_pages[] = {
+        "The stars over the " RPG_NAME_GATE "\nwent dark a month ago.\n" RPG_NAME_SEER " hasn't slept since.",
+    };
+
+    constexpr bn::string_view lunaris_villager_ch4_pages[] = {
+        "So " RPG_NAME_SEER " went with you.\nBring her home, when\nthe sky is clear again.",
+    };
+
+    // The village can't be reached before chapter 3: the first three sets are never shown.
+    constexpr bn::span<const bn::string_view> lunaris_villager_chapter_pages[] = {
+        lunaris_villager_ch3_pages, lunaris_villager_ch3_pages, lunaris_villager_ch3_pages,
+        lunaris_villager_ch4_pages,
+    };
+
+    constexpr MapEvent lunaris_events[] = {
+        { .type = EventType::warp, .x = 10, .y = 13, .warp_map = MapId::field, .warp_x = 9, .warp_y = 2 },
+        // The ruins open once the seer is in the party.
+        { .type = EventType::trigger, .x = 10, .y = 0,
+          .max_progress = progress::ch3_seer - 1, .story = StoryId::ch3_ruins_gate },
+        { .type = EventType::warp, .x = 10, .y = 0, .warp_map = MapId::ruins, .warp_x = 9, .warp_y = 11,
+          .min_progress = progress::ch3_seer },
+        { .type = EventType::inn, .x = 5, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 16, .y = 5, .npc_graphics = 5, .pages = lunaris_shop_pages,
+          .stock = lunaris_shop_stock },
+        { .type = EventType::sign, .x = 15, .y = 8, .pages = lunaris_sign_pages },
+        { .type = EventType::spring, .x = 6, .y = 8, .pages = spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 7, .y = 10, .npc_graphics = 0,
+          .movement = NpcMovement::wander, .wander_radius = 2, .chapter_pages = lunaris_villager_chapter_pages },
+        { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 9,
+          .min_progress = progress::ch3_start, .max_progress = progress::ch3_start,
+          .story = StoryId::ch3_seer_village },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D03: Star Ruins. The mirror on the altar ('A') shows the way under the gate.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view ruins_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%%%%%%%%_A_%%%%%%%%%",    // 1
+        "%%%%%%%_____%%%%%%%%",    // 2
+        "%%%%%%%_____%%%%%%%%",    // 3
+        "%%%%%%%%%_%%%%%%%%%%",    // 4
+        "%____%%%%_%%%%____%%",    // 5
+        "%_________________%%",    // 6
+        "%____%%%%_%%%%____%%",    // 7
+        "%____%%%%_%%%%%%%%%%",    // 8
+        "%%%%%%%%%_%%%%%%%%%%",    // 9
+        "%%%%%%%_____%%%%%%%%",    // 10
+        "%%%%%%%_____%%%%%%%%",    // 11
+        "%%%%%%%%%u%%%%%%%%%%",    // 12
+        "%%%%%%%%%%%%%%%%%%%%",    // 13
+    };
+
+    static_assert(valid_layout(ruins_rows), "Invalid ruins layout");
+
+    constexpr bn::string_view ruins_mirror_pages[] = {
+        "The mirror is cracked.\nIts work is done.",
+    };
+
+    constexpr MapEvent ruins_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 12, .warp_map = MapId::lunaris, .warp_x = 10, .warp_y = 1 },
+        { .type = EventType::story, .x = 9, .y = 1,
+          .min_progress = progress::ch3_seer, .max_progress = progress::ch3_seer, .story = StoryId::ch3_altar },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = ruins_mirror_pages, .min_progress = progress::ch3_sigil },
+        { .type = EventType::chest, .x = 1, .y = 8, .npc_graphics = 3,
+          .flag = FlagId::chest_ruins, .item = ItemId::magic_water, .item_amount = 3 },
+    };
+
+    constexpr EncounterGroup ruins_encounters[] = {
+        { { EnemyId::skeleton, EnemyId::skeleton }, 2 },
+        { { EnemyId::skeleton, EnemyId::bat, EnemyId::bat }, 3 },
+        { { EnemyId::goblin, EnemyId::skeleton }, 2 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D04: the old waterway under the gate. Entered from the sluice by the lake of the fields (Star Sigil needed);
+    // the stairs in the north-east corner come out beyond the gate.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view waterway_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%%%%%%%%%%%%%%%%_u%%",    // 1
+        "%____~~~~____%%%_%%%",    // 2
+        "%____~~~~____%%%_%%%",    // 3
+        "%____====_________%%",    // 4
+        "%____~~~~____%%%%%%%",    // 5
+        "%%_%%~~~~%%_%%%%%%%%",    // 6
+        "%%_%%~~~~%%_%%%%%%%%",    // 7
+        "%____~~~~____%%%%%%%",    // 8
+        "%____====____%%%%%%%",    // 9
+        "%____~~~~____%%%%%%%",    // 10
+        "%_u__~~~~____%%%%%%%",    // 11
+        "%%%%%%%%%%%%%%%%%%%%",    // 12
+        "%%%%%%%%%%%%%%%%%%%%",    // 13
+    };
+
+    static_assert(valid_layout(waterway_rows), "Invalid waterway layout");
+
+    constexpr MapEvent waterway_events[] = {
+        { .type = EventType::warp, .x = 2, .y = 11, .warp_map = MapId::field, .warp_x = 30, .warp_y = 5 },
+        // The warden (npc_graphics 7) blocks the corridor to the exit until he is beaten.
+        { .type = EventType::story, .x = 16, .y = 3, .npc_graphics = 7,
+          .min_progress = progress::ch3_sigil, .max_progress = progress::ch4_start - 1,
+          .story = StoryId::ch3_warden },
+        // Chapter 4 starts on the other side: replace this trigger with a warp when its maps exist.
+        { .type = EventType::trigger, .x = 17, .y = 1, .story = StoryId::ch3_beyond },
+        { .type = EventType::chest, .x = 12, .y = 2, .npc_graphics = 3,
+          .flag = FlagId::chest_waterway, .item = ItemId::herb, .item_amount = 5 },
+    };
+
+    constexpr EncounterGroup waterway_encounters[] = {
+        { { EnemyId::cult_soldier, EnemyId::cult_soldier }, 2 },
+        { { EnemyId::cult_soldier, EnemyId::bat }, 2 },
+        { { EnemyId::skeleton, EnemyId::cult_soldier }, 2 },
+        { { EnemyId::slime, EnemyId::slime, EnemyId::slime }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
     // Map table. The order must match MapId.
     // ---------------------------------------------------------------------------------------------------------------
     constexpr MapData maps[] = {
@@ -603,6 +771,28 @@ namespace
             .encounter_rate = 12,
             .border = TileId::wall,
         },
+        {
+            .name = RPG_NAME_SEER_TOWN,
+            .rows = lunaris_rows,
+            .events = lunaris_events,
+            .border = TileId::tree,
+        },
+        {
+            .name = "Star Ruins",
+            .rows = ruins_rows,
+            .events = ruins_events,
+            .encounters = ruins_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
+        },
+        {
+            .name = "Old Waterway",
+            .rows = waterway_rows,
+            .events = waterway_events,
+            .encounters = waterway_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -634,7 +824,8 @@ namespace
     // Where the party wakes up after a defeat, by chapter_index(). Later chapters use the last one.
     constexpr RespawnPoint respawn_points[] = {
         { start_map, start_x, start_y },    // Chapter 1: home.
-        { MapId::berg, 4, 6 },              // Chapter 2 on: in front of the inn of the post town.
+        { MapId::berg, 4, 6 },              // Chapter 2: in front of the inn of the post town.
+        { MapId::lunaris, 4, 6 },           // Chapter 3 on: in front of the inn of the seer's village.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)

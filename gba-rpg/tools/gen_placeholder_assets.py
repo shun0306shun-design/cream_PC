@@ -367,11 +367,23 @@ def tile_grave():
     return c
 
 
+def tile_altar():
+    c = tile_cave_floor()
+    rect(c, 1, 8, 14, 15, 11)               # stone table
+    rect(c, 1, 8, 14, 9, 12)
+    rect(c, 3, 11, 12, 15, 10)
+    ellipse(c, 7.5, 5, 4, 4, 1)             # black mirror
+    ellipse(c, 7.5, 5, 3, 3, 7)
+    c[4][6] = 12                            # a star
+    c[6][9] = 9
+    return c
+
+
 FIELD_TILES = [
     tile_void, tile_grass, tile_path, tile_tree, tile_water, tile_wall, tile_roof,
     tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate, tile_spring,
     tile_cave_floor, tile_cave_wall, tile_stairs_up, tile_stairs_down,
-    tile_ash, tile_rubble, tile_grave,
+    tile_ash, tile_rubble, tile_grave, tile_altar,
 ]
 
 
@@ -552,6 +564,7 @@ def gen_npcs():
         person('down', 0, hair=12, tunic=4, trim=14),   # 6 the partner (spearman)
         person('down', 0, hair=11, tunic=11, trim=7),   # 7 cultist
         person('down', 0, hair=7, tunic=7, trim=6),     # 8 Ash General
+        person('down', 0, hair=6, tunic=14, trim=9),    # 9 the seer
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
@@ -693,6 +706,27 @@ def gen_cult():
     write_json('enemy_drake.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
 
 
+def gen_guardian():
+    # Star Guardian: a stone statue with a star on its chest.
+    c = canvas(32, 32)
+    rect(c, 8, 10, 23, 25, 10)                      # body
+    rect(c, 3, 11, 7, 24, 10)                       # arms
+    rect(c, 24, 11, 28, 24, 10)
+    rect(c, 9, 26, 14, 31, 11)                      # legs
+    rect(c, 17, 26, 22, 31, 11)
+    rect(c, 11, 2, 20, 9, 10)                       # head
+    rect(c, 12, 5, 19, 6, 1)                        # eye slit
+    rect(c, 13, 5, 14, 6, 14)
+    rect(c, 17, 5, 18, 6, 14)
+    triangle(c, (15, 12), (10, 21), (21, 21), 6)    # star
+    triangle(c, (15, 24), (10, 15), (21, 15), 6)
+    rect(c, 8, 10, 23, 10, 9)                       # highlights
+    rect(c, 11, 2, 20, 2, 9)
+    outline(c)
+    write_bmp('enemy_guardian.bmp', c, SPRITE_PALETTE)
+    write_json('enemy_guardian.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
+
+
 if __name__ == '__main__':
     os.makedirs(OUT_DIR, exist_ok=True)
     gen_field()
@@ -703,4 +737,5 @@ if __name__ == '__main__':
     gen_enemies()
     gen_skeleton()
     gen_cult()
+    gen_guardian()
     print('Placeholder assets written to', os.path.normpath(OUT_DIR))

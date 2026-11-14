@@ -27,6 +27,8 @@ enum class FlagId : uint8_t
     chest_cave_2f,
     chest_cave_3f,
     chest_fort,
+    chest_ruins,
+    chest_waterway,
     // Add new flags here.
     count,
     none = 0xFF         //!< "No flag": the default of MapEvent::flag.

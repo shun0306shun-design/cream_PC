@@ -28,6 +28,7 @@ enum class ItemId : uint8_t
     chain_mail,
     steel_sword,
     iron_spear,
+    star_sigil,     //!< Key item: opens the waterway under the gate (chapter 3).
     count,
     none = 0xFF         //!< "Nothing": an empty equipment slot.
 };
@@ -43,7 +44,8 @@ enum class ItemKind : uint8_t
 {
     consumable,     //!< Used from the item menus: `effect` applies.
     weapon,         //!< Equipment slot 1.
-    armor           //!< Equipment slot 2.
+    armor,          //!< Equipment slot 2.
+    key             //!< Story item: can't be used, equipped or sold (price 0).
 };
 
 struct ItemData
@@ -59,7 +61,7 @@ struct ItemData
 
     [[nodiscard]] constexpr bool is_equipment() const
     {
-        return kind != ItemKind::consumable;
+        return kind == ItemKind::weapon || kind == ItemKind::armor;
     }
 };
 

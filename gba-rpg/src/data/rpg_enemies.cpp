@@ -8,6 +8,7 @@
 #include "bn_sprite_items_enemy_skeleton.h"
 #include "bn_sprite_items_enemy_cultist.h"
 #include "bn_sprite_items_enemy_drake.h"
+#include "bn_sprite_items_enemy_guardian.h"
 
 #include "rpg_names.h"
 
@@ -27,6 +28,9 @@ namespace
         // Story bosses (see rpg_story.cpp). The scout is fought alone, the general by two.
         { "Cult Scout", &bn::sprite_items::enemy_cultist, { 70, 0, 26, 8,  9  }, 45, 40,   SpellId::fire, 25 },
         { RPG_NAME_GENERAL_1, &bn::sprite_items::enemy_drake, { 170, 0, 36, 12, 12 }, 120, 150, SpellId::blizzard, 30 },
+        // Chapter 3 bosses, fought by three.
+        { "Star Guardian", &bn::sprite_items::enemy_guardian, { 230, 0, 36, 16, 7 }, 160, 120, SpellId::blizzard, 25 },
+        { "Gate Warden", &bn::sprite_items::enemy_cultist, { 200, 0, 40, 13, 11 }, 200, 180, SpellId::fire, 30 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

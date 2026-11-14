@@ -21,7 +21,7 @@ enum class ClassId : uint8_t
     hero,
     samurai,
     priest,
-    mage,
+    mage,       //!< The seer (chapter 3): attack magic and some healing.
     lancer,     //!< The partner: fast spear fighter.
     count
 };

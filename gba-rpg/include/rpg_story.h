@@ -38,8 +38,13 @@ namespace progress
     constexpr uint8_t ch2_rivals = 11;      //!< Quarrel with the partner in the post town.
     constexpr uint8_t ch2_allied = 12;      //!< Fighting General 1 side by side (the partner is in the party).
 
-    // Chapter 3 (20-29)
+    // Chapter 3 "The Star-Reader Girl" (20-29)
     constexpr uint8_t ch3_start = 20;       //!< General 1 was driven off: the partner joined for good.
+    constexpr uint8_t ch3_seer = 21;        //!< The seer joined in her village: the Star Ruins open.
+    constexpr uint8_t ch3_sigil = 22;       //!< Star Ruins cleared: got the Star Sigil that opens the waterway.
+
+    // Chapter 4 (30-39)
+    constexpr uint8_t ch4_start = 30;       //!< Crossed under the gate through the waterway.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -63,6 +68,13 @@ enum class StoryId : uint8_t
     ch2_partner_town,   //!< First meeting with the partner.
     ch2_east_gate,      //!< The highway to the fort, closed until the quarrel.
     ch2_fort,           //!< Boss of the ruined fort, fought together. Winning starts chapter 3.
+    ch3_seer_road,      //!< The mountain path to the seer's village, closed until chapter 3.
+    ch3_seer_village,   //!< Meeting the seer: she joins.
+    ch3_ruins_gate,     //!< The way to the Star Ruins, closed until the seer joins.
+    ch3_altar,          //!< Boss of the Star Ruins. Winning gives the Star Sigil.
+    ch3_sluice,         //!< The sealed entrance of the waterway (needs the Star Sigil).
+    ch3_warden,         //!< Boss of the waterway. Winning starts chapter 4.
+    ch3_beyond,         //!< The exit beyond the gate: where the implemented story ends for now.
     count,
     none = 0xFF
 };

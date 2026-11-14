@@ -13,6 +13,9 @@
 #define RPG_NAME_PARTNER    "Sion"      // The partner: a bounty hunter who fights with a spear.
 #define RPG_NAME_VILLAGE    "Hart"      // T01: the hero's home village.
 #define RPG_NAME_TOWN       "Berg"      // T02: the post town.
+#define RPG_NAME_SEER       "Mirea"     // The star-reader girl: joins in chapter 3 (the mage class).
+#define RPG_NAME_SEER_TOWN  "Lunaris"   // T03: the village of fortune tellers.
+#define RPG_NAME_GATE       "Great Gate" // The checkpoint that closes the way north.
 #define RPG_NAME_CULT       "Ashen Cult"
 #define RPG_NAME_EMPEROR    "Valgren"   // The Flame Emperor, leader of the cult.
 #define RPG_NAME_GENERAL_1  "Drake"     // The first of the four Ash Generals.

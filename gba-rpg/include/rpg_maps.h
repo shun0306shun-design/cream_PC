@@ -43,6 +43,7 @@ enum class TileId : uint8_t
     ash,        //!< Burnt ground: walkable, no battles.
     rubble,     //!< What is left of a burnt house: solid.
     grave,      //!< Solid: put a EventType::sign event on it.
+    altar,      //!< Solid: put a EventType::story or sign event on it.
     count
 };
 
@@ -64,6 +65,9 @@ enum class MapId : uint8_t
     cave_3f,
     berg,       //!< T02: post town.
     fort,       //!< D02: ruined fort on the highway.
+    lunaris,    //!< T03: village of fortune tellers.
+    ruins,      //!< D03: Star Ruins.
+    waterway,   //!< D04: waterway under the gate.
     count
 };
 
