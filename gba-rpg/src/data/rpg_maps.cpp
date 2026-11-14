@@ -1269,12 +1269,12 @@ namespace
           .stock = ashbell_shop_stock, .max_progress = last_before_siege },
         { .type = EventType::talk, .x = 18, .y = 9, .npc_graphics = 0, .pages = grancel_citizen_pages,
           .movement = NpcMovement::wander, .wander_radius = 2, .max_progress = last_before_siege },
-        // E602: the companions, out in the city on the eve (npc_graphics 6 partner, 9 seer, 7 defector).
+        // E602: the companions, out in the city on the eve (npc_graphics 6 partner, 9 seer, 12 defector).
         { .type = EventType::story, .x = 11, .y = 7, .npc_graphics = 6,
           .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_partner },
         { .type = EventType::story, .x = 5, .y = 4, .npc_graphics = 9,
           .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_seer },
-        { .type = EventType::story, .x = 18, .y = 7, .npc_graphics = 7,
+        { .type = EventType::story, .x = 18, .y = 7, .npc_graphics = 12,
           .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_defector },
         // The palace doors (the 'D' tiles): the way into the royal castle once the gate is held.
         { .type = EventType::story, .x = 7, .y = 3, .max_progress = last_before_siege, .story = StoryId::ch6_palace },
@@ -1376,7 +1376,7 @@ namespace
         { .type = EventType::sign, .x = 14, .y = 9, .pages = refuge_sign_pages },
         { .type = EventType::spring, .x = 6, .y = 8, .pages = spring_pages, .price = 0 },
         // Rico, the child who pulled the hero out of the river (E701).
-        { .type = EventType::story, .x = 5, .y = 10, .npc_graphics = 0,
+        { .type = EventType::story, .x = 5, .y = 10, .npc_graphics = 13,
           .movement = NpcMovement::wander, .wander_radius = 2, .story = StoryId::ch7_rico },
         // E702: the seer (npc_graphics 9) tends the wounded by the big house until she rejoins.
         { .type = EventType::story, .x = 6, .y = 6, .npc_graphics = 9,

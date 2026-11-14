@@ -207,7 +207,12 @@ def tile_grass(seed=1):
     return c
 
 
-def tile_path():
+# How deep the grass grows into a path, along each of its sides (a loose, uneven fringe).
+FRINGE = [2, 3, 2, 1, 2, 3, 3, 2, 1, 1, 2, 3, 2, 2, 1, 2]
+
+
+def tile_path(edges=0):
+    """edges: the sides that touch grass (bit 0 up, 1 left, 2 right, 3 down). The grass grows over them."""
     c = canvas(16, 16, 6)
     for y in range(16):
         for x in range(16):
@@ -220,6 +225,21 @@ def tile_path():
         c[y][x] = 12
         c[y][x + 1] = c[y + 1][x] = 11
         c[y + 1][x + 1] = 5
+
+    grass = tile_grass()
+    depth = [[0] * 16 for _ in range(16)]       # > 0: grass, 0: its shadow on the sand, < 0: sand.
+    for y in range(16):
+        for x in range(16):
+            depth[y][x] = max((FRINGE[x] - y) if edges & 1 else -9,
+                              (FRINGE[(y + 5) % 16] - x) if edges & 2 else -9,
+                              (FRINGE[(y + 11) % 16] - (15 - x)) if edges & 4 else -9,
+                              (FRINGE[(x + 7) % 16] - (15 - y)) if edges & 8 else -9)
+    for y in range(16):
+        for x in range(16):
+            if depth[y][x] > 0:
+                c[y][x] = grass[y][x] if depth[y][x] > 1 else 2
+            elif depth[y][x] == 0 and (x + y) % 3:
+                c[y][x] = 5
     return c
 
 
@@ -367,7 +387,8 @@ def tile_tall_grass():
     return c
 
 
-def tile_water(shore=False):
+def tile_water(edges=0):
+    """edges: the sides that touch the land (bit 0 up, 1 left, 2 right, 3 down)."""
     c = canvas(16, 16, 8)
     # Ripples: a light crest over a dark trough, in a loose diagonal so the tile repeats without stripes.
     for (x, y, length) in ((1, 2, 5), (10, 5, 4), (4, 9, 5), (12, 12, 3), (0, 14, 3)):
@@ -377,12 +398,34 @@ def tile_water(shore=False):
     for (x, y) in ((7, 3), (14, 8), (2, 6), (9, 13)):       # glints
         c[y][x] = 12
         c[y][x + 1] = 9
-    if shore:
+    if edges & 1:
         # The bank above casts a shadow, with a line of foam under it.
         rect(c, 0, 0, 15, 1, 7)
         for x in range(16):
             c[2][x] = 12 if x % 5 < 3 else 9
             c[3][x] = 9 if x % 5 in (0, 4) else 8
+    # The other banks: a dark rim and broken foam.
+    if edges & 2:
+        for y in range(16):
+            c[y][0] = 7
+            c[y][1] = 9 if y % 6 < 4 else (12 if y % 6 == 4 else 8)
+    if edges & 4:
+        for y in range(16):
+            c[y][15] = 7
+            c[y][14] = 9 if (y + 3) % 6 < 4 else (12 if (y + 3) % 6 == 4 else 8)
+    if edges & 8:
+        rect(c, 0, 15, 15, 15, 7)
+        for x in range(16):
+            c[14][x] = 9 if (x + 2) % 7 < 4 else (12 if (x + 2) % 7 == 4 else 8)
+        if edges & 2:
+            c[14][0] = 7
+        if edges & 4:
+            c[14][15] = 7
+    if edges & 1:
+        if edges & 2:
+            rect(c, 0, 0, 0, 3, 7)
+        if edges & 4:
+            rect(c, 15, 0, 15, 3, 7)
     return c
 
 
@@ -972,7 +1015,7 @@ FIELD_TILES = [
 FIELD_EXTRA_TILES = [
     lambda: tile_roof('left'), lambda: tile_roof('right'), tile_house_wall, tile_house_window,
     tile_stone_floor, tile_wall_torch, tile_wall_chain, tile_cave_torch, tile_ladder,
-    lambda: tile_water(shore=True),
+    lambda: tile_water(1),
     lit_floor(tile_stone_floor), lit_floor(tile_cave_floor),
     lit_wall(tile_wall, -1), lit_wall(tile_wall, 1), lit_wall(tile_cave_wall, -1), lit_wall(tile_cave_wall, 1),
 ]
@@ -983,6 +1026,9 @@ def field_sheet():
     tiles = [t() for t in FIELD_TILES] + [t() for t in FIELD_EXTRA_TILES]
     # Every ground object over every ground: index = base + (object * len(GROUNDS)) + ground.
     tiles += [obj(ground) for obj in GROUND_OBJECTS for ground in GROUNDS]
+    # Paths with grass over their sides and water with banks: index = base + edges (see tile_path / tile_water).
+    tiles += [tile_path(edges) for edges in range(16)]
+    tiles += [tile_water(edges) for edges in range(16)]
     return tiles
 
 
@@ -1087,130 +1133,475 @@ SPRITE_PALETTE = [
 ]
 
 
-def person(direction, step, hair, tunic, trim):
-    """16x16 chibi character. direction: 'down', 'up', 'left', 'right'. step: 0 or 1."""
+# Characters (player.bmp and npc.bmp) have their own palette: skin shadow, hair and cloth colors.
+# Every person is the same little body (BODY, one drawing per direction) with its own colors, plus a few
+# rows drawn over it: the hair style, a hat, a beard, a spear... (see CAST).
+
+CHAR_PALETTE = [
+    (255, 0, 255),    # 0 transparent
+    (34, 28, 44),     # 1 k outline
+    (246, 206, 164),  # 2 f skin
+    (208, 148, 112),  # 3 z skin shadow
+    (246, 242, 228),  # 4 w white
+    (172, 176, 190),  # 5 e light gray (steel, silver hair)
+    (92, 90, 110),    # 6 d dark gray
+    (204, 68, 56),    # 7 r red
+    (140, 204, 236),  # 8 c light blue
+    (62, 110, 200),   # 9 u blue
+    (38, 54, 112),    # 10 n navy
+    (74, 150, 84),    # 11 g green
+    (126, 82, 50),    # 12 b brown
+    (242, 204, 84),   # 13 y yellow
+    (134, 86, 170),   # 14 p purple
+    (226, 134, 62),   # 15 o orange
+]
+
+CHAR_PIXELS = {
+    'k': 1, 'f': 2, 'z': 3, 'w': 4, 'e': 5, 'd': 6, 'r': 7, 'c': 8,
+    'u': 9, 'n': 10, 'g': 11, 'b': 12, 'y': 13, 'p': 14, 'o': 15,
+}
+
+# The body, in "role" letters that each character maps to its own colors:
+#   K outline   H hair   I hair highlight   S skin   Z skin shadow   E eyes
+#   T clothes   U clothes shadow   B belt / trim   P legs   F shoes
+BODY = {
+    'down': [
+        '................',
+        '....KKKKKKKK....',
+        '...KHHIIHHHHK...',
+        '..KHHIHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '..KHHSSHHSSHHK..',
+        '..KHSSSSSSSSHK..',
+        '..KZSESSSSESZK..',
+        '...KSESSSSESK...',
+        '...KKSSZZSSKK...',
+        '..KTTKKKKKKTTK..',
+        '..KSTTTBBTTTSK..',
+        '..KKUTTBBTTUKK..',
+        '...KUTTTTTTUK...',
+        '...KPPPKKPPPK...',
+        '...KFFK..KFFK...',
+    ],
+    'up': [
+        '................',
+        '....KKKKKKKK....',
+        '...KHHIIHHHHK...',
+        '..KHHIHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '...KHHHHHHHHK...',
+        '...KKHHHHHHKK...',
+        '..KTTKKKKKKTTK..',
+        '..KSTTTTTTTTSK..',
+        '..KKUBBBBBBUKK..',
+        '...KUTTTTTTUK...',
+        '...KPPPKKPPPK...',
+        '...KFFK..KFFK...',
+    ],
+    'left': [
+        '................',
+        '....KKKKKKKK....',
+        '...KHHIIHHHHK...',
+        '..KHHIHHHHHHHK..',
+        '..KHHHHHHHHHHK..',
+        '..KSSSHSHHHHHK..',
+        '..KSSSSSHHHHHK..',
+        '..KSSESSZHHHHK..',
+        '...KSESSZHHHK...',
+        '...KKSSSZKKKK...',
+        '....KTTTTTUK....',
+        '....KTTSSTUK....',
+        '....KBBSKBUK....',
+        '....KTTKTTUK....',
+        '.....KPPPPK.....',
+        '....KFFKFFK.....',
+    ],
+}
+
+# What changes in the second frame of the walk: one foot up, the arms swing.
+STEP = {
+    'down': {11: '..KKTTTBBTTTSK..', 12: '..KSUTTBBTTUKK..', 14: '...KPPPKKPPPK...', 15: '...KKKK..KFFK...'},
+    'up': {11: '..KSTTTTTTTTKK..', 12: '..KKUBBBBBBUSK..', 14: '...KPPPKKPPPK...', 15: '...KFFK..KKKK...'},
+    'left': {11: '....KTSSTTUK....', 12: '....KBKKBBUK....', 14: '....KPPKPPPK....', 15: '...KFFK.KFFK....'},
+}
+
+
+def person(look, direction='down', step=0):
+    """16x16 character. look: an entry of CAST. direction: 'down', 'up', 'left', 'right'. step: 0 or 1."""
+    side = 'left' if direction == 'right' else direction
+    rows = list(BODY[side])
+
+    if step:
+        for y, row in STEP[side].items():
+            rows[y] = row
+
     c = canvas(16, 16)
-    rect(c, 4, 1, 11, 7, 2)                      # head
-    rect(c, 4, 1, 11, 3, hair)                   # hair / helmet
-    rect(c, 4, 8, 11, 12, tunic)                 # body
-    rect(c, 4, 10, 11, 10, trim)                 # belt
+    roles = dict(CHAR_PIXELS)
+    roles.update({role: CHAR_PIXELS[color] for role, color in look['colors'].items()})
+    roles.update({'K': 1, 'S': 2, 'Z': 3})
+    roles.setdefault('E', 1)
 
-    if direction == 'down':
-        rect(c, 4, 4, 4, 5, hair)
-        rect(c, 11, 4, 11, 5, hair)
-        c[5][6] = c[5][9] = 1
-        rect(c, 3, 8, 3, 11, tunic)
-        rect(c, 12, 8, 12, 11, tunic)
-        c[11][3] = c[11][12] = 2
-    elif direction == 'up':
-        rect(c, 4, 1, 11, 6, hair)
-        rect(c, 3, 8, 3, 11, tunic)
-        rect(c, 12, 8, 12, 11, tunic)
-        c[11][3] = c[11][12] = 2
-    else:
-        rect(c, 7, 1, 11, 6, hair)
-        rect(c, 4, 1, 11, 2, hair)
-        c[5][5] = 1
-        rect(c, 7, 8, 8, 11, trim)
-        c[11][7] = c[11][8] = 2
+    def draw(art):
+        for y, row in enumerate(art):
+            for x, char in enumerate(row):
+                if char == '_':
+                    c[y][x] = 0
+                elif char != '.':
+                    c[y][x] = roles[char]
 
-    # Legs: alternate which foot is lifted to fake a walk cycle.
-    left_len, right_len = (3, 2) if step == 0 else (2, 3)
-    rect(c, 5, 13, 6, 12 + left_len, 5)
-    rect(c, 9, 13, 10, 12 + right_len, 5)
+    draw(rows)
+    draw(look.get(side, []))
+
+    if step:
+        draw(look.get(side + '_step', []))
 
     if direction == 'right':
         c = [list(reversed(row)) for row in c]
 
-    outline(c)
     return c
 
 
+# Colors (see the roles of BODY) and what is drawn over the body, per direction. In those drawings a letter
+# is a role or a color of CHAR_PIXELS, '.' keeps what is under it and '_' erases it.
+CAST = {
+    # The hero: spiky brown hair, blue tunic, red scarf.
+    'hero': {
+        'colors': {'H': 'b', 'I': 'o', 'T': 'u', 'U': 'n', 'B': 'y', 'P': 'e', 'F': 'b'},
+        'down': [
+            '...K.KK..KK.K...',
+            '..KHKHHKKHHKHK..',
+            '..KHHHIIHHHHHK..',
+            '.KHHHIHHHHHHHHK.',
+            '.KHHHHHHHHHHHHK.',
+            '..KHSHSHHSHSHK..',
+            '', '', '', '',
+            '..KTKrrrrrrKTK..',
+        ],
+        'up': [
+            '...K.KK..KK.K...',
+            '..KHKHHKKHHKHK..',
+            '..KHHHIIHHHHHK..',
+            '.KHHHIHHHHHHHHK.',
+            '.KHHHHHHHHHHHHK.',
+            '', '', '', '',
+            '...KKrrrrrrKK...',
+            '..KTTKKrrKKTTK..',
+            '..KSTTTrrTTTSK..',
+        ],
+        'left': [
+            '...K.KK..KK.K...',
+            '..KHKHHKKHHKHK..',
+            '..KHHHIIHHHHHKK.',
+            '.KHHHIHHHHHHHHK.',
+            '..KHHHHHHHHHHHK.',
+            '..KSSHSHHHHHHK..',
+            '', '', '',
+            '...KKrrrrrrKK...',
+            '....KTTTTTrrK...',
+            '...........KrK..',
+        ],
+    },
+    # The partner: a bounty hunter with a ponytail and a spear on the back.
+    'partner': {
+        'colors': {'H': 'p', 'I': 'c', 'T': 'n', 'U': 'd', 'B': 'e', 'P': 'd', 'F': 'k'},
+        'down': [
+            '.............Ke.',
+            '....KKKKKKKK.KeK',
+            '...KHHHIHHHHKKb.',
+            '..KHHHIHHHHHHKb.',
+            '..KHHHHHHHHHHKb.',
+            '..KHHHSSHHSHHKb.',
+            '..KHSSSSSSSHHKb.',
+            '..............b.',
+            '.............Kb.',
+            '.............Kb.',
+            '..KTTKeeeeKTTKb.',
+            '.............Sb.',
+            '.............Kb.',
+            '.............Kb.',
+            '..............b.',
+            '.............Kb.',
+        ],
+    },
+    # The star reader: long blonde hair, white robe, a star on the hair band.
+    'seer': {
+        'colors': {'H': 'y', 'I': 'w', 'T': 'w', 'U': 'c', 'B': 'c', 'P': 'w', 'F': 'u'},
+        'down': [
+            '',
+            '',
+            '',
+            '..KuuuuucuuuuK..',
+            '..KHHHHcwcHHHK..',
+            '..KHHSSScSSHHK..',
+            '', '',
+            '..KHSESSSSESHK..',
+            '..KHHSSZZSSHHK..',
+            '..KHTTKKKKTTHK..',
+            '..KHTTTccTTTHK..',
+            '..KKUTTccTTUKK..',
+            '...KTTTTTTTTK...',
+            '...KUTTTTTTUK...',
+            '...KKFFKKFFKK...',
+        ],
+    },
+    # The defector: a former priest of the cult. Silver hair over one eye, dark robe, white stole.
+    'defector': {
+        'colors': {'H': 'e', 'I': 'w', 'T': 'd', 'U': 'k', 'B': 'd', 'P': 'd', 'F': 'k'},
+        'down': [
+            '', '', '', '', '',
+            '..KHHHHHSSSHHK..',
+            '..KHHHHSSSSSHK..',
+            '..KHHHSSSSESZK..',
+            '...KHHSSSSESK...',
+            '',
+            '..KTwKKKKKKwTK..',
+            '..KSTwTTTTwTSK..',
+            '..KKUwTTTTwUKK..',
+            '...KTwTTTTwTK...',
+            '...KTrTTTTrTK...',
+            '...KKFFKKFFKK...',
+        ],
+    },
+    # Rico: a small child with a green cap.
+    'child': {
+        'colors': {'H': 'o', 'I': 'y', 'T': 'y', 'U': 'o', 'B': 'y', 'P': 'b', 'F': 'k'},
+        'down': [
+            '________________',
+            '________________',
+            '________________',
+            '....KKKKKKKK....',
+            '...KggggggggK...',
+            '..KggggggggggK..',
+            '..KKKKKKKKKKKKK.',
+            '..KHHSSHHSSHHK..',
+            '..KHSSSSSSSSHK..',
+            '..KZSESSSSESZK..',
+            '...KSESSSSESK...',
+            '...KKSSZZSSKK...',
+            '...KSTTTTTTSK...',
+            '...KKUTTTTUKK...',
+            '....KPPKKPPK....',
+            '....KFFK.KFFK...',
+        ],
+    },
+    'villager': {
+        'colors': {'H': 'b', 'I': 'o', 'T': 'g', 'U': 'b', 'B': 'y', 'P': 'b', 'F': 'k'},
+    },
+    # The elder: bald, with a long white beard and a staff.
+    'elder': {
+        'colors': {'H': 'w', 'I': 'w', 'T': 'p', 'U': 'n', 'B': 'y', 'P': 'p', 'F': 'b'},
+        'down': [
+            '.Kb.............',
+            'KbbK.KKKKKKK....',
+            '.KbKKSSSSSSSK...',
+            '.KbKSSSSSSSSSK..',
+            '.KbKSSSSSSSSwK..',
+            '.KbKwSSSSSSSwK..',
+            '.KbKwwSSSSSwwK..',
+            '.KbKwESSSSESwK..',
+            '.KbKKwSZZSwwK...',
+            '.KbKKwwwwwwKK...',
+            '.KSKTKwwwwKTTK..',
+            '.KbKTTwwwwTTSK..',
+            '.KbKUTTwwTTUKK..',
+            '.KbKUTTTTTTUK...',
+            '.KbKTTTTTTTTK...',
+            '.KbKKFFKKFFKK...',
+        ],
+    },
+    # The innkeeper: a woman with a bun and an apron.
+    'innkeeper': {
+        'colors': {'H': 'o', 'I': 'y', 'T': 'r', 'U': 'b', 'B': 'w', 'P': 'r', 'F': 'b'},
+        'down': [
+            '......KKKK......',
+            '....KKHIHHKK....',
+            '...KHHHHHHHHK...',
+            '', '', '', '', '', '', '',
+            '..KTTKKKKKKTTK..',
+            '..KSTwwwwwwTSK..',
+            '..KKUwwwwwwUKK..',
+            '...KTwwwwwwTK...',
+            '...KTTwwwwTTK...',
+            '...KKFFKKFFKK...',
+        ],
+    },
+    # The shopkeeper: a turban and a moustache.
+    'shopkeeper': {
+        'colors': {'H': 'b', 'I': 'b', 'T': 'o', 'U': 'b', 'B': 'w', 'P': 'g', 'F': 'b'},
+        'down': [
+            '',
+            '....KKKKKKKK....',
+            '...KwwwwwwwwK...',
+            '..KwwwweewwwwK..',
+            '..KeewwrrwweeK..',
+            '..KKeeeeeeeeKK..',
+            '', '',
+            '...KSbbSSbbSK...',
+        ],
+    },
+    # A soldier of the cult: the face is lost in the hood, only the eyes glow.
+    'cultist': {
+        'colors': {'H': 'd', 'I': 'e', 'T': 'd', 'U': 'k', 'B': 'r', 'P': 'd', 'F': 'k', 'E': 'r'},
+        'down': [
+            '.......KK.......',
+            '.....KKHHKK.....',
+            '...KKHHIHHHKK...',
+            '..KHHIHHHHHHHK..',
+            '..KHHHKKKKHHHK..',
+            '..KHHKKKKKKHHK..',
+            '..KHKKKKKKKKHK..',
+            '..KHKrKKKKrKHK..',
+            '...KHKKKKKKHK...',
+            '...KHHKKKKHHK...',
+            '..KTTHHrrHHTTK..',
+            '..KTTTTrrTTTTK..',
+            '..KKUTTrrTTUKK..',
+            '...KTTTrrTTTK...',
+            '...KTTTTTTTTK...',
+            '...KKKKKKKKKK...',
+        ],
+    },
+    # An Ash General: red armor, horned helmet, cape.
+    'general': {
+        'colors': {'H': 'r', 'I': 'o', 'T': 'r', 'U': 'b', 'B': 'y', 'P': 'd', 'F': 'k', 'E': 'y'},
+        'down': [
+            '.KK..........KK.',
+            '.KeK.KKKKKK.KeK.',
+            '.KeeKHHIIHHKeeK.',
+            '..KeHHIHHHHHeK..',
+            '..KHHHHyyHHHHK..',
+            '..KHHHHHHHHHHK..',
+            '..KHKKKKKKKKHK..',
+            '..KHKEKKKKEKHK..',
+            '...KHKKKKKKHK...',
+            '..KKKHHHHHHKKK..',
+            '.KdKeeKKKKeeKdK.',
+            '.KdKeTTBBTTeKdK.',
+            '.KdKKUTBBTUKKdK.',
+            '.KddKUTTTTUKddK.',
+            '.KdddKPKKPKdddK.',
+            '..KKKKFK.KFKKK..',
+        ],
+    },
+    # The stranger of the epilogue: white hair, a traveller's cloak, the necklace.
+    'stranger': {
+        'colors': {'H': 'w', 'I': 'w', 'T': 'p', 'U': 'n', 'B': 'p', 'P': 'n', 'F': 'k'},
+        'down': [
+            '', '', '',
+            '..KHHHHHHHHHHK..',
+            '..KHHHeHHeHHHK..',
+            '..KHeSSHHSSeHK..',
+            '', '', '', '',
+            '..KTTKKKKKKTTK..',
+            '..KTTTKyyKTTTK..',
+            '..KKTTTyyTTTKK..',
+            '...KUTTTTTTUK...',
+            '...KUTTTTTTUK...',
+            '...KKFFKKFFKK...',
+        ],
+    },
+}
+
+
 def gen_player():
-    frames = [person(d, s, hair=4, tunic=3, trim=6)
-              for d in ('down', 'up', 'left', 'right') for s in (0, 1)]
-    write_bmp('player.bmp', stack(frames), SPRITE_PALETTE)
+    frames = [person(CAST['hero'], d, s) for d in ('down', 'up', 'left', 'right') for s in (0, 1)]
+    write_bmp('player.bmp', stack(frames), CHAR_PALETTE)
     write_json('player.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
+
+
+def char_art(rows):
+    c = canvas(16, 16)
+    for y, row in enumerate(rows):
+        for x, char in enumerate(row):
+            if char != '.':
+                c[y][x] = CHAR_PIXELS[char]
+    return c
 
 
 def chest(opened):
     """16x16 treasure chest. Frame order in npc.bmp: closed, then open."""
-    pixels = {'k': 1, 'b': 5, 'y': 6, 'r': 7, 'w': 9, 'd': 11, 'o': 13}
     closed = [
         '................',
-        '................',
-        '...bbbbbbbbbb...',
-        '..boooooooooob..',
-        '.byoooooooooyob.',
-        '.byobbbbbbbboyb.',
-        '.byooooooooooyb.',
-        '.bbbbbbyybbbbbb.',
-        '.kkkkkkywkkkkkk.',
-        '.byoooyykyoooyb.',
-        '.byooooyyooooyb.',
-        '.byooooooooooyb.',
-        '.byobbbbbbbboyb.',
-        '.byooooooooooyb.',
-        '.bbbbbbbbbbbbbb.',
+        '..kkkkkkkkkkkk..',
+        '.kbooooooooooobk',
+        '.kyooooooooooyk.',
+        '.kyobbbbbbbboyk.',
+        '.kyooooooooooyk.',
+        '.kbbbbbkyykbbbbk',
+        '.kkkkkkkywkkkkk.',
+        '.kyooookyykoooyk',
+        '.kyoooookkooooyk',
+        '.kyooooooooooyk.',
+        '.kyobbbbbbbboyk.',
+        '.kyooooooooooyk.',
+        '.kbbbbbbbbbbbbk.',
+        '..kkkkkkkkkkkk..',
         '................',
     ]
     open_ = [
-        '..bbbbbbbbbbbb..',
-        '.byoooooooooyob.',
-        '.byobbbbbbbboyb.',
-        '.byooooooooooyb.',
-        '.bbbbbbbbbbbbbb.',
-        '.bddddddddddddb.',
-        '.bkkkkkkkkkkkkb.',
-        '.bkkywykkyykwkb.',
-        '.bkyyyyywyyyykb.',
-        '.byoooooooooyob.',
-        '.byooooooooooyb.',
-        '.byooooooooooyb.',
-        '.byobbbbbbbboyb.',
-        '.byooooooooooyb.',
-        '.bbbbbbbbbbbbbb.',
+        '..kkkkkkkkkkkk..',
+        '.kyooooooooooyk.',
+        '.kyobbbbbbbboyk.',
+        '.kyooooooooooyk.',
+        '.kbbbbbbbbbbbbk.',
+        '.kddddddddddddk.',
+        '.kkkkkkkkkkkkkk.',
+        '.kkywykkyykwykk.',
+        '.kyyyyywyyyyyyk.',
+        '.kyooooooooooyk.',
+        '.kyooooooooooyk.',
+        '.kyobbbbbbbboyk.',
+        '.kyooooooooooyk.',
+        '.kbbbbbbbbbbbbk.',
+        '..kkkkkkkkkkkk..',
         '................',
     ]
-    c = canvas(16, 16)
-    for y, row in enumerate(open_ if opened else closed):
-        for x, char in enumerate(row):
-            if char != '.':
-                c[y][x] = pixels[char]
-    outline(c)
-    return c
+    return char_art([row[:16] for row in (open_ if opened else closed)])
 
 
 def wyrm_head():
     """16x16 map sprite of the canyon boss: a serpent head rising from the lava."""
-    c = canvas(16, 16)
-    ellipse(c, 7.5, 7, 6, 6, 7)
-    triangle(c, (3, 3), (1, 0), (6, 2), 13)     # horns
-    triangle(c, (12, 3), (14, 0), (9, 2), 13)
-    rect(c, 4, 6, 5, 7, 6)                      # eyes
-    rect(c, 10, 6, 11, 7, 6)
-    rect(c, 5, 10, 10, 11, 1)                   # mouth
-    rect(c, 3, 13, 12, 15, 13)                  # lava around the neck
-    outline(c)
-    return c
+    return char_art([
+        '.kk..........kk.',
+        'kyok........koyk',
+        '.kookkkkkkkkook.',
+        '..krrrorrrrrrk..',
+        '.krrrorrrrrrrrk.',
+        '.krrrrrrrrrrrrk.',
+        '.krykrrrrrrkyrk.',
+        '.krykkrrrrkkyrk.',
+        '.kbrrrrrrrrrrbk.',
+        '..kbrrkrrkrrbk..',
+        '..kkbrrrrrrbkk..',
+        '.kokkwkwwkwkkok.',
+        'koyokkkkkkkkoyok',
+        'kyoyooooooooyoyk',
+        '.kooyyooooyyook.',
+        '..kkkkkkkkkkkk..',
+    ])
 
 
 def gen_npcs():
     frames = [
-        person('down', 0, hair=5, tunic=8, trim=6),     # 0 villager
-        person('down', 0, hair=10, tunic=12, trim=9),   # 1 elder
-        person('down', 0, hair=13, tunic=7, trim=9),    # 2 innkeeper
-        chest(False),                                   # 3 closed chest
-        chest(True),                                    # 4 open chest
-        person('down', 0, hair=5, tunic=13, trim=9),    # 5 shopkeeper
-        person('down', 0, hair=12, tunic=4, trim=14),   # 6 the partner (spearman)
-        person('down', 0, hair=11, tunic=11, trim=7),   # 7 cultist
-        person('down', 0, hair=7, tunic=7, trim=6),     # 8 Ash General
-        person('down', 0, hair=6, tunic=14, trim=9),    # 9 the seer
-        wyrm_head(),                                    # 10 ember wyrm
-        person('down', 0, hair=9, tunic=12, trim=6),    # 11 the stranger (after the ending)
+        person(CAST['villager']),       # 0 villager
+        person(CAST['elder']),          # 1 elder
+        person(CAST['innkeeper']),      # 2 innkeeper
+        chest(False),                   # 3 closed chest
+        chest(True),                    # 4 open chest
+        person(CAST['shopkeeper']),     # 5 shopkeeper
+        person(CAST['partner']),        # 6 the partner (spearman)
+        person(CAST['cultist']),        # 7 cultist
+        person(CAST['general']),        # 8 Ash General
+        person(CAST['seer']),           # 9 the seer
+        wyrm_head(),                    # 10 ember wyrm
+        person(CAST['stranger']),       # 11 the stranger (after the ending)
+        person(CAST['defector']),       # 12 the defector (former cult priest)
+        person(CAST['child']),          # 13 Rico
     ]
-    write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
+    write_bmp('npc.bmp', stack(frames), CHAR_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
 
 

@@ -104,8 +104,14 @@ namespace
         grave,
         altar,
         barrel,
-        magic_circle
+        magic_circle,
+        count
     };
+
+    // Paths with grass over their sides and water with banks, 16 tiles each: the index is a mask of the sides
+    // that touch grass (paths) or land (water). Bit 0 up, 1 left, 2 right, 3 down.
+    constexpr int gfx_path_edges = gfx_ground_objects + (int(GroundObject::count) * int(Ground::count));
+    constexpr int gfx_water_edges = gfx_path_edges + 16;
 
     /// Forts, castles and cathedrals: the maps surrounded by brick walls have flagstones instead of cave floor.
     [[nodiscard]] bool stone_style(const MapData& map)
@@ -182,6 +188,24 @@ namespace
         default:
             return Ground::grass;
         }
+    }
+
+    [[nodiscard]] bool grassy(TileId tile)
+    {
+        return tile == TileId::grass || tile == TileId::flowers || tile == TileId::tall_grass;
+    }
+
+    [[nodiscard]] bool watery(TileId tile)
+    {
+        return tile == TileId::water || tile == TileId::bridge;
+    }
+
+    /// Mask of the neighbours of a tile that pass the given test: bit 0 up, 1 left, 2 right, 3 down.
+    template<typename Test>
+    [[nodiscard]] int neighbours_mask(const MapData& map, int x, int y, Test test)
+    {
+        return (test(map.tile(x, y - 1)) ? 1 : 0) | (test(map.tile(x - 1, y)) ? 2 : 0) |
+                (test(map.tile(x + 1, y)) ? 4 : 0) | (test(map.tile(x, y + 1)) ? 8 : 0);
     }
 
     [[nodiscard]] int ground_object_graphics(GroundObject object, const MapData& map, int x, int y)
@@ -309,14 +333,17 @@ namespace
             }
             break;
 
-        case TileId::water:
+        case TileId::path:
+            if(int edges = neighbours_mask(map, x, y, grassy))
             {
-                TileId above = map.tile(x, y - 1);
+                return gfx_path_edges + edges;
+            }
+            break;
 
-                if(above != TileId::water && above != TileId::bridge)
-                {
-                    return gfx_water_shore;
-                }
+        case TileId::water:
+            if(int edges = neighbours_mask(map, x, y, [](TileId other) { return ! watery(other); }))
+            {
+                return edges == 1 ? gfx_water_shore : gfx_water_edges + edges;
             }
             break;
 
