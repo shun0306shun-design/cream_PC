@@ -173,12 +173,15 @@ WARMER = {7: 8, 10: 11, 11: 6, 12: 15}
 
 
 def glow(c, cx, cy, radius):
-    """Torch light: brightens the pixels around (cx, cy), fading out with an ordered dither."""
+    """Torch light: brightens the pixels around (cx, cy). Near the flame everything is lit, twice for the
+    colors that can take it; further away the light fades out with an ordered dither."""
     for y in range(16):
         for x in range(16):
-            distance = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
-            if distance < radius and (BAYER[y % 4][x % 4] + 0.5) / 16 < 1 - distance / radius:
+            strength = 1.5 * (1 - (((x - cx) ** 2 + (y - cy) ** 2) ** 0.5) / radius)
+            if strength > (BAYER[y % 4][x % 4] + 0.5) / 16:
                 c[y][x] = WARMER.get(c[y][x], c[y][x])
+                if strength > 1.05:
+                    c[y][x] = WARMER.get(c[y][x], c[y][x])
     return c
 
 
@@ -221,23 +224,38 @@ def tile_path():
 
 
 def tile_ash():
-    """Burnt ground: warm gray ash over scorched earth."""
+    """Burnt ground: scorched earth under warm gray ash, with a few charred stubs of grass."""
     c = canvas(16, 16, 10)
+    paint(c, [
+        '..bbbb..........',
+        '.bbbbbb.....bbb.',
+        '..bbbbbb...bbbbb',
+        '....bbb.....bbbb',
+        '.............bb.',
+        '......bbbb......',
+        '.bb..bbbbbbb....',
+        'bbbb..bbbbbbb...',
+        'bbbbb...bbbb....',
+        '.bbb............',
+        '...........bbbb.',
+        '....bbb...bbbbbb',
+        '...bbbbbb..bbbbb',
+        '..bbbbbbb....bb.',
+        '...bbbbb........',
+        '................',
+    ])
     for y in range(16):
         for x in range(16):
             n = noise(x, y, 21)
-            if n < 9:
+            if n < 7:
                 c[y][x] = 1
-            elif n > 247:
-                c[y][x] = 11
-    for (x, y) in ((1, 2), (9, 5), (4, 10), (11, 13)):      # patches of earth showing through
-        rect(c, x, y, x + 3, y, 5)
-        rect(c, x + 1, y + 1, x + 4, y + 1, 5)
+            elif n > 248:
+                c[y][x] = 11 if c[y][x] == 10 else 6
+    for (x, y) in ((9, 3), (2, 11), (13, 8)):               # charred grass
+        c[y][x] = 2
         c[y + 1][x] = 1
-    for (x, y) in ((6, 1), (13, 9), (1, 7)):                 # light flakes of ash
-        c[y][x] = c[y][x + 1] = 11
-    c[3][13] = c[12][8] = 13                                 # embers
-    c[4][13] = c[13][8] = 14
+    c[4][5] = c[13][10] = 13                                # embers
+    c[5][5] = c[14][10] = 14
     return c
 
 
@@ -432,16 +450,16 @@ TORCH = [
 
 def lit_floor(tile):
     """The floor under a torch."""
-    return lambda: glow(tile(), 7.5, -5, 19)
+    return lambda: glow(tile(), 7.5, -5, 23)
 
 
 def lit_wall(tile, torch_side):
     """The wall next to a torch (torch_side: -1 = the torch is at its left, 1 = at its right)."""
-    return lambda: glow(tile(), 7.5 - (16 * -torch_side), 4, 19)
+    return lambda: glow(tile(), 7.5 - (16 * -torch_side), 4, 23)
 
 
 def tile_wall_torch():
-    return paint(glow(tile_wall(), 7.5, 4, 11), TORCH)
+    return paint(glow(tile_wall(), 7.5, 4, 14), TORCH)
 
 
 def tile_wall_chain():
@@ -635,7 +653,7 @@ def tile_cave_wall():
 
 
 def tile_cave_torch():
-    return paint(glow(tile_cave_wall(), 7.5, 4, 11), TORCH)
+    return paint(glow(tile_cave_wall(), 7.5, 4, 14), TORCH)
 
 
 def tile_stairs_down():
