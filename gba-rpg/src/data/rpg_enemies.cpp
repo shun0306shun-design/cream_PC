@@ -9,6 +9,7 @@
 #include "bn_sprite_items_enemy_cultist.h"
 #include "bn_sprite_items_enemy_drake.h"
 #include "bn_sprite_items_enemy_guardian.h"
+#include "bn_sprite_items_enemy_wyrm.h"
 
 #include "rpg_names.h"
 
@@ -31,6 +32,9 @@ namespace
         // Chapter 3 bosses, fought by three.
         { "Star Guardian", &bn::sprite_items::enemy_guardian, { 230, 0, 36, 16, 7 }, 160, 120, SpellId::blizzard, 25 },
         { "Gate Warden", &bn::sprite_items::enemy_cultist, { 200, 0, 40, 13, 11 }, 200, 180, SpellId::fire, 30 },
+        // Chapter 4: beyond the gate.
+        { "Cult Knight", &bn::sprite_items::enemy_cultist, { 75, 0, 34, 14, 10 }, 40, 30, SpellId::fire, 20 },
+        { "Ember Wyrm", &bn::sprite_items::enemy_wyrm, { 320, 0, 44, 16, 12 }, 300, 250, SpellId::fire, 35 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

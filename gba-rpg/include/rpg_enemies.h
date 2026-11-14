@@ -27,6 +27,8 @@ enum class EnemyId : uint8_t
     drake,          //!< Boss of chapter 2 (Ash General).
     star_guardian,  //!< Boss of the Star Ruins (chapter 3).
     warden,         //!< Boss of the waterway (chapter 3).
+    cult_knight,
+    ember_wyrm,     //!< Boss of the Searing Canyon (chapter 4).
     count
 };
 

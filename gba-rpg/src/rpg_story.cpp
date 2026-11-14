@@ -262,12 +262,56 @@ namespace
         SEER ": The " GATE " is\nabove us. We are through.",
         HERO ": " GENERAL ". " RPG_NAME_EMPEROR ".\nI'm coming.",
         SEER ": Your star burns very\nhot, " HERO ". Do not let\nit burn you up.",
-        "- Chapter 4 -",
+        "- Chapter 4 -\nThe Scorched Land",
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 4 "The Scorched Land"
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view wasteland_pages[] = {
+        "Daylight. But no sky:\nonly a gray ceiling\nof smoke.",
+        "No fields. No forest.\nAsh, to the horizon.",
+        PARTNER ": This isn't a\nbattlefield. Nobody\nfought here.",
+        SEER ": I cannot hear the\nland. It is not asleep.\nIt is gone.",
+        HERO ": Smoke, to the west.\nChimney smoke.\nSomeone is alive.",
+    };
+
+    constexpr bn::string_view chronicler_pages[] = {
+        "An old woman marks a\nscorched map with\ncharcoal.",
+        "Chronicler: Travelers?\nFrom beyond the " GATE "?\nThen you don't know.",
+        "Chronicler: Look. Every\nblack mark is a land\nthat burned.",
+        "The map is almost\nentirely black.",
+        "Chronicler: Eight parts in\nten of the world. Gone.\nYours is what is left.",
+        HERO ": ...Eight in ten.\n" RPG_NAME_VILLAGE " was one spark\nin all of this.",
+        PARTNER ": And I was\ncounting bounties.",
+        "Chronicler: The Emperor\ndoes not conquer.\nHe feeds a fire.",
+        "Chronicler: His general\ncamps past the Searing\nCanyon, to the northeast.",
+        SEER ": " HERO ". Is revenge\nstill all you want?",
+        HERO ": ...I don't know\nanymore.",
+    };
+
+    constexpr bn::string_view canyon_gate_pages[] = {
+        "Heat rolls out of a\ncanyon. Better to learn\nwhat lies ahead first.",
+    };
+
+    constexpr bn::string_view wyrm_pages[] = {
+        "The lava stirs. Something\nvast uncoils from it.",
+        SEER ": It was a river\nspirit once. The fire\nate it hollow.",
+        PARTNER ": Mourn it later.\nIt's hungry!",
+    };
+
+    constexpr bn::string_view wyrm_victory_pages[] = {
+        "The wyrm sinks into the\nlava. For a moment, the\nwater in it sings.",
+        "From the canyon's rim:\na plain of black glass,\nand a tower of flame.",
+        HERO ": That's where\nthey are. All of them.",
+        "- Chapter 5 -",
     };
 
     constexpr bn::string_view beyond_pages[] = {
-        "The stairs lead up,\nbeyond the " GATE ".\n(To be continued.)",
+        "The path goes on toward\nthe tower of flame.\n(To be continued.)",
     };
+
+    constexpr EncounterGroup wyrm_battle = { { EnemyId::ember_wyrm }, 1 };
 
     constexpr EncounterGroup altar_battle = { { EnemyId::star_guardian }, 1 };
     constexpr EncounterGroup warden_battle = { { EnemyId::warden, EnemyId::cult_soldier }, 2 };
@@ -422,7 +466,27 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle = &warden_battle;
         break;
 
-    case StoryId::ch3_beyond:
+    case StoryId::ch4_wasteland:
+        say_pages(ui, wasteland_pages);
+        story_progress = progress::ch4_wasteland;
+        break;
+
+    case StoryId::ch4_chronicler:
+        say_pages(ui, chronicler_pages);
+        story_progress = progress::ch4_truth;
+        break;
+
+    case StoryId::ch4_canyon_gate:
+        say_pages(ui, canyon_gate_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch4_wyrm:
+        say_pages(ui, wyrm_pages);
+        result.battle = &wyrm_battle;
+        break;
+
+    case StoryId::ch4_beyond:
         say_pages(ui, beyond_pages);
         result.step_back = true;
         break;
@@ -461,6 +525,11 @@ void run_story_victory(StoryId id, GameState& state, Ui& ui)
     case StoryId::ch3_warden:
         say_pages(ui, warden_victory_pages);
         state.story_progress = progress::ch4_start;
+        break;
+
+    case StoryId::ch4_wyrm:
+        say_pages(ui, wyrm_victory_pages);
+        state.story_progress = progress::ch5_start;
         break;
 
     default:

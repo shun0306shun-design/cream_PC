@@ -379,11 +379,25 @@ def tile_altar():
     return c
 
 
+def tile_lava():
+    c = canvas(16, 16, 13)
+    for y in range(16):
+        for x in range(16):
+            n = noise(x, y, 31)
+            if n < 60:
+                c[y][x] = 14
+            elif n > 215:
+                c[y][x] = 15
+    rect(c, 2, 4, 6, 4, 15)                 # bright flows
+    rect(c, 9, 11, 13, 11, 15)
+    return c
+
+
 FIELD_TILES = [
     tile_void, tile_grass, tile_path, tile_tree, tile_water, tile_wall, tile_roof,
     tile_door, tile_sign, tile_rock, tile_flowers, tile_tall_grass, tile_bridge, tile_gate, tile_spring,
     tile_cave_floor, tile_cave_wall, tile_stairs_up, tile_stairs_down,
-    tile_ash, tile_rubble, tile_grave, tile_altar,
+    tile_ash, tile_rubble, tile_grave, tile_altar, tile_lava,
 ]
 
 
@@ -553,6 +567,20 @@ def chest(opened):
     return c
 
 
+def wyrm_head():
+    """16x16 map sprite of the canyon boss: a serpent head rising from the lava."""
+    c = canvas(16, 16)
+    ellipse(c, 7.5, 7, 6, 6, 7)
+    triangle(c, (3, 3), (1, 0), (6, 2), 13)     # horns
+    triangle(c, (12, 3), (14, 0), (9, 2), 13)
+    rect(c, 4, 6, 5, 7, 6)                      # eyes
+    rect(c, 10, 6, 11, 7, 6)
+    rect(c, 5, 10, 10, 11, 1)                   # mouth
+    rect(c, 3, 13, 12, 15, 13)                  # lava around the neck
+    outline(c)
+    return c
+
+
 def gen_npcs():
     frames = [
         person('down', 0, hair=5, tunic=8, trim=6),     # 0 villager
@@ -565,6 +593,7 @@ def gen_npcs():
         person('down', 0, hair=11, tunic=11, trim=7),   # 7 cultist
         person('down', 0, hair=7, tunic=7, trim=6),     # 8 Ash General
         person('down', 0, hair=6, tunic=14, trim=9),    # 9 the seer
+        wyrm_head(),                                    # 10 ember wyrm
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')
@@ -727,6 +756,26 @@ def gen_guardian():
     write_json('enemy_guardian.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
 
 
+def gen_wyrm():
+    # Ember Wyrm: a serpent of cooling lava.
+    c = canvas(32, 32)
+    ellipse(c, 16, 24, 13, 6, 7)                    # coils
+    ellipse(c, 16, 24, 8, 3, 13)
+    rect(c, 13, 10, 19, 24, 7)                      # neck
+    rect(c, 15, 12, 17, 23, 13)
+    ellipse(c, 16, 8, 8, 6, 7)                      # head
+    triangle(c, (10, 5), (5, 0), (13, 4), 13)       # horns
+    triangle(c, (21, 5), (26, 0), (18, 4), 13)
+    eyes(c, 16, 8, 4)
+    rect(c, 12, 11, 20, 12, 1)                      # mouth
+    rect(c, 13, 12, 14, 13, 9)                      # fangs
+    rect(c, 18, 12, 19, 13, 9)
+    triangle(c, (16, 13), (14, 18), (18, 18), 6)    # fire breath
+    outline(c)
+    write_bmp('enemy_wyrm.bmp', c, SPRITE_PALETTE)
+    write_json('enemy_wyrm.json', '{\n    "type": "sprite",\n    "height": 32\n}\n')
+
+
 if __name__ == '__main__':
     os.makedirs(OUT_DIR, exist_ok=True)
     gen_field()
@@ -738,4 +787,5 @@ if __name__ == '__main__':
     gen_skeleton()
     gen_cult()
     gen_guardian()
+    gen_wyrm()
     print('Placeholder assets written to', os.path.normpath(OUT_DIR))

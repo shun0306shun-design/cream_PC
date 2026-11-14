@@ -44,6 +44,7 @@ enum class TileId : uint8_t
     rubble,     //!< What is left of a burnt house: solid.
     grave,      //!< Solid: put a EventType::sign event on it.
     altar,      //!< Solid: put a EventType::story or sign event on it.
+    lava,       //!< Solid.
     count
 };
 
@@ -68,6 +69,9 @@ enum class MapId : uint8_t
     lunaris,    //!< T03: village of fortune tellers.
     ruins,      //!< D03: Star Ruins.
     waterway,   //!< D04: waterway under the gate.
+    wasteland,  //!< The burnt plains beyond the gate (second overworld).
+    ashbell,    //!< T04: town of survivors.
+    canyon,     //!< D05: Searing Canyon.
     count
 };
 

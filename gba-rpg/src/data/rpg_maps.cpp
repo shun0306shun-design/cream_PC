@@ -38,6 +38,7 @@ namespace
         { 'x',      false,    0 },    // rubble
         { '+',      false,    0 },    // grave (use it with a sign event)
         { 'A',      false,    0 },    // altar (use it with a story or sign event)
+        { 'L',      false,    0 },    // lava
     };
 
     static_assert(sizeof(tiles) / sizeof(tiles[0]) == int(TileId::count), "Tile table doesn't match TileId");
@@ -726,8 +727,8 @@ namespace
         { .type = EventType::story, .x = 16, .y = 3, .npc_graphics = 7,
           .min_progress = progress::ch3_sigil, .max_progress = progress::ch4_start - 1,
           .story = StoryId::ch3_warden },
-        // Chapter 4 starts on the other side: replace this trigger with a warp when its maps exist.
-        { .type = EventType::trigger, .x = 17, .y = 1, .story = StoryId::ch3_beyond },
+        // Out beyond the gate (only reachable once the warden is gone).
+        { .type = EventType::warp, .x = 17, .y = 1, .warp_map = MapId::wasteland, .warp_x = 12, .warp_y = 10 },
         { .type = EventType::chest, .x = 12, .y = 2, .npc_graphics = 3,
           .flag = FlagId::chest_waterway, .item = ItemId::herb, .item_amount = 5 },
     };
@@ -737,6 +738,153 @@ namespace
         { { EnemyId::cult_soldier, EnemyId::bat }, 2 },
         { { EnemyId::skeleton, EnemyId::cult_soldier }, 2 },
         { { EnemyId::slime, EnemyId::slime, EnemyId::slime }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // The burnt plains beyond the gate: cracked ground ('_', with battles), ash, rubble. Chapter 4 starts here.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view wasteland_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%____x__________x___:>%%",    // 1
+        "%___________xx______:_%%",    // 2
+        "%__xx_______________:_%%",    // 3
+        "%___________________:_%%",    // 4
+        "%_____x_____::::::::::%%",    // 5
+        "%___________:____x____%%",    // 6
+        "%__>::::::::::________%%",    // 7
+        "%___________:_____xx__%%",    // 8
+        "%____xx_____:_________%%",    // 9
+        "%%%%%%%%%%%%:%%%%%%%%%%%",    // 10
+        "%%%%%%%%%%%%d%%%%%%%%%%%",    // 11
+        "%%%%%%%%%%%%%%%%%%%%%%%%",    // 12
+    };
+
+    static_assert(valid_layout(wasteland_rows), "Invalid wasteland layout");
+
+    constexpr MapEvent wasteland_events[] = {
+        { .type = EventType::warp, .x = 12, .y = 11, .warp_map = MapId::waterway, .warp_x = 16, .warp_y = 1 },
+        // The only way out of the stairs: the first sight of the burnt world.
+        { .type = EventType::trigger, .x = 12, .y = 9,
+          .min_progress = progress::ch4_start, .max_progress = progress::ch4_start, .story = StoryId::ch4_wasteland },
+        { .type = EventType::warp, .x = 3, .y = 7, .warp_map = MapId::ashbell, .warp_x = 18, .warp_y = 6 },
+        { .type = EventType::trigger, .x = 21, .y = 1,
+          .max_progress = progress::ch4_truth - 1, .story = StoryId::ch4_canyon_gate },
+        { .type = EventType::warp, .x = 21, .y = 1, .warp_map = MapId::canyon, .warp_x = 2, .warp_y = 10,
+          .min_progress = progress::ch4_truth },
+    };
+
+    constexpr EncounterGroup wasteland_encounters[] = {
+        { { EnemyId::cult_knight }, 1 },
+        { { EnemyId::skeleton, EnemyId::skeleton }, 2 },
+        { { EnemyId::cult_knight, EnemyId::cult_soldier }, 2 },
+        { { EnemyId::skeleton, EnemyId::cult_soldier, EnemyId::bat }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // T04: town of survivors, built on ruins. The chronicler (npc_graphics 1) tells how much of the world burned.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view ashbell_rows[] = {
+        "xxxxxxxxxxxxxxxxxxxx",    // 0
+        "xaaaaaaaaaaaaaaaaaax",    // 1
+        "xa^^^^aaaaxxxaaaaaax",    // 2
+        "xa####aaaaxxxaa^^^ax",    // 3
+        "xa#D##aaaaaaaaa###ax",    // 4
+        "xaa:aaaaaaaaaaa#D#ax",    // 5
+        "xaa::::::::::::::aa>",    // 6
+        "xaaaaaaa:aaaaaaaaaax",    // 7
+        "xaxxaaaa:aaFaaaxxaax",    // 8
+        "xaxxaaaa:aaaaaaaaaax",    // 9
+        "xaaaaaaa:aaaaaSaaaax",    // 10
+        "xaaaaaaaaaaaaaaaaaax",    // 11
+        "xxxxxxxxxxxxxxxxxxxx",    // 12
+    };
+
+    static_assert(valid_layout(ashbell_rows), "Invalid ashbell layout");
+
+    constexpr bn::string_view ashbell_sign_pages[] = {
+        RPG_NAME_ASH_TOWN "\nBuilt on what was left.",
+    };
+
+    constexpr bn::string_view ashbell_shop_pages[] = {
+        "Salvage. All of it.\nTake what you need.",
+    };
+
+    constexpr ItemId ashbell_shop_stock[] = {
+        ItemId::herb, ItemId::magic_water, ItemId::fire_bomb,
+        ItemId::steel_sword, ItemId::iron_spear, ItemId::oak_staff, ItemId::chain_mail,
+    };
+
+    constexpr bn::string_view ashbell_spring_pages[] = {
+        "The water is gray with\nash. It is still water.",
+    };
+
+    constexpr bn::string_view ashbell_survivor_pages[] = {
+        "We burn nothing here.\nNot wood. Not candles.\nNot even our dead.",
+    };
+
+    constexpr bn::string_view ashbell_mother_pages[] = {
+        "My son asked what a tree\nwas. I drew him one.\nHe didn't believe me.",
+    };
+
+    constexpr bn::string_view ashbell_chronicler_pages[] = {
+        "Chronicler: I keep the map\nso someone remembers\nwhat was there.",
+        "Chronicler: The canyon is\nto the northeast. Past it,\nthe tower of flame.",
+    };
+
+    constexpr MapEvent ashbell_events[] = {
+        { .type = EventType::warp, .x = 19, .y = 6, .warp_map = MapId::wasteland, .warp_x = 4, .warp_y = 7 },
+        { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 14, .y = 5, .npc_graphics = 5, .pages = ashbell_shop_pages,
+          .stock = ashbell_shop_stock },
+        { .type = EventType::sign, .x = 14, .y = 10, .pages = ashbell_sign_pages },
+        { .type = EventType::spring, .x = 11, .y = 8, .pages = ashbell_spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 5, .y = 9, .npc_graphics = 0, .pages = ashbell_survivor_pages,
+          .movement = NpcMovement::wander, .wander_radius = 2 },
+        { .type = EventType::talk, .x = 14, .y = 2, .npc_graphics = 0, .pages = ashbell_mother_pages },
+        { .type = EventType::story, .x = 10, .y = 8, .npc_graphics = 1,
+          .max_progress = progress::ch4_truth - 1, .story = StoryId::ch4_chronicler },
+        { .type = EventType::talk, .x = 10, .y = 8, .npc_graphics = 1, .pages = ashbell_chronicler_pages,
+          .min_progress = progress::ch4_truth },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D05: Searing Canyon. Stone bridges over lava ('L'); the wyrm guards the corridor to the far rim.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view canyon_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%%%%%%%%%%%%%%%_u_%%",    // 1
+        "%___LLLL_____%%_%%%%",    // 2
+        "%___LLLL_____%%_%%%%",    // 3
+        "%___====__________%%",    // 4
+        "%___LLLL_____%%%%%%%",    // 5
+        "%%_%LLLL%%_%%%%%%%%%",    // 6
+        "%%_%LLLL%%_%%%%%%%%%",    // 7
+        "%___LLLL_____%%%%%%%",    // 8
+        "%___====_____%%%%%%%",    // 9
+        "%___LLLL_____%%%%%%%",    // 10
+        "%_d_LLLL_____%%%%%%%",    // 11
+        "%%%%%%%%%%%%%%%%%%%%",    // 12
+        "%%%%%%%%%%%%%%%%%%%%",    // 13
+    };
+
+    static_assert(valid_layout(canyon_rows), "Invalid canyon layout");
+
+    constexpr MapEvent canyon_events[] = {
+        { .type = EventType::warp, .x = 2, .y = 11, .warp_map = MapId::wasteland, .warp_x = 20, .warp_y = 1 },
+        // The wyrm (npc_graphics 10) blocks the corridor to the exit until it is beaten.
+        { .type = EventType::story, .x = 15, .y = 3, .npc_graphics = 10,
+          .min_progress = progress::ch4_truth, .max_progress = progress::ch5_start - 1,
+          .story = StoryId::ch4_wyrm },
+        // Chapter 5 starts on the other side: replace this trigger with a warp when its maps exist.
+        { .type = EventType::trigger, .x = 16, .y = 1, .story = StoryId::ch4_beyond },
+        { .type = EventType::chest, .x = 12, .y = 2, .npc_graphics = 3,
+          .flag = FlagId::chest_canyon, .item = ItemId::magic_water, .item_amount = 3 },
+    };
+
+    constexpr EncounterGroup canyon_encounters[] = {
+        { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
+        { { EnemyId::cult_knight, EnemyId::skeleton, EnemyId::bat }, 3 },
+        { { EnemyId::cult_knight, EnemyId::cult_soldier }, 2 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -817,6 +965,28 @@ namespace
             .encounter_rate = 12,
             .border = TileId::cave_wall,
         },
+        {
+            .name = "Scorched Plains",
+            .rows = wasteland_rows,
+            .events = wasteland_events,
+            .encounters = wasteland_encounters,
+            .encounter_rate = 10,
+            .border = TileId::cave_wall,
+        },
+        {
+            .name = RPG_NAME_ASH_TOWN,
+            .rows = ashbell_rows,
+            .events = ashbell_events,
+            .border = TileId::rubble,
+        },
+        {
+            .name = "Searing Canyon",
+            .rows = canyon_rows,
+            .events = canyon_events,
+            .encounters = canyon_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -849,7 +1019,8 @@ namespace
     constexpr RespawnPoint respawn_points[] = {
         { start_map, start_x, start_y },    // Chapter 1: home.
         { MapId::berg, 4, 6 },              // Chapter 2: in front of the inn of the post town.
-        { MapId::lunaris, 4, 6 },           // Chapter 3 on: in front of the inn of the seer's village.
+        { MapId::lunaris, 4, 6 },           // Chapter 3: in front of the inn of the seer's village.
+        { MapId::ashbell, 3, 6 },           // Chapter 4 on: in front of the inn of the ash town.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)
