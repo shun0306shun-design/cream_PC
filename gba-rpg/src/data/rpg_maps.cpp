@@ -510,12 +510,15 @@ namespace
     };
 
     constexpr bn::string_view berg_townsman_ch3_pages[] = {
-        "The fort is quiet again.\nThey say the general fled\nnorth, past the " RPG_NAME_GATE ".",
-        "The gate is shut to all.\nAsk the seer of " RPG_NAME_SEER_TOWN ", up\nthe path north of the fields.",
+        RPG_T("The fort is quiet again.\nThey say the general fled\nnorth, past the " RPG_NAME_GATE ".",
+              "砦は静かになったよ。\n将軍は北へ、" RPG_NAME_GATE_JA "の\n向こうへ逃げたそうだ。"),
+        RPG_T("The gate is shut to all.\nAsk the seer of " RPG_NAME_SEER_TOWN ", up\nthe path north of the fields.",
+              "関所は誰も通れない。\n草原の北の山道の先、\n" RPG_NAME_SEER_TOWN_JA "の占い師に聞きな。"),
     };
 
     constexpr bn::string_view berg_townsman_ch4_pages[] = {
-        "You got past the " RPG_NAME_GATE "?\n" RPG_NAME_TOWN " owes you a drink\nwhen you come back.",
+        RPG_T("You got past the " RPG_NAME_GATE "?\n" RPG_NAME_TOWN " owes you a drink\nwhen you come back.",
+              RPG_NAME_GATE_JA "を越えたって？\n帰ってきたら、" RPG_NAME_TOWN_JA "で\n一杯おごるよ。"),
     };
 
     constexpr bn::span<const bn::string_view> berg_townsman_chapter_pages[] = {
@@ -612,11 +615,13 @@ namespace
     static_assert(valid_layout(lunaris_rows), "Invalid lunaris layout");
 
     constexpr bn::string_view lunaris_sign_pages[] = {
-        RPG_NAME_SEER_TOWN "\nNorth: the Star Ruins\nSouth: the fields",
+        RPG_T(RPG_NAME_SEER_TOWN "\nNorth: the Star Ruins\nSouth: the fields",
+              RPG_NAME_SEER_TOWN_JA "\n北: 星見の遺跡\n南: 草原"),
     };
 
     constexpr bn::string_view lunaris_shop_pages[] = {
-        "Charms, herbs and staves.\nThe stars favor a\nprepared traveler.",
+        RPG_T("Charms, herbs and staves.\nThe stars favor a\nprepared traveler.",
+              "お守り、薬草、杖。\n星は、備えある旅人に\n味方します。"),
     };
 
     constexpr ItemId lunaris_shop_stock[] = {
@@ -625,11 +630,13 @@ namespace
     };
 
     constexpr bn::string_view lunaris_villager_ch3_pages[] = {
-        "The stars over the " RPG_NAME_GATE "\nwent dark a month ago.\n" RPG_NAME_SEER " hasn't slept since.",
+        RPG_T("The stars over the " RPG_NAME_GATE "\nwent dark a month ago.\n" RPG_NAME_SEER " hasn't slept since.",
+              RPG_NAME_GATE_JA "の上の星が消えて\nひと月。" RPG_NAME_SEER_JA "は、\nずっと眠っていないんだ。"),
     };
 
     constexpr bn::string_view lunaris_villager_ch4_pages[] = {
-        "So " RPG_NAME_SEER " went with you.\nBring her home, when\nthe sky is clear again.",
+        RPG_T("So " RPG_NAME_SEER " went with you.\nBring her home, when\nthe sky is clear again.",
+              RPG_NAME_SEER_JA "は、あんたたちと\n行ったんだね。空が晴れたら\n連れて帰っておくれ。"),
     };
 
     // The village can't be reached before chapter 3: the first three sets are never shown.
@@ -680,7 +687,8 @@ namespace
     static_assert(valid_layout(ruins_rows), "Invalid ruins layout");
 
     constexpr bn::string_view ruins_mirror_pages[] = {
-        "The mirror is cracked.\nIts work is done.",
+        RPG_T("The mirror is cracked.\nIts work is done.",
+              "鏡はひび割れている。\n役目を終えたのだ。"),
     };
 
     constexpr MapEvent ruins_events[] = {
@@ -802,11 +810,13 @@ namespace
     static_assert(valid_layout(ashbell_rows), "Invalid ashbell layout");
 
     constexpr bn::string_view ashbell_sign_pages[] = {
-        RPG_NAME_ASH_TOWN "\nBuilt on what was left.",
+        RPG_T(RPG_NAME_ASH_TOWN "\nBuilt on what was left.",
+              RPG_NAME_ASH_TOWN_JA "\n残されたものの上に\n建てられた町。"),
     };
 
     constexpr bn::string_view ashbell_shop_pages[] = {
-        "Salvage. All of it.\nTake what you need.",
+        RPG_T("Salvage. All of it.\nTake what you need.",
+              "全部、拾いものだ。\n必要なものを\n持っていきな。"),
     };
 
     constexpr ItemId ashbell_shop_stock[] = {
@@ -815,20 +825,25 @@ namespace
     };
 
     constexpr bn::string_view ashbell_spring_pages[] = {
-        "The water is gray with\nash. It is still water.",
+        RPG_T("The water is gray with\nash. It is still water.",
+              "水は灰でにごっている。\nそれでも、水だ。"),
     };
 
     constexpr bn::string_view ashbell_survivor_pages[] = {
-        "We burn nothing here.\nNot wood. Not candles.\nNot even our dead.",
+        RPG_T("We burn nothing here.\nNot wood. Not candles.\nNot even our dead.",
+              "ここでは何も燃やさない。\nまきも、ろうそくも。\n死者さえも。"),
     };
 
     constexpr bn::string_view ashbell_mother_pages[] = {
-        "My son asked what a tree\nwas. I drew him one.\nHe didn't believe me.",
+        RPG_T("My son asked what a tree\nwas. I drew him one.\nHe didn't believe me.",
+              "息子に、木って何？と\n聞かれてね。絵に描いたけど\n信じてくれなかったよ。"),
     };
 
     constexpr bn::string_view ashbell_chronicler_pages[] = {
-        "Chronicler: I keep the map\nso someone remembers\nwhat was there.",
-        "Chronicler: The canyon is\nto the northeast. Past it,\nthe tower of flame.",
+        RPG_T("Chronicler: I keep the map\nso someone remembers\nwhat was there.",
+              "記録者「地図を残すのは、\n　そこに何があったか、\n　誰かが覚えているためさ。」"),
+        RPG_T("Chronicler: The canyon is\nto the northeast. Past it,\nthe tower of flame.",
+              "記録者「峡谷は北東だよ。\n　その先に、\n　炎の塔がある。」"),
     };
 
     constexpr MapEvent ashbell_events[] = {
@@ -944,13 +959,13 @@ namespace
             .border = TileId::wall,
         },
         {
-            .name = RPG_NAME_SEER_TOWN,
+            .name = RPG_T(RPG_NAME_SEER_TOWN, RPG_NAME_SEER_TOWN_JA),
             .rows = lunaris_rows,
             .events = lunaris_events,
             .border = TileId::tree,
         },
         {
-            .name = "Star Ruins",
+            .name = RPG_T("Star Ruins", "星見の遺跡"),
             .rows = ruins_rows,
             .events = ruins_events,
             .encounters = ruins_encounters,
@@ -958,7 +973,7 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Old Waterway",
+            .name = RPG_T("Old Waterway", "古い水路"),
             .rows = waterway_rows,
             .events = waterway_events,
             .encounters = waterway_encounters,
@@ -966,7 +981,7 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Scorched Plains",
+            .name = RPG_T("Scorched Plains", "焦土の平原"),
             .rows = wasteland_rows,
             .events = wasteland_events,
             .encounters = wasteland_encounters,
@@ -974,13 +989,13 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = RPG_NAME_ASH_TOWN,
+            .name = RPG_T(RPG_NAME_ASH_TOWN, RPG_NAME_ASH_TOWN_JA),
             .rows = ashbell_rows,
             .events = ashbell_events,
             .border = TileId::rubble,
         },
         {
-            .name = "Searing Canyon",
+            .name = RPG_T("Searing Canyon", "焦熱の峡谷"),
             .rows = canyon_rows,
             .events = canyon_events,
             .encounters = canyon_encounters,

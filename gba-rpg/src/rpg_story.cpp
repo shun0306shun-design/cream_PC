@@ -213,102 +213,156 @@ namespace
     // Chapter 3 "The Star-Reader Girl"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view seer_road_pages[] = {
-        "A mountain path climbs\nnorth. Nothing calls you\nthat way yet.",
+        RPG_T("A mountain path climbs\nnorth. Nothing calls you\nthat way yet.",
+              "北へ山道がのびている。\n今はまだ、\n行く理由がない。"),
     };
 
     constexpr bn::string_view seer_village_pages[] = {
-        "A girl looks up from a\nbowl of still water.",
-        "???: One of ash, one of\nsteel. The stars said\nyou would come.",
-        PARTNER ": She means us?\nI'm not paying for a\nfortune.",
-        SEER ": I am " SEER ". I read\nthe stars for " RPG_NAME_SEER_TOWN ".",
-        SEER ": The one you hunt went\nnorth, past the " GATE ".\nIt is shut to all.",
-        HERO ": Then how do we\ncross it?",
-        SEER ": The stars above it\nwent dark. The mirror in\nthe Star Ruins can see.",
-        SEER ": Take me there. I\nmust know why my sky\nis going out.",
-        SEER " joined the party!",
+        RPG_T("A girl looks up from a\nbowl of still water.",
+              "少女が、水をはった鉢から\n顔を上げた。"),
+        RPG_T("???: One of ash, one of\nsteel. The stars said\nyou would come.",
+              "？？？「灰の者と、鋼の者。\n　星は、あなたたちが\n　来ると告げていました。」"),
+        RPG_T(PARTNER ": She means us?\nI'm not paying for a\nfortune.",
+              RPG_NAME_PARTNER_JA "「俺たちのことか？\n　占いの代金なら\n　払わないぞ。」"),
+        RPG_T(SEER ": I am " SEER ". I read\nthe stars for " RPG_NAME_SEER_TOWN ".",
+              RPG_NAME_SEER_JA "「わたしは" RPG_NAME_SEER_JA "。\n　" RPG_NAME_SEER_TOWN_JA "で\n　星を読んでいます。」"),
+        RPG_T(SEER ": The one you hunt went\nnorth, past the " GATE ".\nIt is shut to all.",
+              RPG_NAME_SEER_JA "「あなたが追う者は北へ、\n　" RPG_NAME_GATE_JA "の向こうへ。\n　門は閉ざされています。」"),
+        RPG_T(HERO ": Then how do we\ncross it?",
+              RPG_NAME_HERO_JA "「なら、どうやって\n　越えればいい？」"),
+        RPG_T(SEER ": The stars above it\nwent dark. The mirror in\nthe Star Ruins can see.",
+              RPG_NAME_SEER_JA "「関所の上の星が消えました。\n　星見の遺跡の鏡なら\n　見通せるはずです。」"),
+        RPG_T(SEER ": Take me there. I\nmust know why my sky\nis going out.",
+              RPG_NAME_SEER_JA "「連れていってください。\n　なぜ空が消えていくのか、\n　知りたいのです。」"),
+        RPG_T(SEER " joined the party!",
+              RPG_NAME_SEER_JA "が仲間になった！"),
     };
 
     constexpr bn::string_view ruins_gate_pages[] = {
-        "A stone path climbs to\nold ruins. The villagers\nkeep away from it.",
+        RPG_T("A stone path climbs to\nold ruins. The villagers\nkeep away from it.",
+              "石の道が古い遺跡へ\n続いている。村人たちは\n近よらないようだ。"),
     };
 
     constexpr bn::string_view altar_pages[] = {
-        "A mirror of black glass\nlies on the altar.\nIt shows no stars.",
-        SEER ": Something woke.\nIt guards the mirror!",
+        RPG_T("A mirror of black glass\nlies on the altar.\nIt shows no stars.",
+              "祭壇に黒いガラスの鏡が\n置かれている。\n星はひとつも映らない。"),
+        RPG_T(SEER ": Something woke.\nIt guards the mirror!",
+              RPG_NAME_SEER_JA "「何かが目覚めました。\n　鏡を守っています！」"),
     };
 
     constexpr bn::string_view altar_victory_pages[] = {
-        "The guardian crumbles.\nStarlight fills the\nmirror.",
-        SEER ": I see the " GATE "...\nand under it, water. An\nold waterway. A way through.",
-        SEER ": And I see why the\nstars fade. Ash. It is\nrising to the sky itself.",
-        "The mirror cracks. A shard\nshaped like a star stays\nin " SEER "'s hand.",
-        "Got the Star Sigil!",
-        PARTNER ": A sewer. Great.\nLead on, stargazer.",
-        SEER ": The sluice is by the\nlake, in the east of\nthe fields.",
+        RPG_T("The guardian crumbles.\nStarlight fills the\nmirror.",
+              "守護者がくずれ落ちた。\n鏡に星の光が満ちていく。"),
+        RPG_T(SEER ": I see the " GATE "...\nand under it, water. An\nold waterway. A way through.",
+              RPG_NAME_SEER_JA "「" RPG_NAME_GATE_JA "が見えます……\n　その下に、水。古い水路。\n　通り抜けられます。」"),
+        RPG_T(SEER ": And I see why the\nstars fade. Ash. It is\nrising to the sky itself.",
+              RPG_NAME_SEER_JA "「星が消える理由も\n　見えました。灰です。\n　灰が空までのぼっている。」"),
+        RPG_T("The mirror cracks. A shard\nshaped like a star stays\nin " SEER "'s hand.",
+              "鏡がひび割れた。\n星の形のかけらが、\n" RPG_NAME_SEER_JA "の手に残った。"),
+        RPG_T("Got the Star Sigil!",
+              "星の紋章を手に入れた！"),
+        RPG_T(PARTNER ": A sewer. Great.\nLead on, stargazer.",
+              RPG_NAME_PARTNER_JA "「下水か。最高だな。\n　案内しろよ、星読み。」"),
+        RPG_T(SEER ": The sluice is by the\nlake, in the east of\nthe fields.",
+              RPG_NAME_SEER_JA "「水門は湖のそば、\n　草原の東にあります。」"),
     };
 
     constexpr bn::string_view sluice_pages[] = {
-        "An old sluice gate by\nthe lake. Its lock is\nshaped like a star.",
+        RPG_T("An old sluice gate by\nthe lake. Its lock is\nshaped like a star.",
+              "湖のそばに古い水門がある。\n錠は星の形をしている。"),
     };
 
     constexpr bn::string_view warden_pages[] = {
-        "Warden: Halt. None pass\nunder the " GATE ". By order\nof General " GENERAL ".",
-        HERO ": Then he is on\nthe other side.",
-        "Warden: And you never\nwill be. Drown them!",
+        RPG_T("Warden: Halt. None pass\nunder the " GATE ". By order\nof General " GENERAL ".",
+              "番人「止まれ。" RPG_NAME_GATE_JA "の下は\n　誰も通さん。" RPG_NAME_GENERAL_1_JA "将軍の\n　命令だ。」"),
+        RPG_T(HERO ": Then he is on\nthe other side.",
+              RPG_NAME_HERO_JA "「なら、奴は\n　この向こうにいるんだな。」"),
+        RPG_T("Warden: And you never\nwill be. Drown them!",
+              "番人「お前たちは\n　たどり着けん。\n　沈めてしまえ！」"),
     };
 
     constexpr bn::string_view warden_victory_pages[] = {
-        "The warden falls. Behind\nhim, stairs climb toward\ndaylight.",
-        SEER ": The " GATE " is\nabove us. We are through.",
-        HERO ": " GENERAL ". " RPG_NAME_EMPEROR ".\nI'm coming.",
-        SEER ": Your star burns very\nhot, " HERO ". Do not let\nit burn you up.",
-        "- Chapter 4 -\nThe Scorched Land",
+        RPG_T("The warden falls. Behind\nhim, stairs climb toward\ndaylight.",
+              "番人が倒れた。その奥で、\n階段が日の光へと\n続いている。"),
+        RPG_T(SEER ": The " GATE " is\nabove us. We are through.",
+              RPG_NAME_SEER_JA "「" RPG_NAME_GATE_JA "は、この真上です。\n　通り抜けました。」"),
+        RPG_T(HERO ": " GENERAL ". " RPG_NAME_EMPEROR ".\nI'm coming.",
+              RPG_NAME_HERO_JA "「" RPG_NAME_GENERAL_1_JA "。" RPG_NAME_EMPEROR_JA "。\n　今、行くぞ。」"),
+        RPG_T(SEER ": Your star burns very\nhot, " HERO ". Do not let\nit burn you up.",
+              RPG_NAME_SEER_JA "「あなたの星は、とても\n　熱く燃えています。\n　焼きつくされないで。」"),
+        RPG_T("- Chapter 4 -\nThe Scorched Land",
+              "- 第4章 -\n焦土の大地"),
     };
 
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 4 "The Scorched Land"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view wasteland_pages[] = {
-        "Daylight. But no sky:\nonly a gray ceiling\nof smoke.",
-        "No fields. No forest.\nAsh, to the horizon.",
-        PARTNER ": This isn't a\nbattlefield. Nobody\nfought here.",
-        SEER ": I cannot hear the\nland. It is not asleep.\nIt is gone.",
-        HERO ": Smoke, to the west.\nChimney smoke.\nSomeone is alive.",
+        RPG_T("Daylight. But no sky:\nonly a gray ceiling\nof smoke.",
+              "日の光だ。だが空はない。\nあるのは、灰色の\n煙の天井だけだ。"),
+        RPG_T("No fields. No forest.\nAsh, to the horizon.",
+              "畑も、森もない。\n地平線まで、灰。"),
+        RPG_T(PARTNER ": This isn't a\nbattlefield. Nobody\nfought here.",
+              RPG_NAME_PARTNER_JA "「ここは戦場じゃない。\n　誰も戦ってなんか\n　いないんだ。」"),
+        RPG_T(SEER ": I cannot hear the\nland. It is not asleep.\nIt is gone.",
+              RPG_NAME_SEER_JA "「大地の声が聞こえません。\n　眠っているのではない。\n　もう、いないのです。」"),
+        RPG_T(HERO ": Smoke, to the west.\nChimney smoke.\nSomeone is alive.",
+              RPG_NAME_HERO_JA "「西に煙が見える。\n　かまどの煙だ。\n　誰かが生きている。」"),
     };
 
     constexpr bn::string_view chronicler_pages[] = {
-        "An old woman marks a\nscorched map with\ncharcoal.",
-        "Chronicler: Travelers?\nFrom beyond the " GATE "?\nThen you don't know.",
-        "Chronicler: Look. Every\nblack mark is a land\nthat burned.",
-        "The map is almost\nentirely black.",
-        "Chronicler: Eight parts in\nten of the world. Gone.\nYours is what is left.",
-        HERO ": ...Eight in ten.\n" RPG_NAME_VILLAGE " was one spark\nin all of this.",
-        PARTNER ": And I was\ncounting bounties.",
-        "Chronicler: The Emperor\ndoes not conquer.\nHe feeds a fire.",
-        "Chronicler: His general\ncamps past the Searing\nCanyon, to the northeast.",
-        SEER ": " HERO ". Is revenge\nstill all you want?",
-        HERO ": ...I don't know\nanymore.",
+        RPG_T("An old woman marks a\nscorched map with\ncharcoal.",
+              "老婆が、焼けこげた地図に\n木炭で印をつけている。"),
+        RPG_T("Chronicler: Travelers?\nFrom beyond the " GATE "?\nThen you don't know.",
+              "記録者「旅の人かい？\n　" RPG_NAME_GATE_JA "の向こうから？\n　なら、知らないんだね。」"),
+        RPG_T("Chronicler: Look. Every\nblack mark is a land\nthat burned.",
+              "記録者「ごらん。\n　黒い印はすべて、\n　燃えた土地だよ。」"),
+        RPG_T("The map is almost\nentirely black.",
+              "地図は、ほとんど\nまっ黒だった。"),
+        RPG_T("Chronicler: Eight parts in\nten of the world. Gone.\nYours is what is left.",
+              "記録者「世界の八割。\n　もう無い。あんたたちの\n　国が、残りさ。」"),
+        RPG_T(HERO ": ...Eight in ten.\n" RPG_NAME_VILLAGE " was one spark\nin all of this.",
+              RPG_NAME_HERO_JA "「……八割。\n　" RPG_NAME_VILLAGE_JA "村は、この中の\n　火の粉ひとつだったのか。」"),
+        RPG_T(PARTNER ": And I was\ncounting bounties.",
+              RPG_NAME_PARTNER_JA "「俺は、賞金なんか\n　数えていたのか。」"),
+        RPG_T("Chronicler: The Emperor\ndoes not conquer.\nHe feeds a fire.",
+              "記録者「皇帝は征服しない。\n　火に、まきを\n　くべているだけさ。」"),
+        RPG_T("Chronicler: His general\ncamps past the Searing\nCanyon, to the northeast.",
+              "記録者「奴の将軍は\n　北東、焦熱の峡谷の\n　先に陣を張っている。」"),
+        RPG_T(SEER ": " HERO ". Is revenge\nstill all you want?",
+              RPG_NAME_SEER_JA "「" RPG_NAME_HERO_JA "。今でも望みは、\n　復讐だけですか？」"),
+        RPG_T(HERO ": ...I don't know\nanymore.",
+              RPG_NAME_HERO_JA "「……もう、\n　分からない。」"),
     };
 
     constexpr bn::string_view canyon_gate_pages[] = {
-        "Heat rolls out of a\ncanyon. Better to learn\nwhat lies ahead first.",
+        RPG_T("Heat rolls out of a\ncanyon. Better to learn\nwhat lies ahead first.",
+              "峡谷から熱気が\n吹きつけてくる。先に、\nこの先のことを知るべきだ。"),
     };
 
     constexpr bn::string_view wyrm_pages[] = {
-        "The lava stirs. Something\nvast uncoils from it.",
-        SEER ": It was a river\nspirit once. The fire\nate it hollow.",
-        PARTNER ": Mourn it later.\nIt's hungry!",
+        RPG_T("The lava stirs. Something\nvast uncoils from it.",
+              "溶岩がうごめく。\n巨大な何かが、\n身をほどいていく。"),
+        RPG_T(SEER ": It was a river\nspirit once. The fire\nate it hollow.",
+              RPG_NAME_SEER_JA "「かつては川の精霊でした。\n　炎に、中身を\n　食いつくされたのです。」"),
+        RPG_T(PARTNER ": Mourn it later.\nIt's hungry!",
+              RPG_NAME_PARTNER_JA "「なげくのは後だ。\n　腹をすかせてるぞ！」"),
     };
 
     constexpr bn::string_view wyrm_victory_pages[] = {
-        "The wyrm sinks into the\nlava. For a moment, the\nwater in it sings.",
-        "From the canyon's rim:\na plain of black glass,\nand a tower of flame.",
-        HERO ": That's where\nthey are. All of them.",
-        "- Chapter 5 -",
+        RPG_T("The wyrm sinks into the\nlava. For a moment, the\nwater in it sings.",
+              "ワームが溶岩に沈んでいく。\n一瞬、その中の水が\n歌ったように聞こえた。"),
+        RPG_T("From the canyon's rim:\na plain of black glass,\nand a tower of flame.",
+              "峡谷のふちから見えたのは、\n黒いガラスの平原と、\n炎の塔だった。"),
+        RPG_T(HERO ": That's where\nthey are. All of them.",
+              RPG_NAME_HERO_JA "「あそこに奴らがいる。\n　全員が。」"),
+        RPG_T("- Chapter 5 -",
+              "- 第5章 -"),
     };
 
     constexpr bn::string_view beyond_pages[] = {
-        "The path goes on toward\nthe tower of flame.\n(To be continued.)",
+        RPG_T("The path goes on toward\nthe tower of flame.\n(To be continued.)",
+              "道は炎の塔へと\n続いている。\n（つづく）"),
     };
 
     constexpr EncounterGroup wyrm_battle = { { EnemyId::ember_wyrm }, 1 };
