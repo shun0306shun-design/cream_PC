@@ -65,8 +65,16 @@ namespace progress
     constexpr uint8_t ch7_lantern = 61;     //!< The keeper of the refugee valley gave the hero a lantern.
     constexpr uint8_t ch7_resolve = 62;     //!< The hero lit it and made peace with the party: the east pass opens.
 
-    // Chapter 8 (70-79)
+    // Chapter 8 "Counterattack" (70-79)
     constexpr uint8_t ch8_start = 70;       //!< General 1 was killed in the pass: the first Ash General to fall.
+    constexpr uint8_t ch8_ship_found = 71;  //!< The shipwright of the harbor has a hull, but no crew.
+    constexpr uint8_t ch8_rallied = 72;     //!< The refugees agreed to crew the ship.
+    constexpr uint8_t ch8_ship = 73;        //!< The ship was launched: the pier leads to the citadel.
+    constexpr uint8_t ch8_general_3 = 74;   //!< General 3 fell in the citadel.
+    constexpr uint8_t ch8_general_4 = 75;   //!< General 4 fell in the citadel.
+
+    // Chapter 9 (80-89)
+    constexpr uint8_t ch9_start = 80;       //!< General 2 fell: the four Ash Generals are gone.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -116,6 +124,11 @@ enum class StoryId : uint8_t
     ch7_shrine,         //!< Lighting the lantern: the party is whole again.
     ch7_east_gate,      //!< The pass east of the valley, closed until the hero's resolve.
     ch7_pass,           //!< Boss of the pass: General 1 dies. Winning starts chapter 8.
+    ch8_shipwright,     //!< The shipwright of the harbor: needs a crew, then launches the ship.
+    ch8_pier,           //!< The pier of the harbor, empty until the ship is launched.
+    ch8_general_3,      //!< First boss of the citadel.
+    ch8_general_4,      //!< Second boss of the citadel.
+    ch8_general_2,      //!< Last boss of the citadel: General 2 again. Winning starts chapter 9.
     count,
     none = 0xFF
 };

@@ -42,6 +42,10 @@ namespace
         { RPG_NAME_GENERAL_2, &bn::sprite_items::enemy_drake, { 6000, 0, 140, 70, 40 }, 0, 0, SpellId::blizzard, 40 },
         // Chapter 7: General 1 for the last time.
         { RPG_NAME_GENERAL_1, &bn::sprite_items::enemy_drake, { 700, 0, 60, 22, 15 }, 800, 600, SpellId::blizzard, 35 },
+        // Chapter 8: the three remaining generals, in the citadel. General 2 can be beaten this time.
+        { RPG_NAME_GENERAL_3, &bn::sprite_items::enemy_drake, { 800, 0, 64, 26, 10 }, 900, 700, SpellId::blizzard, 25 },
+        { RPG_NAME_GENERAL_4, &bn::sprite_items::enemy_drake, { 650, 0, 58, 18, 24 }, 900, 700, SpellId::fire, 45 },
+        { RPG_NAME_GENERAL_2, &bn::sprite_items::enemy_drake, { 1000, 0, 70, 26, 18 }, 1500, 1000, SpellId::blizzard, 40 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

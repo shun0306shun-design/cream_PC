@@ -1213,7 +1213,7 @@ namespace
         "%_%%%%%%%%_%%%%%_%%%",    // 3
         "%_%%%______%%%%%_%%%",    // 4
         "%_%%%_%%%%%%%%___%%%",    // 5
-        "%_____%%%%%%%%___%%%",    // 6
+        "%_____%%%%%%%%__>%%%",    // 6
         "%%%%%%%%%%%%%%%%%%%%",    // 7
     };
 
@@ -1226,12 +1226,121 @@ namespace
           .story = StoryId::ch7_pass },
         { .type = EventType::chest, .x = 15, .y = 6, .npc_graphics = 3,
           .flag = FlagId::chest_pass, .gold = 500 },
+        // Down to the harbor (only reachable once the general is dead).
+        { .type = EventType::warp, .x = 16, .y = 6, .warp_map = MapId::harbor, .warp_x = 1, .warp_y = 6 },
     };
 
     constexpr EncounterGroup pass_encounters[] = {
         { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
         { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
         { { EnemyId::cult_knight, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // T08: the harbor town beyond the pass. The pier ('=') leads to the ship once it is launched.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view harbor_rows[] = {
+        "xxxxxxxxxxxxxxxxxxxxxx",    // 0
+        "xaaaaaaaaaaaaaaaa~~~~~",    // 1
+        "xa^^^^aaaaxxaaaaa~~~~~",    // 2
+        "xa####aaaaxxaaaaa~~~~~",    // 3
+        "xa#D##aaaaaaaaaaa~~~~~",    // 4
+        "xaa:aaaaaaaaaaaaa~~~~~",    // 5
+        ">::::::::::::::::===>~",    // 6
+        "xaaaaaaa:aaaaaaaa~~~~~",    // 7
+        "xaaFaaaa:aaaSaaaa~~~~~",    // 8
+        "xaaaaaaa:aaaaaaaa~~~~~",    // 9
+        "xaaaaaaaaaaaaaaaa~~~~~",    // 10
+        "xxxxxxxxxxxxxxxxxxxxxx",    // 11
+    };
+
+    static_assert(valid_layout(harbor_rows), "Invalid harbor layout");
+
+    constexpr bn::string_view harbor_sign_pages[] = {
+        RPG_NAME_HARBOR " - HARBOR\nEast: the pier",
+    };
+
+    constexpr bn::string_view harbor_shop_pages[] = {
+        "Ship's stores. Nobody is\nsailing, so they are\nyours.",
+    };
+
+    constexpr bn::string_view harbor_fisher_ch8_pages[] = {
+        "The citadel is across the\nstrait. On clear nights\nyou can see its fires.",
+    };
+
+    constexpr bn::string_view harbor_fisher_ch9_pages[] = {
+        "The citadel is dark.\nFirst dark night\nin ten years.",
+    };
+
+    // The harbor can't be reached before chapter 8: the first eight sets are never shown.
+    constexpr bn::span<const bn::string_view> harbor_fisher_chapter_pages[] = {
+        harbor_fisher_ch8_pages, harbor_fisher_ch8_pages, harbor_fisher_ch8_pages, harbor_fisher_ch8_pages,
+        harbor_fisher_ch8_pages, harbor_fisher_ch8_pages, harbor_fisher_ch8_pages, harbor_fisher_ch8_pages,
+        harbor_fisher_ch9_pages,
+    };
+
+    constexpr MapEvent harbor_events[] = {
+        { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::pass, .warp_x = 16, .warp_y = 5 },
+        { .type = EventType::trigger, .x = 20, .y = 6,
+          .max_progress = progress::ch8_ship - 1, .story = StoryId::ch8_pier },
+        { .type = EventType::warp, .x = 20, .y = 6, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 10,
+          .min_progress = progress::ch8_ship },
+        { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 11, .y = 5, .npc_graphics = 5, .pages = harbor_shop_pages,
+          .stock = ashbell_shop_stock },
+        { .type = EventType::sign, .x = 12, .y = 8, .pages = harbor_sign_pages },
+        { .type = EventType::spring, .x = 3, .y = 8, .pages = ashbell_spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 6, .y = 9, .npc_graphics = 0,
+          .movement = NpcMovement::wander, .wander_radius = 2, .chapter_pages = harbor_fisher_chapter_pages },
+        { .type = EventType::story, .x = 15, .y = 5, .npc_graphics = 1, .story = StoryId::ch8_shipwright },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D08: the island citadel. The three remaining generals (npc_graphics 8) hold the way to the rite circle ('A'),
+    // one after another: the gate corridor, the upper corridor and the hall.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view citadel_rows[] = {
+        "####################",    // 0
+        "########_A_#########",    // 1
+        "#######_____########",    // 2
+        "#########_##########",    // 3
+        "####_____________###",    // 4
+        "####_###########_###",    // 5
+        "####_###########_###",    // 6
+        "####_____________###",    // 7
+        "#########_##########",    // 8
+        "#######_____########",    // 9
+        "#######_____########",    // 10
+        "#########>##########",    // 11
+        "####################",    // 12
+    };
+
+    static_assert(valid_layout(citadel_rows), "Invalid citadel layout");
+
+    constexpr bn::string_view citadel_circle_pages[] = {
+        "A circle of ash on the\nfloor. Whatever rite it\nwas for, it is cold.",
+    };
+
+    constexpr MapEvent citadel_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::harbor, .warp_x = 19, .warp_y = 6 },
+        { .type = EventType::story, .x = 9, .y = 8, .npc_graphics = 8,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch8_general_3 - 1,
+          .story = StoryId::ch8_general_3 },
+        { .type = EventType::story, .x = 9, .y = 3, .npc_graphics = 8,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch8_general_4 - 1,
+          .story = StoryId::ch8_general_4 },
+        { .type = EventType::story, .x = 9, .y = 2, .npc_graphics = 8,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1,
+          .story = StoryId::ch8_general_2 },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = citadel_circle_pages },
+        { .type = EventType::chest, .x = 4, .y = 5, .npc_graphics = 3,
+          .flag = FlagId::chest_citadel, .item = ItemId::magic_water, .item_amount = 5 },
+    };
+
+    constexpr EncounterGroup citadel_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
+        { { EnemyId::ash_zealot, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot, EnemyId::ash_zealot }, 3 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1374,6 +1483,20 @@ namespace
             .encounter_rate = 12,
             .border = TileId::cave_wall,
         },
+        {
+            .name = RPG_NAME_HARBOR,
+            .rows = harbor_rows,
+            .events = harbor_events,
+            .border = TileId::water,
+        },
+        {
+            .name = "Ember Citadel",
+            .rows = citadel_rows,
+            .events = citadel_events,
+            .encounters = citadel_encounters,
+            .encounter_rate = 12,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1421,7 +1544,8 @@ namespace
         { MapId::ashbell, 3, 6 },           // Chapter 4: in front of the inn of the ash town.
         { MapId::dorn, 4, 6 },              // Chapter 5: in front of the inn of the mining town.
         { MapId::dorn, 4, 6 },              // Chapter 6: the same (the capital has no safe place).
-        { MapId::refuge, 3, 6 },            // Chapter 7 on: in front of the inn of the refugee valley.
+        { MapId::refuge, 3, 6 },            // Chapter 7: in front of the inn of the refugee valley.
+        { MapId::harbor, 3, 6 },            // Chapter 8 on: in front of the inn of the harbor town.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)

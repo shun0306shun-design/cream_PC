@@ -662,9 +662,89 @@ namespace
               PARTNER_JA "「ああ。だが、\n　後ろを見てみろ。」"),
         RPG_T("Down in the valley,\nevery lamp is still lit.",
               "谷では、すべての灯火が\nまだともっていた。"),
-        RPG_T("- Chapter 8 -",
-              "- 第8章 -"),
+        RPG_T("- Chapter 8 -\nCounterattack",
+              "- 第8章 -\n反攻"),
     };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 8 "Counterattack"
+    // ---------------------------------------------------------------------------------------------------------------
+    #define REFUGE RPG_NAME_REFUGE
+    #define SHIP RPG_NAME_SHIP
+    #define GENERAL3 RPG_NAME_GENERAL_3
+    #define GENERAL4 RPG_NAME_GENERAL_4
+
+    constexpr bn::string_view shipwright_pages[] = {
+        "A shipwright planes a\nhull, alone, on a dead\nwaterfront.",
+        "Shipwright: The " SHIP ". Last\nhull in " RPG_NAME_HARBOR ". No crew,\nno sail, no reason.",
+        HERO ": The generals sit in\nthe citadel across the\nstrait. That's a reason.",
+        "Shipwright: I need forty\nhands to launch her.\nI have two.",
+        SEER ": Forty lamps burn\nin " REFUGE ".",
+        HERO ": Then we ask them.",
+    };
+
+    constexpr bn::string_view shipwright_wait_pages[] = {
+        "Shipwright: Forty hands.\nBring them, and the\n" SHIP " sails.",
+    };
+
+    constexpr bn::string_view shipwright_launch_pages[] = {
+        "The waterfront is full of\nvoices. " REFUGE " came.\nAnd " RPG_NAME_MINE_TOWN ". And more.",
+        "Shipwright: Well, I'll be.\nHaul! HAUL!",
+        "The " SHIP " slides into\nthe water.",
+        PARTNER ": An army of\nbakers and miners.",
+        HERO ": An army.",
+        "The " SHIP " waits at\nthe pier.",
+    };
+
+    constexpr bn::string_view shipwright_after_pages[] = {
+        "Shipwright: She's yours.\nBring her back, or\ndon't come back.",
+    };
+
+    constexpr bn::string_view keeper_rally_pages[] = {
+        HERO ": We have a ship and\nno crew. I'm asking you\nall to stop hiding.",
+        "Keeper: You ask a great\ndeal, wall-boy.",
+        "Keeper: ...But a lamp kept\nunder a bowl lights\nnothing. We will come.",
+        "The valley empties\ntoward the sea.",
+    };
+
+    constexpr bn::string_view pier_pages[] = {
+        "A long pier. No ship\nis moored here.",
+    };
+
+    constexpr bn::string_view general3_pages[] = {
+        GENERAL3 ": Bakers and miners,\non a boat. I will enjoy\nthe quiet after.",
+        HERO ": Together. Go!",
+    };
+
+    constexpr bn::string_view general3_victory_pages[] = {
+        GENERAL3 " falls. The second\nof the four.",
+    };
+
+    constexpr bn::string_view general4_pages[] = {
+        GENERAL4 ": Two of us dead?\nThen I will take both\ntheir shares of you.",
+    };
+
+    constexpr bn::string_view general4_victory_pages[] = {
+        GENERAL4 " falls.\nOne is left.",
+    };
+
+    constexpr bn::string_view general2_last_pages[] = {
+        GENERAL2 ": The ember.\nYou did not charge.",
+        HERO ": I'm not alone\nthis time.",
+        GENERAL2 ": No. You brought\nthe whole hearth.",
+    };
+
+    constexpr bn::string_view general2_last_victory_pages[] = {
+        GENERAL2 ": ...He never needed\ngenerals. We were\nkindling, too.",
+        GENERAL2 " falls. The four\nAsh Generals are gone.",
+        NOX ": The Emperor is alone\nin his tower now. He\nwill not mind.",
+        HERO ": Then we go to\nthe tower.",
+        "- Chapter 9 -",
+    };
+
+    constexpr EncounterGroup general3_battle = { { EnemyId::general_3, EnemyId::cult_knight }, 2 };
+    constexpr EncounterGroup general4_battle = { { EnemyId::general_4, EnemyId::ash_zealot }, 2 };
+    constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
 
     constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
 
@@ -950,6 +1030,12 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
             say_pages(ui, keeper_pages);
             story_progress = progress::ch7_lantern;
         }
+        else if(story_progress == progress::ch8_ship_found)
+        {
+            // Chapter 8: the refugees are asked to crew the ship.
+            say_pages(ui, keeper_rally_pages);
+            story_progress = progress::ch8_rallied;
+        }
         else
         {
             say_pages(ui, story_progress < progress::ch7_resolve ? bn::span<const bn::string_view>(keeper_again_pages) :
@@ -971,6 +1057,47 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
     case StoryId::ch7_pass:
         say_pages(ui, pass_pages);
         result.battle = &pass_battle;
+        break;
+
+    case StoryId::ch8_shipwright:
+        if(story_progress < progress::ch8_ship_found)
+        {
+            say_pages(ui, shipwright_pages);
+            story_progress = progress::ch8_ship_found;
+        }
+        else if(story_progress < progress::ch8_rallied)
+        {
+            say_pages(ui, shipwright_wait_pages);
+        }
+        else if(story_progress < progress::ch8_ship)
+        {
+            say_pages(ui, shipwright_launch_pages);
+            story_progress = progress::ch8_ship;
+        }
+        else
+        {
+            say_pages(ui, shipwright_after_pages);
+        }
+        break;
+
+    case StoryId::ch8_pier:
+        say_pages(ui, pier_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch8_general_3:
+        say_pages(ui, general3_pages);
+        result.battle = &general3_battle;
+        break;
+
+    case StoryId::ch8_general_4:
+        say_pages(ui, general4_pages);
+        result.battle = &general4_battle;
+        break;
+
+    case StoryId::ch8_general_2:
+        say_pages(ui, general2_last_pages);
+        result.battle = &general2_last_battle;
         break;
 
     default:
@@ -1029,6 +1156,21 @@ StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& u
     case StoryId::ch7_pass:
         say_pages(ui, pass_victory_pages);
         state.story_progress = progress::ch8_start;
+        break;
+
+    case StoryId::ch8_general_3:
+        say_pages(ui, general3_victory_pages);
+        state.story_progress = progress::ch8_general_3;
+        break;
+
+    case StoryId::ch8_general_4:
+        say_pages(ui, general4_victory_pages);
+        state.story_progress = progress::ch8_general_4;
+        break;
+
+    case StoryId::ch8_general_2:
+        say_pages(ui, general2_last_victory_pages);
+        state.story_progress = progress::ch9_start;
         break;
 
     case StoryId::ch6_general:

@@ -78,6 +78,8 @@ enum class MapId : uint8_t
     grancel,    //!< T06: the royal capital (peaceful, then burning).
     refuge,     //!< T07: the valley of the refugees.
     pass,       //!< D07: the pass east of the valley.
+    harbor,     //!< T08: the harbor town.
+    citadel,    //!< D08: the island citadel of the generals.
     count
 };
 

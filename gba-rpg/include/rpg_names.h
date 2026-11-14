@@ -25,6 +25,10 @@
 #define RPG_NAME_CAPITAL    "Grancel"   // T06: the royal capital, the last city standing.
 #define RPG_NAME_GENERAL_2  "Vesna"     // The second Ash General: takes the capital in chapter 6.
 #define RPG_NAME_REFUGE     "Lanternrest" // T07: the hidden valley of the refugees.
+#define RPG_NAME_HARBOR     "Saltmere"  // T08: the harbor town.
+#define RPG_NAME_SHIP       "Dawn"      // The last ship of the harbor.
+#define RPG_NAME_GENERAL_3  "Garm"      // The third Ash General.
+#define RPG_NAME_GENERAL_4  "Ilse"      // The fourth Ash General.
 #define RPG_NAME_CULT       "Ashen Cult"
 #define RPG_NAME_EMPEROR    "Valgren"   // The Flame Emperor, leader of the cult.
 #define RPG_NAME_GENERAL_1  "Drake"     // The first of the four Ash Generals.
