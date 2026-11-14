@@ -88,6 +88,9 @@ namespace
         // Chapter 8: the Sunken Lighthouse.
         { RPG_T("Drowned Keeper", "沈んだ灯台守"), &bn::sprite_items::enemy_wyrm,
               { 600,  0, 58,  20, 12 }, R::boss,      enemy_exp_for_level(40, 3000),          500,  SpellId::blizzard, 30 },
+        // Chapter 10: fought alone at first; the companions arrive one per round.
+        { RPG_T("Ash " RPG_NAME_HERO, "灰の" RPG_NAME_HERO_JA), &bn::sprite_items::enemy_drake,
+              { 900,  0, 60,  22, 14 }, R::boss,      0,                                      0,    SpellId::fire,     20 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

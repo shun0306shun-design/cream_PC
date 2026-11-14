@@ -128,8 +128,9 @@ BattleResult BattleScene::_run_battle()
     {
         ++round;
 
-        // Story battles: someone may join the fight at the start of a given round.
-        if(round == _state.battle_join_turn)
+        // Story battles: from a given round on, someone may join the fight at the start of every round
+        // (story_battle_reinforce() decides who, and when there is nobody left).
+        if(_state.battle_join_turn > 0 && round >= _state.battle_join_turn)
         {
             MessageBox box(_ui);
 

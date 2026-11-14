@@ -183,11 +183,6 @@ namespace
               "？？？「ここにいるよ。\n　もしゆらめいたら、\n　今日が何日か教えて。」"),
     };
 
-    constexpr bn::string_view survivor_rebuilt_pages[] = {
-        RPG_T("It isn't the same.\nBut the bread is warm,\nand the door shuts.",
-              "元どおりじゃない。\nでもパンは温かいし、\n戸はちゃんと閉まる。"),
-    };
-
     constexpr bn::string_view grave_rebuilt_pages[] = {
         RPG_T("Father and Mother rest\nhere. Flowers grow\naround them now.",
               "父と母が、ここに眠る。\n今は、まわりに\n花が咲いている。"),
@@ -299,25 +294,45 @@ namespace
         { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
           .min_progress = progress::ch1_ashes, .max_progress = progress::ch1_ashes, .story = StoryId::ch1_elder },
         { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1,
-          .min_progress = progress::ch1_departed, .max_progress = progress::ch10_ember_out - 1,
+          .min_progress = progress::ch1_departed, .max_progress = progress::ch10_shadow - 1,
           .chapter_pages = elder_chapter_pages },
         { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_shadow - 1,
           .chapter_pages = survivor_chapter_pages },
-        // Chapter 10: the temptation at the graves (it comes before the grave signs of the same tiles on purpose).
+        // E1001: the companions wait at the gate (npc_graphics 6 partner, 9 seer, 12 defector) and close it.
+        { .type = EventType::story, .x = 8, .y = 18, .npc_graphics = 6,
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_shadow - 1,
+          .story = StoryId::ch10_companions },
+        { .type = EventType::story, .x = 7, .y = 18, .npc_graphics = 9,
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_shadow - 1,
+          .story = StoryId::ch10_companions },
+        { .type = EventType::story, .x = 9, .y = 18, .npc_graphics = 12,
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_shadow - 1,
+          .story = StoryId::ch10_companions },
+        // E1002: the graves (it comes before the grave signs of the same tiles on purpose).
         { .type = EventType::story, .x = 10, .y = 8,
-          .min_progress = progress::ch10_home, .max_progress = progress::ch10_home, .story = StoryId::ch10_grave },
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_shadow - 1,
+          .story = StoryId::ch10_grave },
         { .type = EventType::story, .x = 11, .y = 8,
-          .min_progress = progress::ch10_home, .max_progress = progress::ch10_home, .story = StoryId::ch10_grave },
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_shadow - 1,
+          .story = StoryId::ch10_grave },
         { .type = EventType::sign, .x = 10, .y = 8, .pages = grave_pages,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1 },
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_shadow - 1 },
         { .type = EventType::sign, .x = 11, .y = 8, .pages = grave_pages,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1 },
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_shadow - 1 },
 
-        // --- Chapter 10: rebuilding, the coronation, and after the ending ---
+        // --- Chapter 10: the rebuilt village (E1004-E1006), and after the ending ---
+        // E1005: the elder, in the square.
         { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
-          .min_progress = progress::ch10_ember_out, .max_progress = progress::game_clear - 1,
+          .min_progress = progress::ch10_shadow, .max_progress = progress::game_clear - 1,
           .story = StoryId::ch10_elder },
+        // E1004: the three requests (npc_graphics 13 is the child who saved the hero).
+        { .type = EventType::story, .x = 17, .y = 13, .npc_graphics = 13,
+          .min_progress = progress::ch10_shadow, .story = StoryId::ch10_rico },
+        { .type = EventType::story, .x = 5, .y = 7, .npc_graphics = 0,
+          .min_progress = progress::ch10_shadow, .story = StoryId::ch10_bell },
+        { .type = EventType::story, .x = 9, .y = 15, .npc_graphics = 0,
+          .min_progress = progress::ch10_shadow, .story = StoryId::ch10_mason },
         // After the ending: the stranger (npc_graphics 11) appears in the square as soon as the hero is crowned.
         { .type = EventType::story, .x = 13, .y = 11, .npc_graphics = 11,
           .min_progress = progress::game_clear, .max_progress = progress::game_clear,
@@ -326,16 +341,14 @@ namespace
           .min_progress = progress::post_stranger },
         { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1, .pages = elder_king_pages,
           .min_progress = progress::game_clear },
-        { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0, .pages = survivor_rebuilt_pages,
-          .min_progress = progress::ch10_rebuilt },
         { .type = EventType::sign, .x = 10, .y = 8, .pages = grave_rebuilt_pages,
-          .min_progress = progress::ch10_rebuilt },
+          .min_progress = progress::ch10_shadow },
         { .type = EventType::sign, .x = 11, .y = 8, .pages = grave_rebuilt_pages,
-          .min_progress = progress::ch10_rebuilt },
+          .min_progress = progress::ch10_shadow },
         { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages,
-          .min_progress = progress::ch10_rebuilt },
+          .min_progress = progress::ch10_shadow },
         { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
-          .stock = village_shop_stock, .min_progress = progress::ch10_rebuilt },
+          .stock = village_shop_stock, .min_progress = progress::ch10_shadow },
 
         // --- Always ---
         { .type = EventType::sign, .x = 11, .y = 11, .pages = sign_pages },
@@ -1992,7 +2005,7 @@ namespace
             },
         },
         {
-            MapId::village, progress::ch10_rebuilt, 0xFF,
+            MapId::village, progress::ch10_shadow, 0xFF,
             {
                 .name = RPG_T(RPG_NAME_VILLAGE " Village", RPG_NAME_VILLAGE_JA "村"),
                 .rows = village_rebuilt_rows,
@@ -2002,7 +2015,7 @@ namespace
             },
         },
         {
-            MapId::village, progress::ch1_ashes, progress::ch10_rebuilt - 1,
+            MapId::village, progress::ch1_ashes, progress::ch10_shadow - 1,
             {
                 .name = RPG_T(RPG_NAME_VILLAGE " Ruins", RPG_NAME_VILLAGE_JA "村の焼け跡"),
                 .rows = village_burnt_rows,

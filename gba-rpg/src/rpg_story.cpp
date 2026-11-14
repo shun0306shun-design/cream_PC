@@ -997,82 +997,129 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 10 "Green in the Ash"
     // ---------------------------------------------------------------------------------------------------------------
-    constexpr bn::string_view voyage_pages[] = {
-        RPG_T("The " SHIP " is ready.\nShe sails south, around\nthe " GATE ", toward home.",
-              RPG_NAME_SHIP_JA "の準備はできた。\n船は南へ、" RPG_NAME_GATE_JA "を回って\n故郷へ向かう。"),
+    constexpr bn::string_view homecoming_pages[] = {
+        RPG_T(RPG_NAME_VILLAGE ". Ash, and two\ngraves. Nothing has\nchanged.",
+              RPG_NAME_VILLAGE_JA "村。灰と、ふたつの墓。\n何も変わっていない。"),
+        RPG_T(RPG_NAME_PARTNER ": Go on. We'll wait\nhere, partner.",
+              RPG_NAME_PARTNER_JA "「行ってこい。\n　ここで待つ、相棒。」"),
+        RPG_T(RPG_NAME_HERO " walks to the\ngraves, alone.",
+              RPG_NAME_HERO_JA "は一人で、\n墓へ歩いていった。"),
     };
 
-    constexpr bn::string_view homecoming_pages[] = {
-        RPG_T(RPG_NAME_VILLAGE ". Nothing has\nchanged. Ash, and two\ngraves.",
-              VILLAGE_JA "村。\n何も変わっていない。\n灰と、ふたつの墓。"),
-        RPG_T(HERO ": I killed him. I\nthought it would feel\nlike coming home.",
-              HERO_JA "「あいつをたおした。\n　帰ってきた気持ちになれると\n　思っていたんだ。」"),
-        RPG_T("In your pack, something\nis warm. An ember of the\nPyre. Still alive.",
-              "荷物の中で、何かが温かい。\n火葬台の残り火だ。\nまだ、生きている。"),
+    constexpr bn::string_view companions_pages[] = {
+        RPG_T("The others wait by the\ngate. This walk is\nyours.",
+              "仲間たちは、門のそばで\n待っている。この道は、\n一人で歩く道だ。"),
     };
 
     constexpr bn::string_view grave_ember_pages[] = {
-        RPG_T("The ember burns in your\nhand. A whisper: Feed me,\nand they walk out.",
-              "手の中で残り火が燃える。\nささやき声がする。\n「くべよ。さすれば歩み出る」"),
-        RPG_T(HERO ": ...Father. Mother.",
-              HERO_JA "「……父さん。母さん。」"),
-        RPG_T("For one breath, the fire\ngrows. The ash of " RPG_NAME_VILLAGE "\nbegins to rise.",
-              "ひと息の間、炎が大きくなる。\n" VILLAGE_JA "村の灰が、\n舞い上がりはじめる。"),
-        RPG_T(PARTNER ": " HERO "!",
-              PARTNER_JA "「" HERO_JA "！」"),
-        RPG_T(SEER ": Look down. Not at\nthe fire. Down.",
-              RPG_NAME_SEER_JA "「下を見て。\n　炎ではなく。足もとを。」"),
-        RPG_T("By the graves, in the\nash: one green shoot.",
-              "墓のそば、灰の中に、\n緑の芽がひとつ。"),
-        RPG_T(HERO ": ...No. They don't\ncome back.",
-              HERO_JA "「……いや。\n　ふたりは、帰ってこない。」"),
-        RPG_T(HERO " presses the ember\ninto the wet earth.\nIt goes out.",
-              HERO_JA "は残り火を、\nしめった土に押しこんだ。\n火が消える。"),
-        RPG_T(HERO ": But something\nelse can.",
-              HERO_JA "「でも、別のものなら\n　芽を出せる。」"),
+        RPG_T(RPG_NAME_HERO ": I did it. He is\ngone. ...And you are\nstill under this earth.",
+              RPG_NAME_HERO_JA "「終わったよ。\n　あいつはもういない。\n　……なのに、二人は土の下だ。」"),
+        RPG_T("Nothing came back.\nKilling him returned\nnothing.",
+              "何も戻らなかった。\n焔帝を倒しても、\n何ひとつ。"),
+        RPG_T("The ember stirs in your\nhand. A whisper: Burn,\nand they return.",
+              "手の中で、残り火がうごく。\nささやきが聞こえた。\n「焼けば、返る」"),
+        RPG_T("The world turns red.",
+              "世界が、赤く染まる。"),
+        RPG_T("From the ash rises\nyour own shape.",
+              "灰の中から、\n自分と同じ姿が立ち上がった。"),
     };
 
-    constexpr bn::string_view rebuild_pages[] = {
-        RPG_T("Elder: You came back,\n" HERO ". All of you.",
-              "長老「帰ってきたか、" HERO_JA "。\n　みな、そろってな。」"),
-        RPG_T("Elder: We meant to\nrebuild. We had no\nhands, and no heart.",
-              "長老「建て直すつもりじゃった。\n　だが人手も、気力も\n　なかったのじゃ。」"),
-        RPG_T(HERO ": You have hands\nnow. Where do we start?",
-              HERO_JA "「人手なら、今はある。\n　どこから始める？」"),
-        RPG_T(NOX ": I know how things\nburn. Let me learn how\nthey are built.",
-              RPG_NAME_DEFECTOR_JA "「燃やし方なら知っている。\n　建て方を、\n　学ばせてほしい。」"),
+    constexpr bn::string_view grave_again_pages[] = {
+        RPG_T("The shadow is waiting\nat the graves.",
+              "影が、墓の前で\n待っている。"),
+    };
+
+    constexpr bn::string_view shadow_partner_pages[] = {
+        RPG_T(RPG_NAME_PARTNER ": Not like this,\npartner.",
+              RPG_NAME_PARTNER_JA "「こんなやり方は\n　よせ、相棒。」"),
+    };
+
+    constexpr bn::string_view shadow_seer_pages[] = {
+        RPG_T(RPG_NAME_SEER ": Your star is still\nthere. I can see it.",
+              RPG_NAME_SEER_JA "「あなたの星は、\n　まだそこにあります。」"),
+    };
+
+    constexpr bn::string_view shadow_defector_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": Live, and atone.\nYou taught me that.",
+              RPG_NAME_DEFECTOR_JA "「生きて、償え。\n　あなたが教えたことだ。」"),
+    };
+
+    constexpr bn::string_view shadow_victory_pages[] = {
+        RPG_T("The shadow comes apart.\nThe ember in your hand\ngoes out.",
+              "影がくずれていく。\n手の中の残り火が、\n消えた。"),
+        RPG_T(RPG_NAME_HERO ": ...They are not\ncoming back.",
+              RPG_NAME_HERO_JA "「……二人は、\n　もう戻らない。」"),
+        RPG_T(RPG_NAME_HERO ": But you all came.",
+              RPG_NAME_HERO_JA "「でも、みんなは\n　来てくれた。」"),
+        RPG_T("By the graves, in the\nash: one green shoot.",
+              "墓のそばの灰の中に、\n緑の芽がひとつ、出ていた。"),
     };
 
     constexpr bn::string_view seasons_pages[] = {
-        RPG_T("Seasons pass. Walls rise.\nThe well runs clear.\nPeople come, and stay.",
-              "季節がめぐる。壁が立つ。\n井戸の水がすむ。\n人が来て、住みつく。"),
+        RPG_T("Seasons pass. Survivors\ncome to " RPG_NAME_VILLAGE ", and stay.\nWalls rise from the ash.",
+              "季節がめぐった。\n生き残りが" RPG_NAME_VILLAGE_JA "村に移り住み、\n灰の上に家が建っていく。"),
+    };
+
+    constexpr bn::string_view rebuild_rico_pages[] = {
+        RPG_T("Rico: Can we plant a\ntree by the graves? A\nreal one. I'll water it.",
+              "リコ「お墓のそばに、木を\n　植えていい？ 本物の木。\n　水は、ぼくがやるから。」"),
+    };
+
+    constexpr bn::string_view rebuild_bell_pages[] = {
+        RPG_T("The bell burned with the\nold village. Would you\nname the new one?",
+              "鐘は、前の村といっしょに\n焼けたんだ。新しい鐘に、\n名前をつけてくれないか。"),
+    };
+
+    constexpr bn::string_view rebuild_mason_pages[] = {
+        RPG_T("Mason: The wall needs\nstone and hands. " RPG_NAME_MINE_TOWN "\nwill send both.",
+              "石工「かべには石と人手が\n　いる。" RPG_NAME_MINE_TOWN_JA "が、どちらも\n　出すと言っている。」"),
+    };
+
+    constexpr bn::string_view rebuild_done_pages[] = {
+        RPG_T("Everyone has asked.\n" RPG_NAME_HERO " says yes to\nall three.",
+              "三人の頼みを聞いた。\n" RPG_NAME_HERO_JA "は、すべてに\nうなずいた。"),
+    };
+
+    constexpr bn::string_view elder_wait_pages[] = {
+        RPG_T("Elder: Three people are\nlooking for you. Hear\nthem first.",
+              "長老「三人が、お前を\n　さがしていた。\n　先に聞いてやりなさい。」"),
     };
 
     constexpr bn::string_view coronation_pages[] = {
-        RPG_T("Elder: They have come\nfrom " REFUGE ", " RPG_NAME_MINE_TOWN ",\n" RPG_NAME_HARBOR ". All of them.",
-              "長老「" RPG_NAME_REFUGE_JA "から、\n　" RPG_NAME_MINE_TOWN_JA "から、" RPG_NAME_HARBOR_JA "から。\n　みな、来てくれたぞ。」"),
-        RPG_T("Keeper: We dug this out\nof " CAPITAL ". The realm\nneeds a king.",
-              "灯守り「" RPG_NAME_CAPITAL_JA "から\n　掘り出してきたよ。\n　国には、王が要る。」"),
-        RPG_T("A crown of gold, black\nwith soot.",
-              "すすで黒ずんだ、\n金の王冠。"),
-        RPG_T(HERO ": Not that one.",
-              HERO_JA "「それじゃない。」"),
-        RPG_T(SEER " weaves a ring of\ngreen shoots from the\nash, and holds it out.",
-              RPG_NAME_SEER_JA "が、灰から出た緑の芽で\n輪をあみ、さし出した。"),
-        RPG_T(PARTNER ": King of one\nvillage and a great\ndeal of ash.",
-              PARTNER_JA "「村ひとつと、\n　山ほどの灰の王さまか。」"),
-        RPG_T(HERO ": It's a start.",
-              HERO_JA "「ここから始めるさ。」"),
-        RPG_T(HERO " is crowned, in\nthe square of " RPG_NAME_VILLAGE ",\nbeside two graves.",
-              HERO_JA "は、" VILLAGE_JA "村の広場で\n王冠をいただいた。\nふたつの墓のそばで。"),
-        RPG_T(HERO ": Father. Mother.\nI'm home. You are\nnot here.",
-              HERO_JA "「父さん。母さん。\n　ただいま。\n　ふたりは、ここにいない。」"),
-        RPG_T(HERO ": ...That's all\nright.",
-              HERO_JA "「……それで、いいんだ。」"),
+        RPG_T("People fill the square:\n" RPG_NAME_REFUGE ", " RPG_NAME_MINE_TOWN ", " RPG_NAME_HARBOR ".\nAnd more.",
+              "広場に人が集まっていた。\n" RPG_NAME_REFUGE_JA "、" RPG_NAME_MINE_TOWN_JA "、" RPG_NAME_HARBOR_JA "。\nほかの土地からも。"),
+        RPG_T("Elder: The realm has no\nking. Every one of us\nnames the same man.",
+              "長老「この国には王が\n　いない。みなが、同じ\n　名をあげている。」"),
+        RPG_T(RPG_NAME_HERO ": I burned my way\nhere. I am not fit.",
+              RPG_NAME_HERO_JA "「おれは、焼きながら\n　ここまで来た。\n　ふさわしくない。」"),
+        RPG_T(RPG_NAME_PARTNER ": You stopped.\nThat's why, partner.",
+              RPG_NAME_PARTNER_JA "「お前は止まった。\n　だからだ、相棒。」"),
+        RPG_T(RPG_NAME_HERO " is crowned in\nthe square of " RPG_NAME_VILLAGE ".",
+              RPG_NAME_HERO_JA "は、" RPG_NAME_VILLAGE_JA "村の広場で\n王冠をいただいた。"),
+        RPG_T(RPG_NAME_HERO ": Father. Mother.\nI'm home. You are\nnot here.",
+              RPG_NAME_HERO_JA "「父さん、母さん。\n　ただいま。二人は、\n　ここにいない。」"),
+        RPG_T(RPG_NAME_HERO ": ...That's all right.\nI will look after\nwhat is.",
+              RPG_NAME_HERO_JA "「……それでいい。\n　今あるものを、\n　守っていく。」"),
+    };
+
+    constexpr bn::string_view ending_pages[] = {
         RPG_T("What burned will not\nreturn. What grows now\nis new.",
-              "燃えたものは、戻らない。\n今、育つものは、\n新しいものだ。"),
+              "焼けたものは戻らない。\n今、芽吹くものは\n新しいものだ。"),
         RPG_T("- THE END -\nThank you for playing.",
-              "- おわり -\n遊んでくれてありがとう。"),
+              "- おわり -\nあそんでくれて、ありがとう。"),
+    };
+
+    constexpr bn::string_view ending_saved_pages[] = {
+        RPG_T("The cleared game\nwas saved.",
+              "クリアデータを保存した。"),
+    };
+
+    constexpr EncounterGroup shadow_battle = { { EnemyId::ash_hero }, 1 };
+    constexpr int shadow_join_turn = 2;     // E1003: from the second round, one companion arrives per round.
+
+    constexpr bn::string_view voyage_pages[] = {
+        RPG_T("The " SHIP " is ready.\nShe sails south, around\nthe " GATE ", toward home.",
+              RPG_NAME_SHIP_JA "の準備はできた。\n船は南へ、" RPG_NAME_GATE_JA "を回って\n故郷へ向かう。"),
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1762,39 +1809,92 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         break;
 
     case StoryId::ch10_homecoming:
+        // E1001: the companions stay at the gate; the hero goes on alone.
         say_pages(ui, homecoming_pages);
+        state.party.leave(ClassId::lancer);
+        state.party.leave(ClassId::mage);
+        state.party.leave(ClassId::priest);
         story_progress = progress::ch10_home;
         break;
 
+    case StoryId::ch10_companions:
+        say_pages(ui, companions_pages);
+        break;
+
     case StoryId::ch10_grave:
-        say_pages(ui, grave_ember_pages);
-        story_progress = progress::ch10_ember_out;
+        // E1002 + E1003: the hero fights his own shadow alone; the companions arrive one per round.
+        if(story_progress < progress::ch10_ember)
+        {
+            say_pages(ui, grave_ember_pages);
+            story_progress = progress::ch10_ember;
+        }
+        else
+        {
+            // After losing the battle: it starts again the same way, alone.
+            say_pages(ui, grave_again_pages);
+            state.party.leave(ClassId::lancer);
+            state.party.leave(ClassId::mage);
+            state.party.leave(ClassId::priest);
+        }
+
+        result.battle = &shadow_battle;
+        result.battle_join_turn = shadow_join_turn;
+        break;
+
+    case StoryId::ch10_seasons:
+        say_pages(ui, seasons_pages);
+        break;
+
+    case StoryId::ch10_rico:
+    case StoryId::ch10_bell:
+    case StoryId::ch10_mason:
+        {
+            // E1004: hearing a request is enough. The three of them open the way to the coronation.
+            if(id == StoryId::ch10_rico)
+            {
+                say_pages(ui, rebuild_rico_pages);
+                state.flags.set(FlagId::rebuild_1);
+            }
+            else if(id == StoryId::ch10_bell)
+            {
+                say_pages(ui, rebuild_bell_pages);
+                state.flags.set(FlagId::rebuild_2);
+            }
+            else
+            {
+                say_pages(ui, rebuild_mason_pages);
+                state.flags.set(FlagId::rebuild_3);
+            }
+
+            if(story_progress < progress::ch10_rebuilt && state.flags.get(FlagId::rebuild_1) &&
+               state.flags.get(FlagId::rebuild_2) && state.flags.get(FlagId::rebuild_3))
+            {
+                say_pages(ui, rebuild_done_pages);
+                story_progress = progress::ch10_rebuilt;
+            }
+        }
         break;
 
     case StoryId::ch10_elder:
         if(story_progress < progress::ch10_rebuilt)
         {
-            // Rebuilding: the village becomes its rebuilt state, with the hero in front of the elder.
-            say_pages(ui, rebuild_pages);
-            ui.fade_out(60);
-            ui.wait(60);
-            story_progress = progress::ch10_rebuilt;
-            state.player_x = 12;
-            state.player_y = 10;
-            state.facing = Direction::up;
-            result.reload_map = true;
-            result.next = StoryId::ch10_seasons;
+            say_pages(ui, elder_wait_pages);
         }
         else
         {
-            // The coronation and the ending: the game is cleared, and goes on in the rebuilt village.
+            // E1005: the coronation, and the report at the graves. The ending follows.
             say_pages(ui, coronation_pages);
-            story_progress = progress::game_clear;
+            story_progress = progress::ch10_crowned;
+            result.next = StoryId::ch10_ending;
         }
         break;
 
-    case StoryId::ch10_seasons:
-        say_pages(ui, seasons_pages);
+    case StoryId::ch10_ending:
+        // E1006: the game is cleared and saved; it goes on in the rebuilt village.
+        say_pages(ui, ending_pages);
+        story_progress = progress::game_clear;
+        save_game(state);
+        say_pages(ui, ending_saved_pages);
         break;
 
     case StoryId::post_stranger:
@@ -1849,12 +1949,36 @@ BgmId story_bgm(StoryId id)
 
 bool story_battle_reinforce(GameState& state, MessageBox& box)
 {
+    Party& party = state.party;
+
     // E506: the partner comes back in the middle of the battle against Zelma (once: after a lost battle he is
     // already in the party).
-    if(state.story_battle == StoryId::ch5_zelma && state.party.join(ClassId::lancer, partner_min_level))
+    if(state.story_battle == StoryId::ch5_zelma && party.join(ClassId::lancer, partner_min_level))
     {
         box.say_pages(zelma_reinforce_pages);
         return true;
+    }
+
+    // E1003: one companion per round reaches the hero: the partner first, then the seer, then the defector.
+    if(state.story_battle == StoryId::ch10_grave)
+    {
+        if(party.join(ClassId::lancer, partner_min_level))
+        {
+            box.say_pages(shadow_partner_pages);
+            return true;
+        }
+
+        if(party.join(ClassId::mage, seer_min_level))
+        {
+            box.say_pages(shadow_seer_pages);
+            return true;
+        }
+
+        if(party.join(ClassId::priest, defector_min_level))
+        {
+            box.say_pages(shadow_defector_pages);
+            return true;
+        }
     }
 
     return false;
@@ -1988,6 +2112,24 @@ StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameSt
         state.player_y = 6;
         state.facing = Direction::down;
         result.reload_map = true;
+        break;
+
+    case StoryId::ch10_grave:
+        // E1003: the ember goes out. Time passes: the village becomes its rebuilt state.
+        say_pages(ui, shadow_victory_pages);
+        state.party.remove_item(ItemId::rebirth_ember);
+        state.party.join(ClassId::lancer, partner_min_level);   // Whoever didn't arrive during the battle.
+        state.party.join(ClassId::mage, seer_min_level);
+        state.party.join(ClassId::priest, defector_min_level);
+        ui.fade_out(60);
+        ui.wait(60);
+        state.story_progress = progress::ch10_shadow;
+        state.party.restore_all();
+        state.player_x = 12;
+        state.player_y = 10;
+        state.facing = Direction::up;
+        result.reload_map = true;
+        result.next = StoryId::ch10_seasons;
         break;
 
     case StoryId::ch6_bardos:

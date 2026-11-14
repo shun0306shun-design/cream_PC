@@ -44,6 +44,9 @@ enum class FlagId : uint8_t
     drake_defeated,     //!< E804: the general of the volcano fell.
     chest_lighthouse,
     chest_ice_tower,
+    rebuild_1,          //!< E1004: the three requests of the rebuilt village (all three: E1005 can happen).
+    rebuild_2,
+    rebuild_3,
     // Add new flags here.
     count,
     none = 0xFF         //!< "No flag": the default of MapEvent::flag.

@@ -192,7 +192,7 @@ struct MapEvent
 };
 
 constexpr int max_map_tiles = 32;       //!< Maximum map width/height in tiles (a 512x512 pixels background).
-constexpr int max_map_npcs = 8;
+constexpr int max_map_npcs = 10;
 constexpr int max_map_walkers = 4;     //!< NPCs that walk, per map.
 
 struct MapData

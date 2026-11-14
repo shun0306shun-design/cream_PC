@@ -89,11 +89,13 @@ namespace progress
     constexpr uint8_t ch9_motive = 86;      //!< E903: the Emperor told why he burns the world. The altar opens.
     constexpr uint8_t ch9_final = 88;       //!< E904: the Emperor was beaten once; the flame wearing his crown is left.
 
-    // Chapter 10 "Green in the Ash" (90-99)
-    constexpr uint8_t ch10_start = 90;      //!< The Emperor fell and his fire went out.
-    constexpr uint8_t ch10_home = 91;       //!< Back in the home village, with the last ember of the pyre.
-    constexpr uint8_t ch10_ember_out = 92;  //!< The hero almost fed the ember, then put it out.
-    constexpr uint8_t ch10_rebuilt = 93;    //!< The village was rebuilt (another state of its map).
+    // Chapter 10 "Green in the Ash" (90-99), E1001-E1006.
+    constexpr uint8_t ch10_start = 90;      //!< E905: the Emperor fell; the last ember is in the hero's hand.
+    constexpr uint8_t ch10_home = 91;       //!< E1001: back in the burnt village; the hero walks to the graves alone.
+    constexpr uint8_t ch10_ember = 92;      //!< E1002: the ember's whisper: the hero faces his own shadow.
+    constexpr uint8_t ch10_shadow = 94;     //!< E1003: the shadow was beaten by the four; the village is rebuilt.
+    constexpr uint8_t ch10_rebuilt = 96;    //!< E1004: heard the three requests (FlagId::rebuild_1..3).
+    constexpr uint8_t ch10_crowned = 99;    //!< E1005: the coronation.
 
     constexpr uint8_t game_clear = 100;
 
@@ -182,7 +184,12 @@ enum class StoryId : uint8_t
     ch10_homecoming,    //!< Arriving in the burnt home village (follows ch10_voyage).
     ch10_grave,         //!< At the parents' graves: the temptation of the ember.
     ch10_elder,         //!< The elder: rebuilding the village, then the coronation and the ending.
-    ch10_seasons,       //!< The village after it is rebuilt (follows ch10_elder).
+    ch10_seasons,       //!< E1004: the village after it is rebuilt (follows the battle of ch10_grave).
+    ch10_companions,    //!< E1001: the companions waiting at the gate.
+    ch10_rico,          //!< E1004: the three requests.
+    ch10_bell,
+    ch10_mason,
+    ch10_ending,        //!< E1006: the ending; the cleared game is saved (follows ch10_elder).
     post_stranger,      //!< After the ending: the stranger with the runaway necklace, in the home village.
     post_seer_elder,    //!< The elder of the seers' village: the first clue about the necklace.
     count,
@@ -197,7 +204,7 @@ struct StoryResult
     bool reload_map = false;                //!< The scene ended with the screen faded out: reload the map and fade in.
     StoryId next = StoryId::none;           //!< Scene to run right after this one.
     uint8_t battle_turn_limit = 0;          //!< The battle stops after this many rounds (0 = fought to the end).
-    uint8_t battle_join_turn = 0;           //!< story_battle_reinforce() is called at the start of this round (0 = no).
+    uint8_t battle_join_turn = 0;           //!< story_battle_reinforce() is called from this round on (0 = no).
 };
 
 /// Runs a scene (blocks until it ends). It may change the story progress, the party and the player position.
@@ -216,7 +223,7 @@ struct StoryResult
 [[nodiscard]] bool story_defeat_continues(StoryId id);
 
 /**
- * Called by the battle at the start of the round StoryResult::battle_join_turn: someone joins the fight.
+ * Called by the battle at the start of every round from StoryResult::battle_join_turn on: someone may join the fight.
  * Returns true if the party changed (the battle then refreshes its status window).
  */
 [[nodiscard]] bool story_battle_reinforce(GameState& state, MessageBox& box);

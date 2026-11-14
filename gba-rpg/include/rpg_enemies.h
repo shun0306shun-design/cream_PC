@@ -40,6 +40,7 @@ enum class EnemyId : uint8_t
     emperor,        //!< Final boss (chapter 9), first form.
     emperor_pyre,   //!< Final boss, second form.
     drowned_keeper, //!< Boss of the Sunken Lighthouse (chapter 8, E802).
+    ash_hero,       //!< E1003: the hero's own shadow, born from the ember.
     count
 };
 
