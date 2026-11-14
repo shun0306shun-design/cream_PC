@@ -10,7 +10,7 @@ namespace rpg
 namespace
 {
     constexpr uint32_t save_magic = 0x47505242;     // "BRPG"
-    constexpr uint32_t save_version = 9;            // Bump it when SaveData changes: old saves are then ignored.
+    constexpr uint32_t save_version = 10;            // Bump it when SaveData changes: old saves are then ignored.
 
     /// What is stored in SRAM. Must stay trivially copyable.
     struct SaveData

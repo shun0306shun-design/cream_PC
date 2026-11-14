@@ -906,79 +906,93 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     #define EMPEROR RPG_NAME_EMPEROR
 
-    constexpr bn::string_view circle_pages[] = {
-        RPG_T("The ash circle stirs. A\npath of embers opens,\ntoward the tower.",
-              "灰の円がざわめく。\n残り火の道が、\n塔へ向かって開いていく。"),
-        RPG_T(NOX ": The Emperor's road.\nIt opens only to those\nhe wishes to see.",
-              RPG_NAME_DEFECTOR_JA "「焔帝の道だ。\n　奴が会いたいと望む者に\n　しか、開かない。」"),
+    constexpr bn::string_view island_ask_pages[] = {
+        RPG_T("The " RPG_NAME_SHIP " can reach the\nEmperor's island. There\nis no coming back.",
+              RPG_NAME_SHIP_JA "なら焔帝の島へ\n行ける。行けば、\n引き返せない。"),
     };
 
-    constexpr bn::string_view arrival_pages[] = {
-        RPG_T("A castle of black glass.\nNo guards. No sound but\nthe fire above.",
-              "黒いガラスの城。\n衛兵はいない。聞こえるのは、\n頭上の炎の音だけだ。"),
+    constexpr bn::string_view landing_pages[] = {
+        RPG_T("The island is black glass\nand ash. The " RPG_NAME_SHIP " cannot\nwait in these waters.",
+              "島は、黒いガラスと灰で\nできていた。" RPG_NAME_SHIP_JA "は\nこの海にとどまれない。"),
+        RPG_T(RPG_NAME_PARTNER ": No way back, then.\nGood. I was done with\nrunning anyway, partner.",
+              RPG_NAME_PARTNER_JA "「戻る道はなし、か。\n　いいさ。逃げるのは\n　もうやめたんだ、相棒。」"),
     };
 
-    constexpr bn::string_view visions_pages[] = {
-        RPG_T("The glass walls show a\nvillage. A quiet morning.\nA pail by a spring.",
-              "ガラスの壁に、村が映る。\n静かな朝。\n泉のそばの手おけ。"),
-        RPG_T(SEER ": " HERO ". It is only\nthe fire, remembering.",
-              RPG_NAME_SEER_JA "「" HERO_JA "。あれは炎が\n　思い出しているだけです。」"),
-        RPG_T(HERO ": I know. They are\nnot coming back.",
-              HERO_JA "「分かっている。\n　ふたりは、帰ってこない。」"),
-        RPG_T(HERO ": ...I know.",
-              HERO_JA "「……分かっている。」"),
+    constexpr bn::string_view no_return_pages[] = {
+        RPG_T("The sea is empty. The\nonly way is forward.",
+              "海には何もない。\n進むしかない。"),
     };
 
-    constexpr bn::string_view emperor_pages[] = {
-        RPG_T(EMPEROR ": The ember of\n" RPG_NAME_VILLAGE ". I watched you,\nthe whole way.",
-              RPG_NAME_EMPEROR_JA "「" VILLAGE_JA "の火の粉か。\n　ずっと見ていたぞ。\n　ここまでの道のりを。」"),
-        RPG_T(EMPEROR ": I lost someone,\nonce. As you did. I would\nnot accept it.",
-              RPG_NAME_EMPEROR_JA "「私もかつて、\n　ひとりを失った。お前と同じだ。\n　私は、認めなかった。」"),
-        RPG_T(EMPEROR ": Feed a pyre the\nwhole world, and the\ndead walk out of it.",
-              RPG_NAME_EMPEROR_JA "「火葬台に世界を\n　まるごとくべれば、\n　死者はそこから歩み出る。」"),
-        RPG_T(HERO ": Eight parts in ten.\nDid they?",
-              HERO_JA "「世界の八割だ。\n　それで、出てきたのか？」"),
-        RPG_T(EMPEROR ": ...Not yet.",
-              RPG_NAME_EMPEROR_JA "「……まだだ。」"),
-        RPG_T(HERO ": I wanted that, too.\nI let a city burn,\nwanting it.",
-              HERO_JA "「俺もそれを望んだ。\n　望んだせいで、\n　都をひとつ燃やした。」"),
-        RPG_T(HERO ": They don't come\nback. It ends here.",
-              HERO_JA "「死者は帰ってこない。\n　ここで終わりだ。」"),
+    constexpr bn::string_view zelma_last_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_3 ": My lost lamb, and\nthe boy from " RPG_NAME_PARTNER_HOME ". Come\nto be forgiven?",
+              RPG_NAME_GENERAL_3_JA "「迷える子羊と、\n　" RPG_NAME_PARTNER_HOME_JA "の坊や。\n　ゆるしを乞いに来たの？」"),
+        RPG_T(RPG_NAME_DEFECTOR ": I came to end what\nI helped you begin.",
+              RPG_NAME_DEFECTOR_JA "「あなたと始めたことを、\n　終わらせに来た。」"),
+        RPG_T(RPG_NAME_PARTNER ": And I came\nfor " RPG_NAME_PARTNER_HOME ".",
+              RPG_NAME_PARTNER_JA "「おれは、" RPG_NAME_PARTNER_HOME_JA "の\n　ために来た。」"),
     };
 
-    constexpr bn::string_view emperor_victory_pages[] = {
-        RPG_T(EMPEROR ": Then I will burn\nwhat is left of me.",
-              RPG_NAME_EMPEROR_JA "「ならば、私に残った\n　ものを燃やそう。」"),
-        RPG_T("The Emperor steps into\nhis own pyre.",
-              "焔帝は、みずからの\n火葬台へ踏み入った。"),
-        RPG_T(SEER ": The lamps... I can\nfeel them. All of them.\nStand up!",
-              RPG_NAME_SEER_JA "「灯火が……感じます。\n　すべての灯火を。\n　立ってください！」"),
-        RPG_T("The party's strength\nreturns!",
-              "仲間たちに力がもどった！"),
+    constexpr bn::string_view zelma_last_victory_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_3 " staggers. " RPG_NAME_DEFECTOR "'s\nflame and " RPG_NAME_PARTNER "'s spear\nstrike as one.",
+              RPG_NAME_GENERAL_3_JA "がよろめく。\n" RPG_NAME_DEFECTOR_JA "の炎と" RPG_NAME_PARTNER_JA "の槍が、\n同時につらぬいた。"),
+        RPG_T(RPG_NAME_GENERAL_3 ": The dream... was\nso beautiful...",
+              RPG_NAME_GENERAL_3_JA "「夢は……あんなに\n　美しかったのに……」"),
+        RPG_T(RPG_NAME_PARTNER ": ...It's done, " RPG_NAME_DEFECTOR ".",
+              RPG_NAME_PARTNER_JA "「……終わったぞ、\n　" RPG_NAME_DEFECTOR_JA "。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": Yes. Now I can\nlive with it.",
+              RPG_NAME_DEFECTOR_JA "「ああ。これで、\n　背負って生きていける。」"),
     };
 
-    constexpr bn::string_view pyre_pages[] = {
-        RPG_T("The pyre rises, wearing\na crown of ash.",
-              "火葬台が立ち上がる。\n灰の王冠をまとって。"),
+    constexpr bn::string_view motive_pages[] = {
+        RPG_T(RPG_NAME_EMPEROR ": The ember of " RPG_NAME_VILLAGE ".\nI was a king once. War\ntook my land. My family.",
+              RPG_NAME_EMPEROR_JA "「" RPG_NAME_VILLAGE_JA "の火の粉か。\n　私も昔は王だった。戦が、\n　国も家族もうばった。」"),
+        RPG_T(RPG_NAME_EMPEROR ": The Flame of Rebirth\nreturns what was lost,\nfrom its ashes.",
+              RPG_NAME_EMPEROR_JA "「再誕の炎は、\n　失われたものを\n　灰からよみがえらせる。」"),
+        RPG_T(RPG_NAME_HERO ": You burned eight\nparts in ten. Who has\ncome back?",
+              RPG_NAME_HERO_JA "「世界の八割を\n　焼いて、だれが\n　戻ってきた。」"),
+        RPG_T(RPG_NAME_EMPEROR ": ...No one. Not yet.\nMore ash. It only\nneeds more ash.",
+              RPG_NAME_EMPEROR_JA "「……だれも。まだだ。\n　灰が足りぬ。もっと\n　灰がいるだけだ。」"),
+        RPG_T(RPG_NAME_SEER ": " RPG_NAME_HERO ". He is what\nyou would have become.",
+              RPG_NAME_SEER_JA "「" RPG_NAME_HERO_JA "。あの人は、\n　あなたがなっていたかも\n　しれない姿です。」"),
+        RPG_T(RPG_NAME_EMPEROR ": Come to the altar.\nSee it for yourself.",
+              RPG_NAME_EMPEROR_JA "「祭壇へ来い。\n　その目で見るがよい。」"),
     };
 
-    constexpr bn::string_view pyre_victory_pages[] = {
-        RPG_T("The pyre gutters.\nIn it, a man's voice.",
-              "火葬台の炎がゆらぐ。\nその中から、男の声がした。"),
-        RPG_T(EMPEROR ": She did not come.\nThen what was all this\nash for?",
-              RPG_NAME_EMPEROR_JA "「彼女は来なかった。\n　ならば、この灰は\n　何のためだったのだ？」"),
-        RPG_T(HERO ": Nothing. It is just\nwhat is left. We carry\nit. That's all.",
-              HERO_JA "「何のためでもない。\n　ただ、残ったものだ。\n　俺たちが背負う。それだけだ。」"),
-        RPG_T("The fire above the\ncastle goes out.",
-              "城の上の炎が、消えた。"),
-        RPG_T(PARTNER ": ...It's over.",
-              PARTNER_JA "「……終わったな。」"),
-        RPG_T(HERO ": No. Now we go\nhome, to what isn't\nthere.",
-              HERO_JA "「いや。これから帰るんだ。\n　もう何もない、\n　あの場所へ。」"),
+    constexpr bn::string_view altar_final_pages[] = {
+        RPG_T("The Flame of Rebirth\nburns on the altar. " RPG_NAME_EMPEROR "\nstands before it.",
+              "祭壇で、再誕の炎が\n燃えている。その前に\n" RPG_NAME_EMPEROR_JA "が立っていた。"),
+        RPG_T(RPG_NAME_HERO ": They don't come\nback. It ends here.",
+              RPG_NAME_HERO_JA "「戻ってはこない。\n　ここで終わりだ。」"),
+    };
+
+    constexpr bn::string_view fusion_pages[] = {
+        RPG_T(RPG_NAME_EMPEROR ": Then I will be\nthe ash it needs.",
+              RPG_NAME_EMPEROR_JA "「ならば、私自身が\n　灰となろう。」"),
+        RPG_T(RPG_NAME_EMPEROR " steps into the\nflame. It rises,\nwearing his crown.",
+              RPG_NAME_EMPEROR_JA "は炎の中へ\n歩み入った。炎が、王冠を\nいただいて立ち上がる。"),
+    };
+
+    constexpr bn::string_view fusion_again_pages[] = {
+        RPG_T("The Flame of Rebirth\ndescends on you.",
+              "再誕の炎が、\nおそいかかってくる。"),
+    };
+
+    constexpr bn::string_view fading_pages[] = {
+        RPG_T("The flame gutters.\nIn it, a man's voice.",
+              "炎がゆらぐ。その中から、\n男の声がした。"),
+        RPG_T(RPG_NAME_EMPEROR ": ...So. They did\nnot return, after all.",
+              RPG_NAME_EMPEROR_JA "「……やはり、\n　返らなかったか。」"),
+        RPG_T("The altar goes dark.\nOne ember is left,\nin " RPG_NAME_HERO "'s hand.",
+              "祭壇の火が消えた。\n残り火がひとつ、" RPG_NAME_HERO_JA "の\n手の中に残った。"),
+        RPG_T("Got the Ember of Rebirth.",
+              "再誕の残り火を手に入れた。"),
+        RPG_T(RPG_NAME_PARTNER ": ...It's over.",
+              RPG_NAME_PARTNER_JA "「……終わったな。」"),
         RPG_T("- Final Chapter -\nGreen in the Ash",
               "- 最終章 -\n灰に芽吹く"),
     };
 
+    constexpr EncounterGroup zelma_last_battle = { { EnemyId::general_3, EnemyId::ash_zealot }, 2 };
     constexpr EncounterGroup emperor_battle = { { EnemyId::emperor }, 1 };
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 10 "Green in the Ash"
@@ -1626,6 +1640,31 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         }
         else
         {
+            // E901: the Emperor's island. Landing there can't be undone.
+            if(story_progress >= progress::ch9_start)
+            {
+                bool land;
+
+                {
+                    MessageBox box(ui);
+                    box.show(island_ask_pages[0]);
+                    land = ask_yes_no(ui);
+                }
+
+                if(land)
+                {
+                    ui.fade_out(40);
+                    story_progress = progress::ch9_landing;
+                    state.map = MapId::castle;
+                    state.player_x = 9;
+                    state.player_y = 13;
+                    state.facing = Direction::up;
+                    result.reload_map = true;
+                    result.next = StoryId::ch9_landing;
+                    break;
+                }
+            }
+
             // The ship: north to the ice tower, or to the volcano fort. Both come back to this pier.
             int choice;
 
@@ -1671,41 +1710,41 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         }
         break;
 
-    case StoryId::ch9_circle:
-        // The ember road: straight into the castle (walk out of its door to come back).
-        say_pages(ui, circle_pages);
-        ui.fade_out(40);
-        state.map = MapId::castle;
-        state.player_x = 9;
-        state.player_y = 13;
-        state.facing = Direction::up;
-        result.reload_map = true;
-        result.next = story_progress < progress::ch9_visions ? StoryId::ch9_arrival : StoryId::none;
+    // ----- Chapter 9 (E901-E905; E901 starts at the pier, in ch8_pier) -----
+    case StoryId::ch9_landing:
+        say_pages(ui, landing_pages);
         break;
 
-    case StoryId::ch9_arrival:
-        say_pages(ui, arrival_pages);
+    case StoryId::ch9_no_return:
+        say_pages(ui, no_return_pages);
+        result.step_back = true;
         break;
 
-    case StoryId::ch9_visions:
-        say_pages(ui, visions_pages);
-        story_progress = progress::ch9_visions;
+    case StoryId::ch9_zelma:
+        say_pages(ui, zelma_last_pages);
+        result.battle = &zelma_last_battle;
         break;
 
-    case StoryId::ch9_emperor:
-        if(story_progress < progress::ch9_first_form)
+    case StoryId::ch9_motive:
+        say_pages(ui, motive_pages);
+        story_progress = progress::ch9_motive;
+        break;
+
+    case StoryId::ch9_altar:
+        // E904: two battles in a row, with no rest in between.
+        if(story_progress < progress::ch9_final)
         {
-            say_pages(ui, emperor_pages);
+            say_pages(ui, altar_final_pages);
             result.battle = &emperor_battle;
         }
         else
         {
-            result.next = StoryId::ch9_pyre;    // The first form is already beaten: only the pyre is left.
+            result.next = StoryId::ch9_flame;   // The Emperor is already beaten: only the flame is left.
         }
         break;
 
-    case StoryId::ch9_pyre:
-        say_pages(ui, pyre_pages);
+    case StoryId::ch9_flame:
+        say_pages(ui, fusion_again_pages);
         result.battle = &pyre_battle;
         break;
 
@@ -1923,22 +1962,31 @@ StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameSt
         state.flags.set(FlagId::drake_defeated);
         break;
 
-    case StoryId::ch9_emperor:
-        // Two battles in a row: the second one starts as soon as this scene ends.
-        say_pages(ui, emperor_victory_pages);
-        state.party.restore_all();
-        state.story_progress = progress::ch9_first_form;
-        result.next = StoryId::ch9_pyre;
+    case StoryId::ch9_zelma:
+        // E902: the partner and the defector end it together.
+        say_pages(ui, zelma_last_victory_pages);
+        state.story_progress = progress::ch9_zelma;
         break;
 
-    case StoryId::ch9_pyre:
-        // The castle goes dark and the party is taken back to the harbor (the respawn point of the chapter).
-        say_pages(ui, pyre_victory_pages);
+    case StoryId::ch9_altar:
+        // E904: the second battle starts as soon as this scene ends. No rest.
+        say_pages(ui, fusion_pages);
+        state.story_progress = progress::ch9_final;
+        result.next = StoryId::ch9_flame;
+        break;
+
+    case StoryId::ch9_flame:
+        // E905: the flame goes out; its last ember stays with the hero. The party is taken back to the port.
+        say_pages(ui, fading_pages);
+        state.party.add_item(ItemId::rebirth_ember);
         ui.fade_out(60);
         ui.wait(60);
         state.story_progress = progress::ch10_start;
         state.party.restore_all();
-        state.return_to_start();
+        state.map = MapId::harbor;
+        state.player_x = 3;
+        state.player_y = 6;
+        state.facing = Direction::down;
         result.reload_map = true;
         break;
 

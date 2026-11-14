@@ -1661,10 +1661,6 @@ namespace
         // E804: General Drake (npc_graphics 8) in the hall, until he is beaten (FlagId::drake_defeated).
         { .type = EventType::story, .x = 9, .y = 3, .npc_graphics = 8,
           .min_progress = progress::ch8_ship, .story = StoryId::ch8_drake, .gone_flag = FlagId::drake_defeated },
-        // Chapter 9 as it is implemented now: the rite circle is the way to the Emperor's castle (until he falls).
-        { .type = EventType::story, .x = 9, .y = 1,
-          .min_progress = progress::ch9_start, .max_progress = progress::ch10_start - 1,
-          .story = StoryId::ch9_circle },
         { .type = EventType::sign, .x = 9, .y = 1, .pages = citadel_circle_pages },
         { .type = EventType::chest, .x = 4, .y = 5, .npc_graphics = 3,
           .flag = FlagId::chest_citadel, .item = ItemId::magic_water, .item_amount = 5 },
@@ -1682,7 +1678,7 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view castle_rows[] = {
         "####################",    // 0
-        "########_A_#########",    // 1
+        "########_Ao#########",    // 1
         "#######_____########",    // 2
         "#######_____########",    // 3
         "#########_##########",    // 4
@@ -1707,22 +1703,52 @@ namespace
     };
 
     constexpr bn::string_view castle_pyre_pages[] = {
-        RPG_T("The Pyre of Return.\nNothing ever came\nback out of it.",
-              "帰還の火葬台。\nそこから帰ってきたものは、\n何ひとつない。"),
+        RPG_T("The Emperor's throne.\nIt is covered in ash.",
+              "焔帝の玉座だ。\n灰をかぶっている。"),
     };
 
     constexpr MapEvent castle_events[] = {
-        { .type = EventType::warp, .x = 9, .y = 14, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 2 },
-        // The only way up passes through here.
-        { .type = EventType::trigger, .x = 16, .y = 9,
-          .max_progress = progress::ch9_visions - 1, .story = StoryId::ch9_visions },
+        // E901: the ship is gone.
+        { .type = EventType::trigger, .x = 9, .y = 14, .story = StoryId::ch9_no_return },
+        // E902: General Zelma (npc_graphics 8) holds the only way up.
+        { .type = EventType::story, .x = 16, .y = 9, .npc_graphics = 8,
+          .max_progress = progress::ch9_zelma - 1, .story = StoryId::ch9_zelma },
         { .type = EventType::spring, .x = 7, .y = 5, .pages = castle_spring_pages, .price = 0 },
         { .type = EventType::chest, .x = 5, .y = 5, .npc_graphics = 3,
           .flag = FlagId::chest_castle, .item = ItemId::magic_water, .item_amount = 5 },
+        // E903: the Emperor (npc_graphics 8) in his room, until he leaves for the altar.
         { .type = EventType::story, .x = 9, .y = 3, .npc_graphics = 8,
-          .min_progress = progress::ch9_start, .max_progress = progress::ch10_start - 1,
-          .story = StoryId::ch9_emperor },
+          .max_progress = progress::ch9_motive - 1, .story = StoryId::ch9_motive },
         { .type = EventType::sign, .x = 9, .y = 1, .pages = castle_pyre_pages },
+        // The circle behind the throne leads to the Altar of Rebirth.
+        { .type = EventType::warp, .x = 10, .y = 1, .warp_map = MapId::rebirth_altar, .warp_x = 9, .warp_y = 4 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D14: the Altar of Rebirth. Examining the altar ('A') starts the last two battles (E904).
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view rebirth_altar_rows[] = {
+        "####################",    // 0
+        "########_A_#########",    // 1
+        "#######_____########",    // 2
+        "#######_____########",    // 3
+        "#########_##########",    // 4
+        "#########o##########",    // 5
+        "####################",    // 6
+    };
+
+    static_assert(valid_layout(rebirth_altar_rows), "Invalid rebirth altar layout");
+
+    constexpr bn::string_view rebirth_altar_dark_pages[] = {
+        RPG_T("The altar is dark.",
+              "祭壇の火は、消えている。"),
+    };
+
+    constexpr MapEvent rebirth_altar_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 5, .warp_map = MapId::castle, .warp_x = 10, .warp_y = 2 },
+        { .type = EventType::story, .x = 9, .y = 1,
+          .max_progress = progress::ch10_start - 1, .story = StoryId::ch9_altar },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = rebirth_altar_dark_pages },
     };
 
     constexpr EncounterGroup castle_encounters[] = {
@@ -1931,6 +1957,12 @@ namespace
             .encounter_rate = 12,
             .border = TileId::cave_wall,
         },
+        {
+            .name = RPG_T("Altar of Rebirth", "再誕の祭壇"),
+            .rows = rebirth_altar_rows,
+            .events = rebirth_altar_events,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1991,7 +2023,7 @@ namespace
         { MapId::dorn, 4, 6 },              // Chapter 6: the same (the capital has no safe place).
         { MapId::refuge, 3, 6 },            // Chapter 7: in front of the inn of the refugee valley.
         { MapId::harbor, 3, 6 },            // Chapter 8 on: in front of the inn of the harbor town.
-        { MapId::harbor, 3, 6 },            // Chapter 9: the same.
+        { MapId::castle, 9, 13 },           // Chapter 9: the shore of the island (there is no way back).
         { start_map, start_x, start_y },    // Chapter 10 and after the ending: home.
     };
 

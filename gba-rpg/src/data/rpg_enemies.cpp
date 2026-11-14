@@ -83,7 +83,7 @@ namespace
         // Chapter 9: the Flame Emperor, two battles in a row (the party is restored in between).
         { RPG_T(RPG_NAME_EMPEROR, RPG_NAME_EMPEROR_JA), &bn::sprite_items::enemy_drake,
               { 1400, 0, 76,  28, 20 }, R::last_boss, 0,                                      0,    SpellId::blizzard, 40 },
-        { RPG_T("Pyre of Return", "帰還の火葬台"), &bn::sprite_items::enemy_wyrm,
+        { RPG_T("Rebirth Flame", "再誕の炎"), &bn::sprite_items::enemy_wyrm,
               { 2000, 0, 88,  30, 24 }, R::last_boss, 0,                                      0,    SpellId::fire,     50 },
         // Chapter 8: the Sunken Lighthouse.
         { RPG_T("Drowned Keeper", "沈んだ灯台守"), &bn::sprite_items::enemy_wyrm,

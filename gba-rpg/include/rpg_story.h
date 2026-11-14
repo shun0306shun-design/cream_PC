@@ -82,10 +82,12 @@ namespace progress
     constexpr uint8_t ch8_goals = 71;       //!< E801: the elder named the three goals: a ship and two generals.
     constexpr uint8_t ch8_ship = 73;        //!< E802: got the compass in the Sunken Lighthouse: the ship can sail.
 
-    // Chapter 9 "The Flame Emperor's Castle" (80-89)
-    constexpr uint8_t ch9_start = 80;       //!< E805: the send-off. The rite circle of the volcano fort opens (see ch9_circle).
-    constexpr uint8_t ch9_visions = 81;     //!< Saw the fire's memories in the castle.
-    constexpr uint8_t ch9_first_form = 82;  //!< The Emperor was beaten once: only his pyre form is left.
+    // Chapter 9 "The Flame Emperor's Castle" (80-89), E901-E905.
+    constexpr uint8_t ch9_start = 80;       //!< E805: the send-off. The ship can reach the Emperor's island.
+    constexpr uint8_t ch9_landing = 81;     //!< E901: landed on the island: there is no way back.
+    constexpr uint8_t ch9_zelma = 84;       //!< E902: General Zelma fell in the castle (the partner and the defector).
+    constexpr uint8_t ch9_motive = 86;      //!< E903: the Emperor told why he burns the world. The altar opens.
+    constexpr uint8_t ch9_final = 88;       //!< E904: the Emperor was beaten once; the flame wearing his crown is left.
 
     // Chapter 10 "Green in the Ash" (90-99)
     constexpr uint8_t ch10_start = 90;      //!< The Emperor fell and his fire went out.
@@ -170,11 +172,12 @@ enum class StoryId : uint8_t
     ch8_ryuze,          //!< E803: General Ryuze in the Tower of the Ice Wall.
     ch8_drake,          //!< E804: General Drake in the Volcano Fort.
     ch8_sendoff,        //!< E805: back in the village with both generals dead. Starts chapter 9.
-    ch9_circle,         //!< The rite circle of the citadel: the way to the Emperor's castle.
-    ch9_arrival,        //!< First steps in the castle (follows ch9_circle).
-    ch9_visions,        //!< The fire's memories, in a corridor of the castle.
-    ch9_emperor,        //!< Final boss, first form. Winning leads straight to ch9_pyre.
-    ch9_pyre,           //!< Final boss, second form. Winning starts the final chapter.
+    ch9_landing,        //!< E901: the island (follows the pier of the port town, see ch8_pier).
+    ch9_no_return,      //!< The shore of the island: no way back.
+    ch9_zelma,          //!< E902: General Zelma in the castle.
+    ch9_motive,         //!< E903: the Emperor's room.
+    ch9_altar,          //!< E904: the Altar of Rebirth: the Emperor, then (with no rest) ch9_flame.
+    ch9_flame,          //!< E904: the Flame of Rebirth wearing his crown. E905 follows the victory.
     ch10_voyage,        //!< The pier of the harbor after the Emperor's fall: the ship sails home.
     ch10_homecoming,    //!< Arriving in the burnt home village (follows ch10_voyage).
     ch10_grave,         //!< At the parents' graves: the temptation of the ember.

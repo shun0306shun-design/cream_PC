@@ -97,6 +97,7 @@ enum class MapId : uint8_t
     fort_marsh, //!< D09: the Fort of the Weeping Marsh.
     lighthouse, //!< D10: the Sunken Lighthouse.
     ice_tower,  //!< D11: the Tower of the Ice Wall.
+    rebirth_altar,  //!< D14: the Altar of Rebirth (final battles).
     count
 };
 

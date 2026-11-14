@@ -32,6 +32,7 @@ namespace
         { RPG_T("Star Sigil", "星の印章"),       {},     0,     ItemKind::key },
         { RPG_T("Rico's Charm", "リコのお守り"),   {},     0,     ItemKind::key },
         { RPG_T("Compass", "羅針盤"),            {},     0,     ItemKind::key },
+        { RPG_T("Rebirth Ember", "再誕の残り火"),  {},     0,     ItemKind::key },
     };
 
     static_assert(sizeof(items) / sizeof(items[0]) == item_count, "Item table doesn't match ItemId");
