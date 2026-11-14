@@ -1155,23 +1155,28 @@ namespace
     static_assert(valid_layout(refuge_rows), "Invalid refuge layout");
 
     constexpr bn::string_view refuge_sign_pages[] = {
-        RPG_NAME_REFUGE "\nKeep a lamp lit for\nthose still on the road.",
+        RPG_T(RPG_NAME_REFUGE "\nKeep a lamp lit for\nthose still on the road.",
+              RPG_NAME_REFUGE_JA "\nまだ道の途中にいる者の\nために、灯火をひとつ。"),
     };
 
     constexpr bn::string_view refuge_shop_pages[] = {
-        "Whatever we carried out\nof " RPG_NAME_CAPITAL ". Take what\nhelps.",
+        RPG_T("Whatever we carried out\nof " RPG_NAME_CAPITAL ". Take what\nhelps.",
+              RPG_NAME_CAPITAL_JA "から持ち出せた\nものばかりさ。\n役に立つものを持っていきな。"),
     };
 
     constexpr bn::string_view refuge_child_pages[] = {
-        "My brother says you were\non the wall. Is the wall\ncoming here, too?",
+        RPG_T("My brother says you were\non the wall. Is the wall\ncoming here, too?",
+              "兄ちゃんが言ってた。城壁に\nいたんでしょ？ 城壁は\nここにも来るの？"),
     };
 
     constexpr bn::string_view refuge_shrine_before_pages[] = {
-        "Dozens of small lamps.\nEach one has a name.",
+        RPG_T("Dozens of small lamps.\nEach one has a name.",
+              "小さな灯火が何十も並ぶ。\nひとつひとつに\n名前がある。"),
     };
 
     constexpr bn::string_view refuge_shrine_after_pages[] = {
-        "Your lamp burns among\nthe others.",
+        RPG_T("Your lamp burns among\nthe others.",
+              "自分のともした灯火が、\nほかの灯火の中で\n燃えている。"),
     };
 
     constexpr MapEvent refuge_events[] = {
@@ -1356,13 +1361,13 @@ namespace
             .border = TileId::wall,
         },
         {
-            .name = RPG_NAME_REFUGE,
+            .name = RPG_T(RPG_NAME_REFUGE, RPG_NAME_REFUGE_JA),
             .rows = refuge_rows,
             .events = refuge_events,
             .border = TileId::tree,
         },
         {
-            .name = "Lantern Pass",
+            .name = RPG_T("Lantern Pass", "灯火の峠"),
             .rows = pass_rows,
             .events = pass_events,
             .encounters = pass_encounters,

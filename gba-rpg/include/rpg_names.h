@@ -41,6 +41,7 @@
 #define RPG_NAME_MINE_TOWN_JA   "ドルン"
 #define RPG_NAME_PARTNER_HOME_JA "カザミ"
 #define RPG_NAME_CAPITAL_JA     "グランセル"
+#define RPG_NAME_REFUGE_JA      "ランタンレスト"
 #define RPG_NAME_CULT_JA        "灰の教団"
 #define RPG_NAME_EMPEROR_JA     "ヴァルグレン"
 #define RPG_NAME_GENERAL_1_JA   "ドレイク"

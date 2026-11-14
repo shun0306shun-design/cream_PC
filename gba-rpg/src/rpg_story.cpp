@@ -581,58 +581,89 @@ namespace
     // Chapter 7 "The Lamplight"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view south_gate_pages[] = {
-        "A track south, into the\nhills. No reason to\ntake it yet.",
+        RPG_T("A track south, into the\nhills. No reason to\ntake it yet.",
+              "南の丘へ続く小道だ。\n今はまだ、\n行く理由がない。"),
     };
 
     constexpr bn::string_view keeper_pages[] = {
-        "Lamps hang from every\nbranch. The fire never\nreached this valley.",
-        "Keeper: " CAPITAL " folk, all\nof us. You were on the\nwall. I remember you.",
-        HERO ": Then you know\nI left it.",
-        "Keeper: I know my grandson\nran through that gate\nwhile it still stood.",
-        "Keeper: Each night we\nlight one lamp for\nsomeone lost.",
-        "Keeper: Take this. Light\nit at the shrine, when you\nknow who it is for.",
-        HERO " took the lantern.",
+        RPG_T("Lamps hang from every\nbranch. The fire never\nreached this valley.",
+              "どの枝にも灯火が\n下がっている。この谷に、\n炎は届かなかったのだ。"),
+        RPG_T("Keeper: " CAPITAL " folk, all\nof us. You were on the\nwall. I remember you.",
+              "灯守り「ここの者は皆、\n　" RPG_NAME_CAPITAL_JA "の民だよ。城壁に\n　いたね。覚えているよ。」"),
+        RPG_T(HERO ": Then you know\nI left it.",
+              HERO_JA "「なら、俺が持ち場を\n　離れたことも知っているな。」"),
+        RPG_T("Keeper: I know my grandson\nran through that gate\nwhile it still stood.",
+              "灯守り「知っているのは、\n　門がまだ立っていた間に、\n　孫が逃げのびたことさ。」"),
+        RPG_T("Keeper: Each night we\nlight one lamp for\nsomeone lost.",
+              "灯守り「わたしらは毎晩、\n　失われた誰かのために\n　灯火をひとつともす。」"),
+        RPG_T("Keeper: Take this. Light\nit at the shrine, when you\nknow who it is for.",
+              "灯守り「これをお持ち。\n　誰のための灯か分かったら、\n　祠でともしなさい。」"),
+        RPG_T(HERO " took the lantern.",
+              HERO_JA "は灯火を受け取った。"),
     };
 
     constexpr bn::string_view keeper_again_pages[] = {
-        "Keeper: The shrine is up\nthe path, in the north-\neast of the valley.",
+        RPG_T("Keeper: The shrine is up\nthe path, in the north-\neast of the valley.",
+              "灯守り「祠は道をのぼった先、\n　谷の北東にあるよ。」"),
     };
 
     constexpr bn::string_view keeper_after_pages[] = {
-        "Keeper: A lamp is small.\nThat is why it takes\nso many of us.",
+        RPG_T("Keeper: A lamp is small.\nThat is why it takes\nso many of us.",
+              "灯守り「灯火は小さい。\n　だから、こんなに大勢が\n　要るのさ。」"),
     };
 
     constexpr bn::string_view shrine_pages[] = {
-        HERO " lights the lantern.",
-        HERO ": For Father. For\nMother. ...For " CAPITAL ".",
-        PARTNER ": I lit one here for\n" RPG_NAME_PARTNER_HOME ", years ago.\nNever told anyone.",
-        NOX ": May I light one?\nFor those I burned.",
-        SEER ": " HERO ". Your star\nis back. Small. But\nit is there.",
-        HERO ": I had all of you\nbeside me, and I fought\nalone. I'm sorry.",
-        HERO ": No more revenge.\nI want there to be lamps\nleft to light.",
-        PARTNER ": ...Took you\nlong enough.",
-        "A runner: Torches in the\neast pass! " GENERAL "'s host,\nhunting us!",
-        HERO ": Not this time.\nTogether.",
+        RPG_T(HERO " lights the lantern.",
+              HERO_JA "は灯火をともした。"),
+        RPG_T(HERO ": For Father. For\nMother. ...For " CAPITAL ".",
+              HERO_JA "「父さんに。母さんに。\n　……" RPG_NAME_CAPITAL_JA "に。」"),
+        RPG_T(PARTNER ": I lit one here for\n" RPG_NAME_PARTNER_HOME ", years ago.\nNever told anyone.",
+              PARTNER_JA "「何年も前、俺もここで\n　" RPG_NAME_PARTNER_HOME_JA "のためにともした。\n　誰にも言わなかったがな。」"),
+        RPG_T(NOX ": May I light one?\nFor those I burned.",
+              RPG_NAME_DEFECTOR_JA "「私も、ひとつ\n　ともしていいだろうか。\n　私が焼いた者たちのために。」"),
+        RPG_T(SEER ": " HERO ". Your star\nis back. Small. But\nit is there.",
+              RPG_NAME_SEER_JA "「" HERO_JA "。あなたの星が\n　戻りました。小さい。\n　けれど、そこにあります。」"),
+        RPG_T(HERO ": I had all of you\nbeside me, and I fought\nalone. I'm sorry.",
+              HERO_JA "「みんなが隣にいたのに、\n　俺はひとりで戦った。\n　すまなかった。」"),
+        RPG_T(HERO ": No more revenge.\nI want there to be lamps\nleft to light.",
+              HERO_JA "「復讐はもういい。\n　ともす灯火が残る世界で\n　あってほしいんだ。」"),
+        RPG_T(PARTNER ": ...Took you\nlong enough.",
+              PARTNER_JA "「……やっと、\n　分かったか。」"),
+        RPG_T("A runner: Torches in the\neast pass! " GENERAL "'s host,\nhunting us!",
+              "伝令「東の峠にたいまつだ！\n　" GENERAL_JA "の軍勢が、\n　俺たちを狩りに来た！」"),
+        RPG_T(HERO ": Not this time.\nTogether.",
+              HERO_JA "「今度はちがう。\n　一緒にだ。」"),
     };
 
     constexpr bn::string_view east_gate_ch7_pages[] = {
-        "The east pass. The lamps\nare kept dark on\nthis side.",
+        RPG_T("The east pass. The lamps\nare kept dark on\nthis side.",
+              "東の峠だ。こちら側では、\n灯火は消してある。"),
     };
 
     constexpr bn::string_view pass_pages[] = {
-        GENERAL ": The ember. Come.\nCharge me, as you\ncharged her.",
-        HERO ": No.",
-        HERO ": " PARTNER ", left.\n" SEER ", light. " NOX ", with\nme. We hold the line.",
-        GENERAL ": ...So. You have\nlearned to burn slow.",
+        RPG_T(GENERAL ": The ember. Come.\nCharge me, as you\ncharged her.",
+              GENERAL_JA "「火の粉か。来い。\n　" RPG_NAME_GENERAL_2_JA "に斬りかかったように、\n　私にも来るがいい。」"),
+        RPG_T(HERO ": No.",
+              HERO_JA "「いいや。」"),
+        RPG_T(HERO ": " PARTNER ", left.\n" SEER ", light. " NOX ", with\nme. We hold the line.",
+              HERO_JA "「" PARTNER_JA "は左。" RPG_NAME_SEER_JA "、光を。\n　" RPG_NAME_DEFECTOR_JA "は俺と来い。\n　戦列を守るぞ。」"),
+        RPG_T(GENERAL ": ...So. You have\nlearned to burn slow.",
+              GENERAL_JA "「……そうか。\n　ゆっくり燃えることを\n　覚えたな。」"),
     };
 
     constexpr bn::string_view pass_victory_pages[] = {
-        GENERAL ": A wall... I broke\na hundred walls...",
-        GENERAL " falls, and does\nnot rise. The first of\nthe four.",
-        HERO ": It doesn't bring\nthem back.",
-        PARTNER ": No. But look\nbehind you.",
-        "Down in the valley,\nevery lamp is still lit.",
-        "- Chapter 8 -",
+        RPG_T(GENERAL ": A wall... I broke\na hundred walls...",
+              GENERAL_JA "「壁、か……\n　私は百の壁を\n　くだいてきたのだが……」"),
+        RPG_T(GENERAL " falls, and does\nnot rise. The first of\nthe four.",
+              GENERAL_JA "はたおれ、\n二度と立たなかった。\n四人のうちの、最初のひとり。"),
+        RPG_T(HERO ": It doesn't bring\nthem back.",
+              HERO_JA "「それでも、みんなは\n　帰ってこない。」"),
+        RPG_T(PARTNER ": No. But look\nbehind you.",
+              PARTNER_JA "「ああ。だが、\n　後ろを見てみろ。」"),
+        RPG_T("Down in the valley,\nevery lamp is still lit.",
+              "谷では、すべての灯火が\nまだともっていた。"),
+        RPG_T("- Chapter 8 -",
+              "- 第8章 -"),
     };
 
     constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
