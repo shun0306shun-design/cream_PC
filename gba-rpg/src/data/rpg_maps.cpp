@@ -1378,11 +1378,13 @@ namespace
     static_assert(valid_layout(castle_rows), "Invalid castle layout");
 
     constexpr bn::string_view castle_spring_pages[] = {
-        "Clear water, in the heart\nof the fire. Someone kept\nit clean.",
+        RPG_T("Clear water, in the heart\nof the fire. Someone kept\nit clean.",
+              "炎のただ中に、すんだ水。\n誰かが、きれいに\n保っていたのだ。"),
     };
 
     constexpr bn::string_view castle_pyre_pages[] = {
-        "The Pyre of Return.\nNothing ever came\nback out of it.",
+        RPG_T("The Pyre of Return.\nNothing ever came\nback out of it.",
+              "帰還の火葬台。\nそこから帰ってきたものは、\n何ひとつない。"),
     };
 
     constexpr MapEvent castle_events[] = {
@@ -1560,7 +1562,7 @@ namespace
             .border = TileId::wall,
         },
         {
-            .name = "Emperor's Castle",
+            .name = RPG_T("Emperor's Castle", "焔帝の城"),
             .rows = castle_rows,
             .events = castle_events,
             .encounters = castle_encounters,

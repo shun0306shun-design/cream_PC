@@ -782,50 +782,76 @@ namespace
     #define EMPEROR RPG_NAME_EMPEROR
 
     constexpr bn::string_view circle_pages[] = {
-        "The ash circle stirs. A\npath of embers opens,\ntoward the tower.",
-        NOX ": The Emperor's road.\nIt opens only to those\nhe wishes to see.",
+        RPG_T("The ash circle stirs. A\npath of embers opens,\ntoward the tower.",
+              "灰の円がざわめく。\n残り火の道が、\n塔へ向かって開いていく。"),
+        RPG_T(NOX ": The Emperor's road.\nIt opens only to those\nhe wishes to see.",
+              RPG_NAME_DEFECTOR_JA "「焔帝の道だ。\n　奴が会いたいと望む者に\n　しか、開かない。」"),
     };
 
     constexpr bn::string_view arrival_pages[] = {
-        "A castle of black glass.\nNo guards. No sound but\nthe fire above.",
+        RPG_T("A castle of black glass.\nNo guards. No sound but\nthe fire above.",
+              "黒いガラスの城。\n衛兵はいない。聞こえるのは、\n頭上の炎の音だけだ。"),
     };
 
     constexpr bn::string_view visions_pages[] = {
-        "The glass walls show a\nvillage. A quiet morning.\nA pail by a spring.",
-        SEER ": " HERO ". It is only\nthe fire, remembering.",
-        HERO ": I know. They are\nnot coming back.",
-        HERO ": ...I know.",
+        RPG_T("The glass walls show a\nvillage. A quiet morning.\nA pail by a spring.",
+              "ガラスの壁に、村が映る。\n静かな朝。\n泉のそばの手おけ。"),
+        RPG_T(SEER ": " HERO ". It is only\nthe fire, remembering.",
+              RPG_NAME_SEER_JA "「" HERO_JA "。あれは炎が\n　思い出しているだけです。」"),
+        RPG_T(HERO ": I know. They are\nnot coming back.",
+              HERO_JA "「分かっている。\n　ふたりは、帰ってこない。」"),
+        RPG_T(HERO ": ...I know.",
+              HERO_JA "「……分かっている。」"),
     };
 
     constexpr bn::string_view emperor_pages[] = {
-        EMPEROR ": The ember of\n" RPG_NAME_VILLAGE ". I watched you,\nthe whole way.",
-        EMPEROR ": I lost someone,\nonce. As you did. I would\nnot accept it.",
-        EMPEROR ": Feed a pyre the\nwhole world, and the\ndead walk out of it.",
-        HERO ": Eight parts in ten.\nDid they?",
-        EMPEROR ": ...Not yet.",
-        HERO ": I wanted that, too.\nI let a city burn,\nwanting it.",
-        HERO ": They don't come\nback. It ends here.",
+        RPG_T(EMPEROR ": The ember of\n" RPG_NAME_VILLAGE ". I watched you,\nthe whole way.",
+              RPG_NAME_EMPEROR_JA "「" VILLAGE_JA "の火の粉か。\n　ずっと見ていたぞ。\n　ここまでの道のりを。」"),
+        RPG_T(EMPEROR ": I lost someone,\nonce. As you did. I would\nnot accept it.",
+              RPG_NAME_EMPEROR_JA "「私もかつて、\n　ひとりを失った。お前と同じだ。\n　私は、認めなかった。」"),
+        RPG_T(EMPEROR ": Feed a pyre the\nwhole world, and the\ndead walk out of it.",
+              RPG_NAME_EMPEROR_JA "「火葬台に世界を\n　まるごとくべれば、\n　死者はそこから歩み出る。」"),
+        RPG_T(HERO ": Eight parts in ten.\nDid they?",
+              HERO_JA "「世界の八割だ。\n　それで、出てきたのか？」"),
+        RPG_T(EMPEROR ": ...Not yet.",
+              RPG_NAME_EMPEROR_JA "「……まだだ。」"),
+        RPG_T(HERO ": I wanted that, too.\nI let a city burn,\nwanting it.",
+              HERO_JA "「俺もそれを望んだ。\n　望んだせいで、\n　都をひとつ燃やした。」"),
+        RPG_T(HERO ": They don't come\nback. It ends here.",
+              HERO_JA "「死者は帰ってこない。\n　ここで終わりだ。」"),
     };
 
     constexpr bn::string_view emperor_victory_pages[] = {
-        EMPEROR ": Then I will burn\nwhat is left of me.",
-        "The Emperor steps into\nhis own pyre.",
-        SEER ": The lamps... I can\nfeel them. All of them.\nStand up!",
-        "The party's strength\nreturns!",
+        RPG_T(EMPEROR ": Then I will burn\nwhat is left of me.",
+              RPG_NAME_EMPEROR_JA "「ならば、私に残った\n　ものを燃やそう。」"),
+        RPG_T("The Emperor steps into\nhis own pyre.",
+              "焔帝は、みずからの\n火葬台へ踏み入った。"),
+        RPG_T(SEER ": The lamps... I can\nfeel them. All of them.\nStand up!",
+              RPG_NAME_SEER_JA "「灯火が……感じます。\n　すべての灯火を。\n　立ってください！」"),
+        RPG_T("The party's strength\nreturns!",
+              "仲間たちに力がもどった！"),
     };
 
     constexpr bn::string_view pyre_pages[] = {
-        "The pyre rises, wearing\na crown of ash.",
+        RPG_T("The pyre rises, wearing\na crown of ash.",
+              "火葬台が立ち上がる。\n灰の王冠をまとって。"),
     };
 
     constexpr bn::string_view pyre_victory_pages[] = {
-        "The pyre gutters.\nIn it, a man's voice.",
-        EMPEROR ": She did not come.\nThen what was all this\nash for?",
-        HERO ": Nothing. It is just\nwhat is left. We carry\nit. That's all.",
-        "The fire above the\ncastle goes out.",
-        PARTNER ": ...It's over.",
-        HERO ": No. Now we go\nhome, to what isn't\nthere.",
-        "- Final Chapter -",
+        RPG_T("The pyre gutters.\nIn it, a man's voice.",
+              "火葬台の炎がゆらぐ。\nその中から、男の声がした。"),
+        RPG_T(EMPEROR ": She did not come.\nThen what was all this\nash for?",
+              RPG_NAME_EMPEROR_JA "「彼女は来なかった。\n　ならば、この灰は\n　何のためだったのだ？」"),
+        RPG_T(HERO ": Nothing. It is just\nwhat is left. We carry\nit. That's all.",
+              HERO_JA "「何のためでもない。\n　ただ、残ったものだ。\n　俺たちが背負う。それだけだ。」"),
+        RPG_T("The fire above the\ncastle goes out.",
+              "城の上の炎が、消えた。"),
+        RPG_T(PARTNER ": ...It's over.",
+              PARTNER_JA "「……終わったな。」"),
+        RPG_T(HERO ": No. Now we go\nhome, to what isn't\nthere.",
+              HERO_JA "「いや。これから帰るんだ。\n　もう何もない、\n　あの場所へ。」"),
+        RPG_T("- Final Chapter -",
+              "- 最終章 -"),
     };
 
     constexpr EncounterGroup emperor_battle = { { EnemyId::emperor }, 1 };
