@@ -32,7 +32,7 @@ namespace
         //  name        HP  MP  ATK DEF AGI      HP  MP  ATK DEF AGI     spells
         { RPG_NAME_HERO, { 30, 8,  14, 10, 8  },  { 60, 20, 25, 20, 15 },   hero_spells },
         { "Samurai",  { 36, 0,  18, 9,  10 },  { 70, 0,  32, 18, 20 },   {} },
-        { "Priest",   { 24, 14, 9,  8,  7  },  { 45, 35, 14, 16, 14 },   priest_spells },
+        { RPG_NAME_DEFECTOR, { 24, 14, 9,  8,  7  },  { 45, 35, 14, 16, 14 },   priest_spells },
         { RPG_NAME_SEER, { 20, 18, 6,  6,  9  },  { 38, 42, 10, 12, 18 },   mage_spells },
         // The partner: strikes first and hard, but has less defense than the hero and no magic.
         { RPG_NAME_PARTNER, { 28, 0, 16, 8, 14 }, { 55, 0, 28, 15, 28 }, {} },

@@ -29,6 +29,8 @@ enum class EnemyId : uint8_t
     warden,         //!< Boss of the waterway (chapter 3).
     cult_knight,
     ember_wyrm,     //!< Boss of the Searing Canyon (chapter 4).
+    ash_zealot,
+    drake_true,     //!< Boss of the Ash Cathedral (chapter 5): General 1 at full strength.
     count
 };
 

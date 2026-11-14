@@ -890,8 +890,8 @@ namespace
         { .type = EventType::story, .x = 15, .y = 3, .npc_graphics = 10,
           .min_progress = progress::ch4_truth, .max_progress = progress::ch5_start - 1,
           .story = StoryId::ch4_wyrm },
-        // Chapter 5 starts on the other side: replace this trigger with a warp when its maps exist.
-        { .type = EventType::trigger, .x = 16, .y = 1, .story = StoryId::ch4_beyond },
+        // Out to the mining town (only reachable once the wyrm is gone).
+        { .type = EventType::warp, .x = 16, .y = 1, .warp_map = MapId::dorn, .warp_x = 1, .warp_y = 6 },
         { .type = EventType::chest, .x = 12, .y = 2, .npc_graphics = 3,
           .flag = FlagId::chest_canyon, .item = ItemId::magic_water, .item_amount = 3 },
     };
@@ -900,6 +900,132 @@ namespace
         { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
         { { EnemyId::cult_knight, EnemyId::skeleton, EnemyId::bat }, 3 },
         { { EnemyId::cult_knight, EnemyId::cult_soldier }, 2 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // T05: mining town at the far end of the canyon. The former cult priest (npc_graphics 7) waits here.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view dorn_rows[] = {
+        "%%%%%%%%%%>%%%%%%%%%%%",    // 0
+        "%_________:__________%",    // 1
+        "%__^^^^___:___^^^^___%",    // 2
+        "%__####___:___####___%",    // 3
+        "%__#D##___:___#D##___%",    // 4
+        "%___:_____:____:_____%",    // 5
+        ">::::::::::::::::::::>",    // 6
+        "%_________:__________%",    // 7
+        "%___F_____:____S_____%",    // 8
+        "%_________:__xx______%",    // 9
+        "%____________xx______%",    // 10
+        "%____________________%",    // 11
+        "%%%%%%%%%%%%%%%%%%%%%%",    // 12
+    };
+
+    static_assert(valid_layout(dorn_rows), "Invalid dorn layout");
+
+    constexpr bn::string_view dorn_sign_pages[] = {
+        RPG_NAME_MINE_TOWN " - MINING TOWN\nNorth: ruins\nEast: the Ash Cathedral",
+    };
+
+    constexpr bn::string_view dorn_shop_pages[] = {
+        "Picks, blades, bandages.\nAll the mine has left.",
+    };
+
+    constexpr bn::string_view dorn_miner_pages[] = {
+        RPG_NAME_MINE_TOWN " digs no more coal.\nNobody wants anything\nthat burns.",
+    };
+
+    constexpr MapEvent dorn_events[] = {
+        { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::canyon, .warp_x = 15, .warp_y = 1 },
+        { .type = EventType::trigger, .x = 10, .y = 0,
+          .max_progress = progress::ch5_defector - 1, .story = StoryId::ch5_north_gate },
+        { .type = EventType::warp, .x = 10, .y = 0, .warp_map = MapId::kazami, .warp_x = 9, .warp_y = 9,
+          .min_progress = progress::ch5_defector },
+        { .type = EventType::trigger, .x = 21, .y = 6,
+          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_east_gate },
+        { .type = EventType::warp, .x = 21, .y = 6, .warp_map = MapId::cathedral, .warp_x = 9, .warp_y = 10,
+          .min_progress = progress::ch5_split },
+        { .type = EventType::inn, .x = 5, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 16, .y = 5, .npc_graphics = 5, .pages = dorn_shop_pages,
+          .stock = ashbell_shop_stock },
+        { .type = EventType::sign, .x = 15, .y = 8, .pages = dorn_sign_pages },
+        { .type = EventType::spring, .x = 4, .y = 8, .pages = ashbell_spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 7, .y = 9, .npc_graphics = 0, .pages = dorn_miner_pages,
+          .movement = NpcMovement::wander, .wander_radius = 2 },
+        { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 7,
+          .max_progress = progress::ch5_defector - 1, .story = StoryId::ch5_defector },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Ruins of the partner's home village: no battles, one grave ('+').
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view kazami_rows[] = {
+        "xxxxxxxxxxxxxxxxxxxx",    // 0
+        "xaaaaaaaaaaaaaaaaaax",    // 1
+        "xaaxxxaaaaaaaxxxaaax",    // 2
+        "xaaxxxaaa+aaaxxxaaax",    // 3
+        "xaaaaaaaaaaaaaaaaaax",    // 4
+        "xaaaaaaaa:aaaaaaaaax",    // 5
+        "xaxxaaaaa:aaaaaxxaax",    // 6
+        "xaxxaaaaa:aaaaaxxaax",    // 7
+        "xaaaaaaaa:aaaaaaaaax",    // 8
+        "xaaaaaaaa:aaaaaaaaax",    // 9
+        "xxxxxxxxx>xxxxxxxxxx",    // 10
+    };
+
+    static_assert(valid_layout(kazami_rows), "Invalid kazami layout");
+
+    constexpr bn::string_view kazami_grave_pages[] = {
+        RPG_NAME_PARTNER_HOME ".\nThe marker is clean now.\nSomeone was here.",
+    };
+
+    constexpr MapEvent kazami_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 10, .warp_map = MapId::dorn, .warp_x = 10, .warp_y = 1 },
+        { .type = EventType::story, .x = 9, .y = 3,
+          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_ruins },
+        { .type = EventType::sign, .x = 9, .y = 3, .pages = kazami_grave_pages, .min_progress = progress::ch5_split },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D06: Ash Cathedral. General 1 (npc_graphics 8) blocks the corridor to the pyre.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view cathedral_rows[] = {
+        "####################",    // 0
+        "########_A_#########",    // 1
+        "#######_____########",    // 2
+        "#######_____########",    // 3
+        "#########_##########",    // 4
+        "#___#####_#####____#",    // 5
+        "#__________________#",    // 6
+        "#___#####_#####____#",    // 7
+        "#########_##########",    // 8
+        "#######_____########",    // 9
+        "#######_____########",    // 10
+        "#########>##########",    // 11
+        "####################",    // 12
+    };
+
+    static_assert(valid_layout(cathedral_rows), "Invalid cathedral layout");
+
+    constexpr bn::string_view cathedral_pyre_pages[] = {
+        "A cold pyre.\nThe ash in it is\nstill warm.",
+    };
+
+    constexpr MapEvent cathedral_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::dorn, .warp_x = 20, .warp_y = 6 },
+        { .type = EventType::story, .x = 9, .y = 4, .npc_graphics = 8,
+          .min_progress = progress::ch5_split, .max_progress = progress::ch6_start - 1,
+          .story = StoryId::ch5_cathedral },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = cathedral_pyre_pages },
+        { .type = EventType::chest, .x = 17, .y = 5, .npc_graphics = 3,
+          .flag = FlagId::chest_cathedral, .item = ItemId::herb, .item_amount = 5 },
+    };
+
+    constexpr EncounterGroup cathedral_encounters[] = {
+        { { EnemyId::ash_zealot }, 1 },
+        { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
+        { { EnemyId::ash_zealot, EnemyId::skeleton, EnemyId::skeleton }, 3 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1002,6 +1128,26 @@ namespace
             .encounter_rate = 12,
             .border = TileId::cave_wall,
         },
+        {
+            .name = RPG_NAME_MINE_TOWN,
+            .rows = dorn_rows,
+            .events = dorn_events,
+            .border = TileId::cave_wall,
+        },
+        {
+            .name = RPG_NAME_PARTNER_HOME " Ruins",
+            .rows = kazami_rows,
+            .events = kazami_events,
+            .border = TileId::rubble,
+        },
+        {
+            .name = "Ash Cathedral",
+            .rows = cathedral_rows,
+            .events = cathedral_events,
+            .encounters = cathedral_encounters,
+            .encounter_rate = 12,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1035,7 +1181,8 @@ namespace
         { start_map, start_x, start_y },    // Chapter 1: home.
         { MapId::berg, 4, 6 },              // Chapter 2: in front of the inn of the post town.
         { MapId::lunaris, 4, 6 },           // Chapter 3: in front of the inn of the seer's village.
-        { MapId::ashbell, 3, 6 },           // Chapter 4 on: in front of the inn of the ash town.
+        { MapId::ashbell, 3, 6 },           // Chapter 4: in front of the inn of the ash town.
+        { MapId::dorn, 4, 6 },              // Chapter 5 on: in front of the inn of the mining town.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)

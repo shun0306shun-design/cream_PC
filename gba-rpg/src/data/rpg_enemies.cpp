@@ -35,6 +35,9 @@ namespace
         // Chapter 4: beyond the gate.
         { "Cult Knight", &bn::sprite_items::enemy_cultist, { 75, 0, 34, 14, 10 }, 40, 30, SpellId::fire, 20 },
         { "Ember Wyrm", &bn::sprite_items::enemy_wyrm, { 320, 0, 44, 16, 12 }, 300, 250, SpellId::fire, 35 },
+        // Chapter 5: the Ash Cathedral. The general is fought by four this time, and dies.
+        { "Ash Zealot", &bn::sprite_items::enemy_cultist, { 95, 0, 40, 15, 11 }, 55, 45, SpellId::fire, 30 },
+        { RPG_NAME_GENERAL_1, &bn::sprite_items::enemy_drake, { 520, 0, 54, 20, 14 }, 500, 400, SpellId::blizzard, 35 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

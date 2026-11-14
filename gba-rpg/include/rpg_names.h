@@ -19,6 +19,9 @@
 #define RPG_NAME_SEER_TOWN  "Lunaris"   // T03: the village of fortune tellers.
 #define RPG_NAME_GATE       "Great Gate" // The checkpoint that closes the way north.
 #define RPG_NAME_ASH_TOWN   "Ashbell"   // T04: the town of survivors beyond the gate.
+#define RPG_NAME_DEFECTOR   "Nox"       // The former cult priest: joins in chapter 5 (the priest class).
+#define RPG_NAME_MINE_TOWN  "Dorn"      // T05: the mining town.
+#define RPG_NAME_PARTNER_HOME "Kazami"  // The partner's home village, burnt long ago.
 #define RPG_NAME_CULT       "Ashen Cult"
 #define RPG_NAME_EMPEROR    "Valgren"   // The Flame Emperor, leader of the cult.
 #define RPG_NAME_GENERAL_1  "Drake"     // The first of the four Ash Generals.

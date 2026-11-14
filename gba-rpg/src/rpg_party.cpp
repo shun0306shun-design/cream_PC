@@ -230,6 +230,35 @@ bool Party::join(ClassId class_id, int level)
     return true;
 }
 
+bool Party::leave(ClassId class_id)
+{
+    for(int index = 1; index < size; ++index)
+    {
+        if(members[index].class_id == class_id)
+        {
+            // Keep the equipment: it returns to the bag (if the bag has room for it).
+            for(ItemId id : { members[index].weapon, members[index].armor })
+            {
+                if(id != ItemId::none)
+                {
+                    add_item(id);
+                }
+            }
+
+            for(int other = index; other < size - 1; ++other)
+            {
+                members[other] = members[other + 1];
+            }
+
+            --size;
+            members[size] = PartyMember();
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Party::valid() const
 {
     if(size < 1 || size > max_party_size)

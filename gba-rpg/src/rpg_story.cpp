@@ -356,14 +356,80 @@ namespace
               "峡谷のふちから見えたのは、\n黒いガラスの平原と、\n炎の塔だった。"),
         RPG_T(HERO ": That's where\nthey are. All of them.",
               RPG_NAME_HERO_JA "「あそこに奴らがいる。\n　全員が。」"),
-        RPG_T("- Chapter 5 -",
-              "- 第5章 -"),
+        RPG_T("- Chapter 5 -\nAshes of Betrayal",
+              "- 第5章 -\n裏切りの灰"),
     };
 
-    constexpr bn::string_view beyond_pages[] = {
-        RPG_T("The path goes on toward\nthe tower of flame.\n(To be continued.)",
-              "道は炎の塔へと\n続いている。\n（つづく）"),
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 5 "Ashes of Betrayal"
+    // ---------------------------------------------------------------------------------------------------------------
+    #define NOX RPG_NAME_DEFECTOR
+
+    constexpr bn::string_view defector_pages[] = {
+        "A man in a cult robe sits\nalone. The miners give\nhim a wide berth.",
+        HERO ": That crest--!",
+        "???: Put the sword down.\nI took the robe off once.\nIt doesn't come off.",
+        NOX ": I am " NOX ". I was a\npriest of the " RPG_NAME_CULT ".\nI lit their fires.",
+        PARTNER ": Then burn.",
+        NOX ": Soon enough. First:\n" GENERAL " prays at the Ash\nCathedral, east of here.",
+        NOX ": Its doors open only\nto the seal of a priest.\nI can open them.",
+        NOX ": But I buried my seal\nin a ruin, north of here.\nWe need it first.",
+        SEER ": His star is dim.\nBut it is not lying.",
+        HERO ": ...You walk in\nfront. Where I can\nsee you.",
+        NOX " joined the party!",
     };
+
+    constexpr bn::string_view north_gate_pages[] = {
+        "A road north, into ruins.\nThe miners say no one\nlives there anymore.",
+    };
+
+    constexpr bn::string_view east_gate_ch5_pages[] = {
+        "A black spire rises in\nthe east. Its doors are\nsealed to outsiders.",
+    };
+
+    constexpr bn::string_view ruins_pages[] = {
+        "A single grave marker.\nSomeone tended it, once.",
+        PARTNER ": ...Stop.\nDon't touch that.",
+        PARTNER ": This is " RPG_NAME_PARTNER_HOME ".\nThis was my home.",
+        HERO ": You said you hunt\nfor bounties.",
+        PARTNER ": A bounty is\nlighter to carry than\na grave.",
+        NOX ": ...I know this\nplace. I held a torch\nhere, that night.",
+        PARTNER ": You.",
+        PARTNER "'s spear is at\n" NOX "'s throat. " HERO "\nsteps between them.",
+        PARTNER ": You'd shield him?\nAfter " RPG_NAME_VILLAGE "? After your\nown dead?",
+        HERO ": We need him to\nreach " GENERAL ".",
+        PARTNER ": Then need him.\nI'm done needing anyone.",
+        PARTNER " left the party.",
+        NOX ": The seal is here.\n...So is everything\nelse I buried.",
+    };
+
+    constexpr bn::string_view cathedral_pages[] = {
+        "The doors open at " NOX "'s\ntouch. " GENERAL " kneels\nbefore a pyre.",
+        GENERAL ": The traitor, the\nstray, the stargazer. And\nno spear. Did he break?",
+        HERO ": He's not here.\nI am.",
+        "A spear strikes the floor\nbetween them.",
+        PARTNER ": I didn't come\nfor you, " HERO ".",
+        PARTNER ": " RPG_NAME_PARTNER_HOME " deserves\nbetter than a son who\nruns. Move over.",
+        PARTNER " rejoined the party!",
+    };
+
+    constexpr bn::string_view cathedral_again_pages[] = {
+        PARTNER ": Again.\nHe falls today.",
+    };
+
+    constexpr bn::string_view cathedral_victory_pages[] = {
+        GENERAL ": So the ash\nremembers its dead...",
+        GENERAL ": I gave the orders.\nBut the fire is his.\nIt will eat you, too.",
+        GENERAL " falls.\nThe pyre goes out.",
+        PARTNER ": ...It doesn't\nfeel like anything.",
+        PARTNER ": " NOX ". I won't\nforgive you. But I'll\nstand next to you.",
+        NOX ": That is more than\nI will ever ask.",
+        HERO ": One general.\nThree left. Then him.",
+        "- Chapter 6 -",
+    };
+
+    constexpr EncounterGroup cathedral_battle = { { EnemyId::drake_true, EnemyId::ash_zealot }, 2 };
+    constexpr int defector_min_level = 12;
 
     constexpr EncounterGroup wyrm_battle = { { EnemyId::ember_wyrm }, 1 };
 
@@ -540,9 +606,43 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle = &wyrm_battle;
         break;
 
-    case StoryId::ch4_beyond:
-        say_pages(ui, beyond_pages);
+    case StoryId::ch5_defector:
+        say_pages(ui, defector_pages);
+        join_member(state.party, ClassId::priest, defector_min_level, ItemId::oak_staff);
+        story_progress = progress::ch5_defector;
+        break;
+
+    case StoryId::ch5_north_gate:
+        say_pages(ui, north_gate_pages);
         result.step_back = true;
+        break;
+
+    case StoryId::ch5_ruins:
+        // The party splits: the partner is gone (his equipment goes to the bag) until the cathedral.
+        say_pages(ui, ruins_pages);
+        state.party.leave(ClassId::lancer);
+        story_progress = progress::ch5_split;
+        break;
+
+    case StoryId::ch5_east_gate:
+        say_pages(ui, east_gate_ch5_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch5_cathedral:
+        if(story_progress < progress::ch5_reunited)
+        {
+            say_pages(ui, cathedral_pages);
+            state.party.remove_item(ItemId::iron_spear);    // He takes back the spear he left behind, if it's still there.
+            join_member(state.party, ClassId::lancer, partner_min_level, ItemId::iron_spear);
+            story_progress = progress::ch5_reunited;
+        }
+        else
+        {
+            say_pages(ui, cathedral_again_pages);   // After losing the battle.
+        }
+
+        result.battle = &cathedral_battle;
         break;
 
     default:
@@ -584,6 +684,11 @@ void run_story_victory(StoryId id, GameState& state, Ui& ui)
     case StoryId::ch4_wyrm:
         say_pages(ui, wyrm_victory_pages);
         state.story_progress = progress::ch5_start;
+        break;
+
+    case StoryId::ch5_cathedral:
+        say_pages(ui, cathedral_victory_pages);
+        state.story_progress = progress::ch6_start;
         break;
 
     default:

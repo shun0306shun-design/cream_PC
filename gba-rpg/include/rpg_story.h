@@ -48,8 +48,14 @@ namespace progress
     constexpr uint8_t ch4_wasteland = 31;   //!< Saw the burnt plains beyond the gate.
     constexpr uint8_t ch4_truth = 32;       //!< Learned that eight parts in ten of the world burned: the canyon opens.
 
-    // Chapter 5 (40-49)
+    // Chapter 5 "Ashes of Betrayal" (40-49)
     constexpr uint8_t ch5_start = 40;       //!< The wyrm of the Searing Canyon was defeated.
+    constexpr uint8_t ch5_defector = 41;    //!< The former cult priest joined: the ruins of the partner's village open.
+    constexpr uint8_t ch5_split = 42;       //!< The partner's past came out and he left the party: the cathedral opens.
+    constexpr uint8_t ch5_reunited = 43;    //!< The partner came back for the battle against General 1.
+
+    // Chapter 6 (50-59)
+    constexpr uint8_t ch6_start = 50;       //!< General 1 was killed in the Ash Cathedral.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -83,7 +89,11 @@ enum class StoryId : uint8_t
     ch4_chronicler,     //!< The chronicler of the ash town shows the map of what burned.
     ch4_canyon_gate,    //!< The way to the Searing Canyon, closed until the truth is known.
     ch4_wyrm,           //!< Boss of the Searing Canyon. Winning starts chapter 5.
-    ch4_beyond,         //!< The exit of the canyon: where the implemented story ends for now.
+    ch5_defector,       //!< Meeting the former cult priest in the mining town: he joins.
+    ch5_north_gate,     //!< The road to the ruined village, closed until he joins.
+    ch5_ruins,          //!< At the grave of the ruined village: the partner's past. He leaves the party.
+    ch5_east_gate,      //!< The way to the Ash Cathedral, closed until the party splits.
+    ch5_cathedral,      //!< Boss of the Ash Cathedral: the partner returns. Winning starts chapter 6.
     count,
     none = 0xFF
 };

@@ -103,6 +103,10 @@ struct Party
     /// Adds a member with full HP/MP. Returns false if the party is full or that class is already in it.
     bool join(ClassId class_id, int level);
 
+    /// Removes the member of that class (never the first one). What it wears goes back to the bag.
+    /// Returns false if nobody of that class is in the party.
+    bool leave(ClassId class_id);
+
     /// Checks that the data (for example loaded from a save) can't make the game crash.
     [[nodiscard]] bool valid() const;
 

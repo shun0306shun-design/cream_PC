@@ -72,6 +72,9 @@ enum class MapId : uint8_t
     wasteland,  //!< The burnt plains beyond the gate (second overworld).
     ashbell,    //!< T04: town of survivors.
     canyon,     //!< D05: Searing Canyon.
+    dorn,       //!< T05: mining town.
+    kazami,     //!< Ruins of the partner's home village.
+    cathedral,  //!< D06: Ash Cathedral.
     count
 };
 
