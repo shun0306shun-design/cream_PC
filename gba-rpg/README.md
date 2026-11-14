@@ -53,9 +53,9 @@ Butano 公式の導入ガイド: <https://gvaliente.github.io/butano/getting_sta
 gba-rpg/
 ├── Makefile                    Butano テンプレートベースのビルド設定
 ├── audio/                      BGM（bgm_*.mod）と SE（se_*.wav）。すべて仮の音
-├── graphics/                   画像アセット（BMP + JSON）。すべてプレースホルダー
+├── graphics/                   画像アセット（BMP + JSON）。マップタイルと宝箱はピクセルアート、人物・敵は仮素材
 ├── tools/
-│   ├── gen_placeholder_assets.py   プレースホルダー画像の生成スクリプト
+│   ├── gen_placeholder_assets.py   画像アセットの生成スクリプト（タイルの絵もこの中）
 │   ├── gen_placeholder_audio.py    仮の BGM（.mod）・SE（.wav）の生成スクリプト
 │   ├── gen_japanese_font.py        日本語フォント（BMP + JSON + ヘッダー）の生成スクリプト
 │   └── fonts/                      PixelMplus12（M+ FONT LICENSE）
@@ -137,7 +137,7 @@ gba-rpg/
 | 敵を追加 | 32x32 の BMP+JSON を `graphics/` に置く → `EnemyId` に追加 → `rpg_enemies.cpp` に1行 → マップの `EncounterGroup` に入れる |
 | 職業・初期パーティを変更 | `rpg_classes.cpp` / `Party::init_new_game()`（rpg_party.cpp） |
 | 町・ダンジョンを追加 | `MapId` に追加 → `rpg_maps.cpp` に ASCII レイアウト・イベント・`maps[]` の項目を書く → 既存マップに `warp` イベントを置いてつなぐ |
-| タイルの種類を追加 | `TileId` と `rpg_maps.cpp` の `tiles[]`（記号・通行可否・エンカウント倍率）、タイル画像を同じ順番で追加 |
+| タイルの種類を追加 | `TileId` の **末尾** と `rpg_maps.cpp` の `tiles[]`（記号・通行可否・エンカウント倍率）に追加し、`gen_placeholder_assets.py` の `FIELD_TILES` に同じ順番で絵を足す（下の「マップタイル」参照） |
 | 装備品を追加 | `ItemId` に追加 → `rpg_items.cpp` に1行（`kind` = weapon/armor、`classes` = 装備できる職業、`bonus` = 能力の加算値）。店の `stock`・宝箱の `item` にそのまま使える。装備は「アイテムの一種」なので所持数・売買・セーブの仕組みを共有する |
 | ダンジョンの階・町を追加 | `MapId` に追加 → `rpg_maps.cpp` に ASCII レイアウト・イベント・出現テーブルを書く。階段は `stairs_up`/`stairs_down` タイル（`u`/`d`）+ `warp` イベント。ワープ元・先が通れないタイルだとビルドエラーになる（`valid_events()`） |
 | NPCを歩かせる | その `MapEvent`（`npc_graphics` ありの会話・宿屋など。宝箱は不可）に `.movement = NpcMovement::wander, .wander_radius = 3` を足す。1マップに最大4体（`max_map_walkers`）。位置はセーブされず、マップを読み込むと元の場所に戻る（プレイヤーがその場所にいれば近くの空きマスに出る） |
@@ -209,14 +209,43 @@ Lv61〜100 はやり込み用です。敵の HP・攻撃力などは本編のま
 
 | ファイル | 内容 |
 | --- | --- |
-| `field_tiles.bmp` / `field_palette.bmp` | マップタイル（14番目が泉）。幅16pxで、16x16タイルを `TileId` の順に縦に並べる |
+| `field_tiles.bmp` / `field_palette.bmp` | マップタイル。幅16pxで、16x16タイルを縦に並べる。前半は `TileId` の順、後半は見た目だけの差分タイル（下の「マップタイル」参照） |
 | `ui_tiles.bmp` / `ui_palette.bmp` | ウィンドウ枠（8x8 × 10枚の横並び） |
 | `player.bmp` | 16x16 × 8コマ（下・上・左・右 × 歩行2コマ） |
 | `npc.bmp` | 16x16 × N コマ。`MapEvent::npc_graphics` がコマ番号（3 = 閉じた宝箱、4 = 開いた宝箱、5 = 道具屋） |
 | `enemy_*.bmp` | 32x32 の敵グラフィック |
 | `cursor.bmp` | 8x8 のカーソル |
 
-`python3 tools/gen_placeholder_assets.py` を実行するとプレースホルダーを再生成（上書き）します。
+`python3 tools/gen_placeholder_assets.py` を実行すると全画像を再生成（上書き）します。
+
+### マップタイル
+マップタイルと宝箱（閉・開）は、`tools/gen_placeholder_assets.py` の中に **ASCII のドット絵**（1文字 = 1ピクセル、`paint()`）として
+描いてあります。外部の画像ファイルから切り出したタイルはありません。参考画像をもとに 16x16・共通15色パレット
+（`FIELD_PALETTE`、色0は未使用）へ描き起こしたもので、スクリプトを直せば同じ絵柄のまま再生成できます。
+
+追加したタイル（`TileId` の末尾。既存の番号・記号は変えていません）:
+
+| 記号 | `TileId` | 内容 |
+| --- | --- | --- |
+| `f` `l` `b` `W` | `fence` `lamp` `bench` `well` | 村の飾り（柵・街灯・ベンチ・井戸）。通れない。草地用 |
+| `B` | `barrel` | 樽。通れない |
+| `o` | `magic_circle` | 魔法陣。通れる。`warp` イベントを重ねて使う |
+| `I` `G` | `inn_sign` `shop_sign` | 宿屋・道具屋の吊り看板つきの家の壁。扉の隣の `#` の代わりに置く |
+
+**見た目だけの差分タイル**: マップデータを書き換えなくても、`FieldScene` の `tile_graphics()`（rpg_field_scene.cpp）が
+周りのタイルを見て絵を選びます。通行可否などの性質は常に `TileId` のままです。
+
+- 屋根（`^`）: 左端・右端に破風板がつく
+- 壁（`#`）: 上に屋根があれば家の壁（屋根の直下は1つおきに窓）。なければ石レンガの城壁
+- 洞窟の床（`_`）: 外周（`border`）が `wall` のマップ（砦・聖堂・城など）では石畳になる
+- 城壁・洞窟の壁: 手前が床のところに、まばらに松明（城壁には鎖も）がかかる
+- 松明の光: 松明の左右の壁と、真下の床が少し明るくなる（`glow()` で元のタイルから自動生成）
+- 上り階段（`u`）: 奥が洞窟の壁なら梯子になる
+- 水（`~`）: 上が岸なら影と波打ち際がつく
+- 看板・泉・墓・祭壇・樽・魔法陣: 周りの地面（草 / 灰 / 洞窟の床 / 石畳）の上に描かれる
+
+差分タイルを増やすときは、`gen_placeholder_assets.py` の `FIELD_EXTRA_TILES` / `GROUND_OBJECTS` と、
+rpg_field_scene.cpp の `gfx_*` 定数・`GroundObject` を同じ順番にそろえます。
 
 ### 日本語対応
 - **言語**: `rpg_text.h` の `Language`（既定は `default_language = Language::japanese`）。タイトル画面の `Language` で切り替え。セーブはされないので、起動のたびに既定値に戻ります。
