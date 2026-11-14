@@ -53,6 +53,37 @@ namespace
         bn::ostringstream stream(text);
         int total = 0;
 
+        if(effect.type == EffectType::revive)
+        {
+            int target = choose_member(party, ui);
+
+            if(target < 0)
+            {
+                return false;
+            }
+
+            PartyMember& member = party.members[target];
+
+            if(member.alive())
+            {
+                say(ui, "It has no effect.");
+                return false;
+            }
+
+            // A failed attempt is spent too.
+            if(apply_revive(effect, member, state.random))
+            {
+                stream << member.name() << " is revived!";
+            }
+            else
+            {
+                stream << "But " << member.name() << " didn't wake up...";
+            }
+
+            say(ui, text);
+            return true;
+        }
+
         if(effect.targets_all())
         {
             for(PartyMember& member : party.members)
@@ -200,7 +231,7 @@ namespace
 
             PartyMember& caster = party.members[caster_index];
 
-            // Only healing spells can be cast outside of battle.
+            // Only healing skills can be used outside of battle.
             SpellList spells;
             Label labels[max_known_spells];
             bn::string_view options[max_known_spells];
@@ -223,7 +254,7 @@ namespace
 
             if(spells.empty())
             {
-                say(ui, "No spells to cast here.");
+                say(ui, "No skills to use here.");
                 continue;
             }
 
@@ -255,7 +286,7 @@ namespace
 
 void open_field_menu(GameState& state, Ui& ui)
 {
-    static constexpr bn::string_view options[] = { "Status", "Items", "Magic", "Save" };
+    static constexpr bn::string_view options[] = { "Status", "Items", "Skill", "Save" };
 
     Menu menu(ui, 0, 0, main_cols, options);
 

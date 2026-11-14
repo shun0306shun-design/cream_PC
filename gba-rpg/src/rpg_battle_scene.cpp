@@ -217,7 +217,7 @@ bool BattleScene::_select_commands()
 
 BattleScene::CommandResult BattleScene::_select_command(int member_index)
 {
-    static constexpr bn::string_view commands[] = { "Fight", "Magic", "Item", "Run" };
+    static constexpr bn::string_view commands[] = { "Fight", "Skill", "Item", "Run" };
 
     const PartyMember& member = _party.members[member_index];
     Action& action = _actions[member_index];
@@ -278,7 +278,7 @@ bool BattleScene::_choose_spell(int member_index, Action& action)
 
     if(spells.empty())
     {
-        _notice("No spells learned yet.");
+        _notice("No skills learned yet.");
         return false;
     }
 
@@ -372,13 +372,13 @@ bool BattleScene::_choose_item(Action& action)
 
 bool BattleScene::_choose_target(const Effect& effect, Action& action)
 {
-    if(effect.targets_all())
+    if(! effect.needs_target_choice())
     {
         action.target = -1;
         return true;
     }
 
-    int target = effect.is_heal() ? _choose_ally() : _choose_enemy();
+    int target = effect.target == TargetType::one_ally ? _choose_ally() : _choose_enemy();
 
     if(target < 0)
     {
@@ -521,7 +521,8 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
                 box.say_timed(text);
 
                 int defense = _enemies[target].data->stats.defense;
-                _damage_enemy(target, roll_physical_damage(member.stats().attack, defense, _state.random), box);
+                int damage = roll_physical_damage(member.stats().attack, defense, _state.random);
+                _damage_enemy(target, damage * _take_charge(member_index), box);
             }
         }
         break;
@@ -529,12 +530,12 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
     case ActionType::spell:
         {
             const SpellData& spell = spell_data(SpellId(action.id));
-            stream << member.name() << " casts " << spell.name << "!";
+            stream << member.name() << " uses " << spell.name << "!";
             box.say_timed(text);
 
             member.mp = int16_t(member.mp - spell.mp_cost);
             _refresh_status();
-            _apply_party_effect(spell.effect, action.target, box);
+            _apply_party_effect(member_index, spell.effect, action.target, box);
         }
         break;
 
@@ -548,7 +549,7 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
             {
                 stream << member.name() << " uses " << item.name << "!";
                 box.say_timed(text);
-                _apply_party_effect(item.effect, action.target, box);
+                _apply_party_effect(member_index, item.effect, action.target, box);
             }
             else
             {
@@ -575,31 +576,58 @@ void BattleScene::_enemy_turn(int enemy_index, MessageBox& box)
     }
 
     const EnemyData& data = *enemy.data;
-    Text text;
-    bn::ostringstream stream(text);
 
-    if(data.spell_chance > 0 && _state.random.get_int(100) < data.spell_chance)
+    if(enemy.stunned)
     {
-        const SpellData& spell = spell_data(data.spell);
-        stream << enemy.name << " casts " << spell.name << "!";
+        enemy.stunned = false;
+
+        Text text;
+        bn::ostringstream stream(text);
+        stream << enemy.name << " is stunned\nand can't move!";
         box.say_timed(text);
-        _apply_enemy_effect(spell.effect, enemy_index, box);
+        return;
     }
-    else
-    {
-        int target = _random_alive_member();
-        stream << enemy.name << " attacks!";
-        box.say_timed(text);
 
-        int defense = _party.members[target].stats().defense;
-        _damage_member(target, roll_physical_damage(data.stats.attack, defense, _state.random), box);
+    // Bosses may act several times in a row. To keep these rounds fair:
+    //   - The spell is cast once per round at most.
+    //   - Consecutive attacks don't hit the same member twice in a row if someone else is standing.
+    int actions = _roll_enemy_actions(data.rank);
+    bool spell_cast = false;
+    int last_target = -1;
+
+    for(int action = 0; action < actions && ! _party.all_dead(); ++action)
+    {
+        Text text;
+        bn::ostringstream stream(text);
+
+        if(! spell_cast && data.spell_chance > 0 && _state.random.get_int(100) < data.spell_chance)
+        {
+            const SpellData& spell = spell_data(data.spell);
+            spell_cast = true;
+            stream << enemy.name << " casts " << spell.name << "!";
+            box.say_timed(text);
+            _apply_enemy_effect(spell.effect, enemy_index, box);
+        }
+        else
+        {
+            int target = _random_alive_member(last_target);
+            last_target = target;
+            stream << enemy.name << " attacks!";
+            box.say_timed(text);
+
+            int defense = _party.members[target].stats().defense;
+            _damage_member(target, roll_physical_damage(data.stats.attack, defense, _state.random), box);
+        }
     }
 }
 
-void BattleScene::_apply_party_effect(const Effect& effect, int target, MessageBox& box)
+void BattleScene::_apply_party_effect(int member_index, const Effect& effect, int target, MessageBox& box)
 {
-    if(effect.is_heal())
+    switch(effect.type)
     {
+
+    case EffectType::heal_hp:
+    case EffectType::heal_mp:
         if(effect.targets_all())
         {
             for(int index = 0; index < max_party_size; ++index)
@@ -612,40 +640,118 @@ void BattleScene::_apply_party_effect(const Effect& effect, int target, MessageB
         }
         else
         {
-            _heal_member(target, effect, box);
+            _heal_member(effect.target == TargetType::self ? member_index : target, effect, box);
         }
-    }
-    else if(effect.targets_all())
-    {
-        for(int index = 0; index < _enemies.size(); ++index)
+        break;
+
+    case EffectType::revive:
+        _revive_member(target, effect, box);
+        break;
+
+    case EffectType::charge:
         {
-            if(_enemies[index].alive())
+            Text text;
+            bn::ostringstream stream(text);
+            stream << _party.members[member_index].name() << " is gathering power!";
+            _charged[member_index] = true;
+            box.say_timed(text);
+        }
+        break;
+
+    case EffectType::physical:
+        {
+            // A charge powers up every hit of the technique.
+            int multiplier = _take_charge(member_index);
+
+            for(int hit = 0; hit < effect.hits; ++hit)
             {
-                _damage_enemy(index, roll_effect(effect, _state.random), box);
+                if(effect.targets_all())
+                {
+                    for(int index = 0; index < _enemies.size(); ++index)
+                    {
+                        if(_enemies[index].alive())
+                        {
+                            _physical_hit(member_index, effect, index, multiplier, box);
+                        }
+                    }
+                }
+                else
+                {
+                    int enemy_index = effect.target == TargetType::random_enemy ?
+                                _random_alive_enemy() : _valid_enemy_target(target);
+
+                    if(enemy_index < 0)
+                    {
+                        break;
+                    }
+
+                    _physical_hit(member_index, effect, enemy_index, multiplier, box);
+                }
             }
         }
-    }
-    else
-    {
-        int enemy_index = _valid_enemy_target(target);
+        break;
 
-        if(enemy_index >= 0)
+    case EffectType::damage:
+        if(effect.targets_all())
         {
-            _damage_enemy(enemy_index, roll_effect(effect, _state.random), box);
+            for(int index = 0; index < _enemies.size(); ++index)
+            {
+                if(_enemies[index].alive())
+                {
+                    _damage_enemy(index, roll_effect(effect, _state.random), box);
+                }
+            }
         }
+        else
+        {
+            int enemy_index = effect.target == TargetType::random_enemy ?
+                        _random_alive_enemy() : _valid_enemy_target(target);
+
+            if(enemy_index >= 0)
+            {
+                _damage_enemy(enemy_index, roll_effect(effect, _state.random), box);
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void BattleScene::_physical_hit(int member_index, const Effect& effect, int enemy_index, int multiplier,
+                                MessageBox& box)
+{
+    Enemy& enemy = _enemies[enemy_index];
+    int attack = _party.members[member_index].stats().attack;
+    int damage = roll_physical_damage(attack, enemy.data->stats.defense, _state.random);
+    damage = (damage * effect.power * multiplier) / 100;
+    _damage_enemy(enemy_index, damage < 1 ? 1 : damage, box);
+
+    // Bosses can't be stunned.
+    if(enemy.alive() && ! enemy.stunned && enemy.data->rank == EnemyRank::normal &&
+            _state.random.get_int(100) < effect.chance)
+    {
+        enemy.stunned = true;
+
+        Text text;
+        bn::ostringstream stream(text);
+        stream << enemy.name << " is stunned!";
+        box.say_timed(text);
     }
 }
 
 void BattleScene::_apply_enemy_effect(const Effect& effect, int enemy_index, MessageBox& box)
 {
     // Same effects as the party, seen from the other side.
-    if(effect.is_heal())
+    // Enemies only use fixed damage and HP recovery: they have no MP, charge or fallen allies to revive.
+    if(effect.type != EffectType::damage && effect.type != EffectType::heal_hp)
     {
-        if(effect.type != EffectType::heal_hp)
-        {
-            return;     // Enemies don't use MP.
-        }
+        return;
+    }
 
+    if(effect.type == EffectType::heal_hp)
+    {
         if(effect.targets_all())
         {
             for(int index = 0; index < _enemies.size(); ++index)
@@ -714,6 +820,7 @@ void BattleScene::_damage_member(int member_index, int amount, MessageBox& box)
 
     if(! member.alive())
     {
+        _charged[member_index] = false;
         stream << "\n" << member.name() << " falls!";
     }
 
@@ -735,6 +842,29 @@ void BattleScene::_heal_member(int member_index, const Effect& effect, MessageBo
     else
     {
         stream << "It has no effect on " << member.name() << ".";
+    }
+
+    box.say_timed(text);
+}
+
+void BattleScene::_revive_member(int member_index, const Effect& effect, MessageBox& box)
+{
+    PartyMember& member = _party.members[member_index];
+    Text text;
+    bn::ostringstream stream(text);
+
+    if(member.alive())
+    {
+        stream << "It has no effect on " << member.name() << ".";
+    }
+    else if(apply_revive(effect, member, _state.random))
+    {
+        _refresh_status();
+        stream << member.name() << " is revived!";
+    }
+    else
+    {
+        stream << "But " << member.name() << " didn't wake up...";
     }
 
     box.say_timed(text);
@@ -806,19 +936,24 @@ void BattleScene::_victory(MessageBox& box)
         {
             _refresh_status();
 
-            Text text;
-            bn::ostringstream stream(text);
-            stream << member.name() << " reached level " << member.level << "!";
+            {
+                Text text;
+                bn::ostringstream stream(text);
+                stream << member.name() << " reached level " << member.level << "!";
+                box.say(text);
+            }
 
+            // One page per new skill: several levels (and skills) can be gained at once.
             for(const SpellLearn& learn : class_data(member.class_id).spells)
             {
                 if(learn.level > old_level && learn.level <= member.level)
                 {
-                    stream << "\nLearned " << spell_data(learn.spell).name << "!";
+                    Text text;
+                    bn::ostringstream stream(text);
+                    stream << member.name() << " learned " << spell_data(learn.spell).name << "!";
+                    box.say(text);
                 }
             }
-
-            box.say(text);
         }
     }
 }
@@ -859,7 +994,22 @@ int BattleScene::_valid_enemy_target(int enemy_index) const
     return -1;
 }
 
-int BattleScene::_random_alive_member() const
+int BattleScene::_random_alive_enemy() const
+{
+    bn::vector<int, max_enemies> indexes;
+
+    for(int index = 0; index < _enemies.size(); ++index)
+    {
+        if(_enemies[index].alive())
+        {
+            indexes.push_back(index);
+        }
+    }
+
+    return indexes.empty() ? -1 : indexes[_state.random.get_int(indexes.size())];
+}
+
+int BattleScene::_random_alive_member(int avoid) const
 {
     bn::vector<int, max_party_size> indexes;
 
@@ -873,7 +1023,48 @@ int BattleScene::_random_alive_member() const
 
     BN_ASSERT(! indexes.empty(), "There are no party members alive");
 
+    if(indexes.size() > 1)
+    {
+        for(auto it = indexes.begin(), end = indexes.end(); it != end; ++it)
+        {
+            if(*it == avoid)
+            {
+                indexes.erase(it);
+                break;
+            }
+        }
+    }
+
     return indexes[_state.random.get_int(indexes.size())];
+}
+
+int BattleScene::_take_charge(int member_index)
+{
+    if(_charged[member_index])
+    {
+        _charged[member_index] = false;
+        return 2;
+    }
+
+    return 1;
+}
+
+int BattleScene::_roll_enemy_actions(EnemyRank rank) const
+{
+    const EnemyActionChances& chances = enemy_action_chances(rank);
+    int roll = _state.random.get_int(100);
+
+    for(int index = 0; index < max_enemy_actions; ++index)
+    {
+        if(roll < chances.percent[index])
+        {
+            return index + 1;
+        }
+
+        roll -= chances.percent[index];
+    }
+
+    return 1;
 }
 
 }
