@@ -20,6 +20,8 @@ namespace rpg
 {
 
 /// The order must match the tile sheet built by tools/gen_placeholder_assets.py (graphics/field_tiles.bmp).
+/// Add new tiles at the end. The sheet has more tiles after these: variants that FieldScene picks by looking
+/// at the neighbours of a tile (roof edges, house walls, torches...), see tile_graphics() in rpg_field_scene.cpp.
 enum class TileId : uint8_t
 {
     void_,
@@ -46,6 +48,14 @@ enum class TileId : uint8_t
     grave,      //!< Solid: put a EventType::sign event on it.
     altar,      //!< Solid: put a EventType::story or sign event on it.
     lava,       //!< Solid.
+    fence,      //!< Village decorations: solid.
+    lamp,
+    bench,
+    well,
+    barrel,     //!< Solid. Drawn over the ground around it, like the sign, the spring, the grave and the altar.
+    magic_circle,   //!< Walkable, no battles: put a EventType::warp event on it.
+    inn_sign,   //!< House wall with the sign of an inn: solid, use it instead of a wall next to the door.
+    shop_sign,  //!< House wall with the sign of a shop.
     count
 };
 

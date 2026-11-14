@@ -63,6 +63,239 @@ namespace
     constexpr int direction_dx[] = { 0, 0, -1, 1 };         // Indexed by Direction.
     constexpr int direction_dy[] = { 1, -1, 0, 0 };
 
+    // ---------------------------------------------------------------------------------------------------------------
+    // Tile graphics. The first tiles of graphics/field_tiles.bmp are the TileId ones; the tiles after them are
+    // variants that only exist here: the map data never names them. The order must match FIELD_EXTRA_TILES and
+    // GROUND_OBJECTS in tools/gen_placeholder_assets.py.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr int gfx_roof_left = int(TileId::count);       // Roof without another roof at its left.
+    constexpr int gfx_roof_right = gfx_roof_left + 1;
+    constexpr int gfx_house_wall = gfx_roof_left + 2;       // Wall under a roof (plain walls are stone bricks).
+    constexpr int gfx_house_window = gfx_roof_left + 3;
+    constexpr int gfx_stone_floor = gfx_roof_left + 4;      // cave_floor in forts, castles and cathedrals.
+    constexpr int gfx_wall_torch = gfx_roof_left + 5;
+    constexpr int gfx_wall_chain = gfx_roof_left + 6;
+    constexpr int gfx_cave_torch = gfx_roof_left + 7;
+    constexpr int gfx_ladder = gfx_roof_left + 8;           // stairs_up against a cave wall.
+    constexpr int gfx_water_shore = gfx_roof_left + 9;      // Water under a bank.
+    constexpr int gfx_ground_objects = gfx_roof_left + 10;  // GroundObject x Ground tiles.
+
+    /// What the objects stand on.
+    enum class Ground : uint8_t
+    {
+        grass,
+        ash,
+        cave,
+        stone,
+        count
+    };
+
+    /// Solid things that are drawn over the ground around them: a sign looks right in a meadow and in a cave.
+    enum class GroundObject : uint8_t
+    {
+        sign,
+        spring,
+        grave,
+        altar,
+        barrel,
+        magic_circle
+    };
+
+    /// Forts, castles and cathedrals: the maps surrounded by brick walls have flagstones instead of cave floor.
+    [[nodiscard]] bool stone_style(const MapData& map)
+    {
+        return map.border == TileId::wall;
+    }
+
+    [[nodiscard]] bool house_part(TileId tile)
+    {
+        return tile == TileId::wall || tile == TileId::door || tile == TileId::inn_sign ||
+                tile == TileId::shop_sign;
+    }
+
+    /// Returns true if the wall at the given position belongs to a house: there's a roof over it.
+    [[nodiscard]] bool under_roof(const MapData& map, int x, int y)
+    {
+        for(int above_y = y - 1; above_y >= y - 3; --above_y)
+        {
+            TileId tile = map.tile(x, above_y);
+
+            if(tile == TileId::roof)
+            {
+                return true;
+            }
+
+            if(! house_part(tile))
+            {
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    /// The ground around a tile: the first neighbour that tells it, else the one that fits the map.
+    [[nodiscard]] Ground ground_around(const MapData& map, int x, int y)
+    {
+        static constexpr int neighbour_dx[] = { 0, -1, 1, 0 };
+        static constexpr int neighbour_dy[] = { 1, 0, 0, -1 };
+
+        for(int index = 0; index < 4; ++index)
+        {
+            switch(map.tile(x + neighbour_dx[index], y + neighbour_dy[index]))
+            {
+
+            case TileId::grass:
+            case TileId::flowers:
+            case TileId::tall_grass:
+                return Ground::grass;
+
+            case TileId::ash:
+                return Ground::ash;
+
+            case TileId::cave_floor:
+                return stone_style(map) ? Ground::stone : Ground::cave;
+
+            default:
+                break;
+            }
+        }
+
+        switch(map.border)
+        {
+
+        case TileId::wall:
+            return Ground::stone;
+
+        case TileId::cave_wall:
+            return Ground::cave;
+
+        case TileId::rubble:
+            return Ground::ash;
+
+        default:
+            return Ground::grass;
+        }
+    }
+
+    [[nodiscard]] int ground_object_graphics(GroundObject object, const MapData& map, int x, int y)
+    {
+        return gfx_ground_objects + (int(object) * int(Ground::count)) + int(ground_around(map, x, y));
+    }
+
+    /// Torches and chains hang on some of the walls that have floor in front of them. Returns 0 for none.
+    [[nodiscard]] int wall_decoration(const MapData& map, int x, int y, bool cave)
+    {
+        if(map.tile(x, y + 1) != TileId::cave_floor)
+        {
+            return 0;
+        }
+
+        switch(((x * 5) + (y * 3)) % 11)
+        {
+
+        case 0:
+            return cave ? gfx_cave_torch : gfx_wall_torch;
+
+        case 5:
+            return cave ? 0 : gfx_wall_chain;
+
+        default:
+            return 0;
+        }
+    }
+
+    /// Returns the tile of graphics/field_tiles.bmp to show at the given position: the TileId one, or a variant
+    /// that depends on the tiles around it. Only looks: what a tile *is* (walkable...) is always its TileId.
+    [[nodiscard]] int tile_graphics(const MapData& map, int x, int y)
+    {
+        TileId tile = map.tile(x, y);
+
+        switch(tile)
+        {
+
+        case TileId::roof:
+            if(map.tile(x - 1, y) != TileId::roof)
+            {
+                return gfx_roof_left;
+            }
+
+            if(map.tile(x + 1, y) != TileId::roof)
+            {
+                return gfx_roof_right;
+            }
+            break;
+
+        case TileId::wall:
+            if(under_roof(map, x, y))
+            {
+                // Windows in the upper floor, every other tile.
+                return map.tile(x, y - 1) == TileId::roof && (x % 2) != 0 ? gfx_house_window : gfx_house_wall;
+            }
+
+            if(int decoration = wall_decoration(map, x, y, false))
+            {
+                return decoration;
+            }
+            break;
+
+        case TileId::cave_wall:
+            if(int decoration = wall_decoration(map, x, y, true))
+            {
+                return decoration;
+            }
+            break;
+
+        case TileId::cave_floor:
+            if(stone_style(map))
+            {
+                return gfx_stone_floor;
+            }
+            break;
+
+        case TileId::stairs_up:
+            if(map.tile(x, y - 1) == TileId::cave_wall)
+            {
+                return gfx_ladder;
+            }
+            break;
+
+        case TileId::water:
+            {
+                TileId above = map.tile(x, y - 1);
+
+                if(above != TileId::water && above != TileId::bridge)
+                {
+                    return gfx_water_shore;
+                }
+            }
+            break;
+
+        case TileId::sign:
+            return ground_object_graphics(GroundObject::sign, map, x, y);
+
+        case TileId::spring:
+            return ground_object_graphics(GroundObject::spring, map, x, y);
+
+        case TileId::grave:
+            return ground_object_graphics(GroundObject::grave, map, x, y);
+
+        case TileId::altar:
+            return ground_object_graphics(GroundObject::altar, map, x, y);
+
+        case TileId::barrel:
+            return ground_object_graphics(GroundObject::barrel, map, x, y);
+
+        case TileId::magic_circle:
+            return ground_object_graphics(GroundObject::magic_circle, map, x, y);
+
+        default:
+            break;
+        }
+
+        return int(tile);
+    }
+
     /// Expands the 16x16 tiles of a map into 8x8 background cells.
     void fill_cells(const MapData& map, const bn::regular_bg_map_item& map_item)
     {
@@ -71,7 +304,7 @@ namespace
             for(int tile_x = 0; tile_x < max_map_tiles; ++tile_x)
             {
                 // Each map tile is made of 4 consecutive hardware tiles (see tools/gen_placeholder_assets.py).
-                int first_tile_index = int(map.tile(tile_x, tile_y)) * 4;
+                int first_tile_index = tile_graphics(map, tile_x, tile_y) * 4;
 
                 for(int quarter = 0; quarter < 4; ++quarter)
                 {
