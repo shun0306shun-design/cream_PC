@@ -924,15 +924,18 @@ namespace
     static_assert(valid_layout(dorn_rows), "Invalid dorn layout");
 
     constexpr bn::string_view dorn_sign_pages[] = {
-        RPG_NAME_MINE_TOWN " - MINING TOWN\nNorth: ruins\nEast: the Ash Cathedral",
+        RPG_T(RPG_NAME_MINE_TOWN " - MINING TOWN\nNorth: ruins\nEast: the Ash Cathedral",
+              "鉱山町" RPG_NAME_MINE_TOWN_JA "\n北: 廃墟\n東: 灰の聖堂"),
     };
 
     constexpr bn::string_view dorn_shop_pages[] = {
-        "Picks, blades, bandages.\nAll the mine has left.",
+        RPG_T("Picks, blades, bandages.\nAll the mine has left.",
+              "つるはし、刃物、包帯。\n鉱山に残ったのは\nこれで全部さ。"),
     };
 
     constexpr bn::string_view dorn_miner_pages[] = {
-        RPG_NAME_MINE_TOWN " digs no more coal.\nNobody wants anything\nthat burns.",
+        RPG_T(RPG_NAME_MINE_TOWN " digs no more coal.\nNobody wants anything\nthat burns.",
+              RPG_NAME_MINE_TOWN_JA "はもう石炭を\n掘らない。燃えるものなんて\n誰もほしがらないからな。"),
     };
 
     constexpr MapEvent dorn_events[] = {
@@ -976,7 +979,8 @@ namespace
     static_assert(valid_layout(kazami_rows), "Invalid kazami layout");
 
     constexpr bn::string_view kazami_grave_pages[] = {
-        RPG_NAME_PARTNER_HOME ".\nThe marker is clean now.\nSomeone was here.",
+        RPG_T(RPG_NAME_PARTNER_HOME ".\nThe marker is clean now.\nSomeone was here.",
+              RPG_NAME_PARTNER_HOME_JA "。\n墓標はきれいになっている。\n誰かが来たのだ。"),
     };
 
     constexpr MapEvent kazami_events[] = {
@@ -1008,7 +1012,8 @@ namespace
     static_assert(valid_layout(cathedral_rows), "Invalid cathedral layout");
 
     constexpr bn::string_view cathedral_pyre_pages[] = {
-        "A cold pyre.\nThe ash in it is\nstill warm.",
+        RPG_T("A cold pyre.\nThe ash in it is\nstill warm.",
+              "冷えた火葬台。\n中の灰は、\nまだあたたかい。"),
     };
 
     constexpr MapEvent cathedral_events[] = {
@@ -1129,19 +1134,19 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = RPG_NAME_MINE_TOWN,
+            .name = RPG_T(RPG_NAME_MINE_TOWN, RPG_NAME_MINE_TOWN_JA),
             .rows = dorn_rows,
             .events = dorn_events,
             .border = TileId::cave_wall,
         },
         {
-            .name = RPG_NAME_PARTNER_HOME " Ruins",
+            .name = RPG_T(RPG_NAME_PARTNER_HOME " Ruins", RPG_NAME_PARTNER_HOME_JA "村跡"),
             .rows = kazami_rows,
             .events = kazami_events,
             .border = TileId::rubble,
         },
         {
-            .name = "Ash Cathedral",
+            .name = RPG_T("Ash Cathedral", "灰の聖堂"),
             .rows = cathedral_rows,
             .events = cathedral_events,
             .encounters = cathedral_encounters,
