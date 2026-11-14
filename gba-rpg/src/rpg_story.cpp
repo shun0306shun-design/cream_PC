@@ -770,12 +770,67 @@ namespace
               RPG_NAME_DEFECTOR_JA "「炎帝は今、塔にひとりだ。\n　気にもとめないだろうが。」"),
         RPG_T(HERO ": Then we go to\nthe tower.",
               HERO_JA "「なら、塔へ行く。」"),
-        RPG_T("- Chapter 9 -",
-              "- 第9章 -"),
+        RPG_T("- Chapter 9 -\nThe Flame Emperor's Castle",
+              "- 第9章 -\n焔帝の城"),
     };
 
     constexpr EncounterGroup general3_battle = { { EnemyId::general_3, EnemyId::cult_knight }, 2 };
     constexpr EncounterGroup general4_battle = { { EnemyId::general_4, EnemyId::ash_zealot }, 2 };
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 9 "The Flame Emperor's Castle"
+    // ---------------------------------------------------------------------------------------------------------------
+    #define EMPEROR RPG_NAME_EMPEROR
+
+    constexpr bn::string_view circle_pages[] = {
+        "The ash circle stirs. A\npath of embers opens,\ntoward the tower.",
+        NOX ": The Emperor's road.\nIt opens only to those\nhe wishes to see.",
+    };
+
+    constexpr bn::string_view arrival_pages[] = {
+        "A castle of black glass.\nNo guards. No sound but\nthe fire above.",
+    };
+
+    constexpr bn::string_view visions_pages[] = {
+        "The glass walls show a\nvillage. A quiet morning.\nA pail by a spring.",
+        SEER ": " HERO ". It is only\nthe fire, remembering.",
+        HERO ": I know. They are\nnot coming back.",
+        HERO ": ...I know.",
+    };
+
+    constexpr bn::string_view emperor_pages[] = {
+        EMPEROR ": The ember of\n" RPG_NAME_VILLAGE ". I watched you,\nthe whole way.",
+        EMPEROR ": I lost someone,\nonce. As you did. I would\nnot accept it.",
+        EMPEROR ": Feed a pyre the\nwhole world, and the\ndead walk out of it.",
+        HERO ": Eight parts in ten.\nDid they?",
+        EMPEROR ": ...Not yet.",
+        HERO ": I wanted that, too.\nI let a city burn,\nwanting it.",
+        HERO ": They don't come\nback. It ends here.",
+    };
+
+    constexpr bn::string_view emperor_victory_pages[] = {
+        EMPEROR ": Then I will burn\nwhat is left of me.",
+        "The Emperor steps into\nhis own pyre.",
+        SEER ": The lamps... I can\nfeel them. All of them.\nStand up!",
+        "The party's strength\nreturns!",
+    };
+
+    constexpr bn::string_view pyre_pages[] = {
+        "The pyre rises, wearing\na crown of ash.",
+    };
+
+    constexpr bn::string_view pyre_victory_pages[] = {
+        "The pyre gutters.\nIn it, a man's voice.",
+        EMPEROR ": She did not come.\nThen what was all this\nash for?",
+        HERO ": Nothing. It is just\nwhat is left. We carry\nit. That's all.",
+        "The fire above the\ncastle goes out.",
+        PARTNER ": ...It's over.",
+        HERO ": No. Now we go\nhome, to what isn't\nthere.",
+        "- Final Chapter -",
+    };
+
+    constexpr EncounterGroup emperor_battle = { { EnemyId::emperor }, 1 };
+    constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };
+
     constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
 
     constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
@@ -1132,6 +1187,44 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle = &general2_last_battle;
         break;
 
+    case StoryId::ch9_circle:
+        // The ember road: straight into the castle (walk out of its door to come back).
+        say_pages(ui, circle_pages);
+        ui.fade_out(40);
+        state.map = MapId::castle;
+        state.player_x = 9;
+        state.player_y = 13;
+        state.facing = Direction::up;
+        result.reload_map = true;
+        result.next = story_progress < progress::ch9_visions ? StoryId::ch9_arrival : StoryId::none;
+        break;
+
+    case StoryId::ch9_arrival:
+        say_pages(ui, arrival_pages);
+        break;
+
+    case StoryId::ch9_visions:
+        say_pages(ui, visions_pages);
+        story_progress = progress::ch9_visions;
+        break;
+
+    case StoryId::ch9_emperor:
+        if(story_progress < progress::ch9_first_form)
+        {
+            say_pages(ui, emperor_pages);
+            result.battle = &emperor_battle;
+        }
+        else
+        {
+            result.next = StoryId::ch9_pyre;    // The first form is already beaten: only the pyre is left.
+        }
+        break;
+
+    case StoryId::ch9_pyre:
+        say_pages(ui, pyre_pages);
+        result.battle = &pyre_battle;
+        break;
+
     default:
         BN_ERROR("Invalid story id: ", int(id));
         break;
@@ -1203,6 +1296,25 @@ StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& u
     case StoryId::ch8_general_2:
         say_pages(ui, general2_last_victory_pages);
         state.story_progress = progress::ch9_start;
+        break;
+
+    case StoryId::ch9_emperor:
+        // Two battles in a row: the second one starts as soon as this scene ends.
+        say_pages(ui, emperor_victory_pages);
+        state.party.restore_all();
+        state.story_progress = progress::ch9_first_form;
+        result.next = StoryId::ch9_pyre;
+        break;
+
+    case StoryId::ch9_pyre:
+        // The castle goes dark and the party is taken back to the harbor (the respawn point of the chapter).
+        say_pages(ui, pyre_victory_pages);
+        ui.fade_out(60);
+        ui.wait(60);
+        state.story_progress = progress::ch10_start;
+        state.party.restore_all();
+        state.return_to_start();
+        result.reload_map = true;
         break;
 
     case StoryId::ch6_general:

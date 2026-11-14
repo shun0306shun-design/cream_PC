@@ -1337,6 +1337,10 @@ namespace
         { .type = EventType::story, .x = 9, .y = 2, .npc_graphics = 8,
           .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1,
           .story = StoryId::ch8_general_2 },
+        // Once the generals are gone, the circle is the way to the Emperor's castle (until he falls).
+        { .type = EventType::story, .x = 9, .y = 1,
+          .min_progress = progress::ch9_start, .max_progress = progress::ch10_start - 1,
+          .story = StoryId::ch9_circle },
         { .type = EventType::sign, .x = 9, .y = 1, .pages = citadel_circle_pages },
         { .type = EventType::chest, .x = 4, .y = 5, .npc_graphics = 3,
           .flag = FlagId::chest_citadel, .item = ItemId::magic_water, .item_amount = 5 },
@@ -1346,6 +1350,59 @@ namespace
         { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
         { { EnemyId::ash_zealot, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
         { { EnemyId::ash_zealot, EnemyId::ash_zealot, EnemyId::ash_zealot }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D09: the Flame Emperor's castle, the last dungeon. A winding way up to the throne room; a spring ('F') and a
+    // chest wait just before it. The Emperor (npc_graphics 8) stands in front of his pyre ('A').
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view castle_rows[] = {
+        "####################",    // 0
+        "########_A_#########",    // 1
+        "#######_____########",    // 2
+        "#######_____########",    // 3
+        "#########_##########",    // 4
+        "####___F______######",    // 5
+        "####_########_######",    // 6
+        "####_########_######",    // 7
+        "####_____________###",    // 8
+        "################_###",    // 9
+        "###______________###",    // 10
+        "###_################",    // 11
+        "###______________###",    // 12
+        "#########_##########",    // 13
+        "#########>##########",    // 14
+        "####################",    // 15
+    };
+
+    static_assert(valid_layout(castle_rows), "Invalid castle layout");
+
+    constexpr bn::string_view castle_spring_pages[] = {
+        "Clear water, in the heart\nof the fire. Someone kept\nit clean.",
+    };
+
+    constexpr bn::string_view castle_pyre_pages[] = {
+        "The Pyre of Return.\nNothing ever came\nback out of it.",
+    };
+
+    constexpr MapEvent castle_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 14, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 2 },
+        // The only way up passes through here.
+        { .type = EventType::trigger, .x = 16, .y = 9,
+          .max_progress = progress::ch9_visions - 1, .story = StoryId::ch9_visions },
+        { .type = EventType::spring, .x = 7, .y = 5, .pages = castle_spring_pages, .price = 0 },
+        { .type = EventType::chest, .x = 5, .y = 5, .npc_graphics = 3,
+          .flag = FlagId::chest_castle, .item = ItemId::magic_water, .item_amount = 5 },
+        { .type = EventType::story, .x = 9, .y = 3, .npc_graphics = 8,
+          .min_progress = progress::ch9_start, .max_progress = progress::ch10_start - 1,
+          .story = StoryId::ch9_emperor },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = castle_pyre_pages },
+    };
+
+    constexpr EncounterGroup castle_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot, EnemyId::ash_zealot }, 3 },
+        { { EnemyId::ash_zealot, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1500,6 +1557,14 @@ namespace
             .events = citadel_events,
             .encounters = citadel_encounters,
             .encounter_rate = 12,
+            .border = TileId::wall,
+        },
+        {
+            .name = "Emperor's Castle",
+            .rows = castle_rows,
+            .events = castle_events,
+            .encounters = castle_encounters,
+            .encounter_rate = 10,
             .border = TileId::wall,
         },
     };

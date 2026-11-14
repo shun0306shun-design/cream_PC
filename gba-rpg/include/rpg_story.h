@@ -73,8 +73,13 @@ namespace progress
     constexpr uint8_t ch8_general_3 = 74;   //!< General 3 fell in the citadel.
     constexpr uint8_t ch8_general_4 = 75;   //!< General 4 fell in the citadel.
 
-    // Chapter 9 (80-89)
-    constexpr uint8_t ch9_start = 80;       //!< General 2 fell: the four Ash Generals are gone.
+    // Chapter 9 "The Flame Emperor's Castle" (80-89)
+    constexpr uint8_t ch9_start = 80;       //!< General 2 fell: the four Ash Generals are gone. The rite circle opens.
+    constexpr uint8_t ch9_visions = 81;     //!< Saw the fire's memories in the castle.
+    constexpr uint8_t ch9_first_form = 82;  //!< The Emperor was beaten once: only his pyre form is left.
+
+    // Final chapter (90-99)
+    constexpr uint8_t ch10_start = 90;      //!< The Emperor fell and his fire went out.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -129,6 +134,11 @@ enum class StoryId : uint8_t
     ch8_general_3,      //!< First boss of the citadel.
     ch8_general_4,      //!< Second boss of the citadel.
     ch8_general_2,      //!< Last boss of the citadel: General 2 again. Winning starts chapter 9.
+    ch9_circle,         //!< The rite circle of the citadel: the way to the Emperor's castle.
+    ch9_arrival,        //!< First steps in the castle (follows ch9_circle).
+    ch9_visions,        //!< The fire's memories, in a corridor of the castle.
+    ch9_emperor,        //!< Final boss, first form. Winning leads straight to ch9_pyre.
+    ch9_pyre,           //!< Final boss, second form. Winning starts the final chapter.
     count,
     none = 0xFF
 };

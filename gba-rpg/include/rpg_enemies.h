@@ -36,6 +36,8 @@ enum class EnemyId : uint8_t
     general_3,      //!< Bosses of the citadel (chapter 8).
     general_4,
     general_2_last,
+    emperor,        //!< Final boss (chapter 9), first form.
+    emperor_pyre,   //!< Final boss, second form.
     count
 };
 

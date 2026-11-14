@@ -80,6 +80,7 @@ enum class MapId : uint8_t
     pass,       //!< D07: the pass east of the valley.
     harbor,     //!< T08: the harbor town.
     citadel,    //!< D08: the island citadel of the generals.
+    castle,     //!< D09: the Flame Emperor's castle (last dungeon).
     count
 };
 
