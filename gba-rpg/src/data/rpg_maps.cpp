@@ -139,6 +139,44 @@ namespace
 
     static_assert(valid_layout(village_burnt_rows), "Invalid burnt village layout");
 
+    // Rebuilt (from progress::ch10_rebuilt on): the old layout again, with the two graves and flowers around them.
+    constexpr bn::string_view village_rebuilt_rows[] = {
+        "TTTTTTTTTTTTTTTTTTTTTTTT",    // 0
+        "T......................T",    // 1
+        "T..^^^^.......^^^^^....T",    // 2
+        "T..####.......#####....T",    // 3
+        "T..#D##...,...##D##....T",    // 4
+        "T...:......,....:....F.T",    // 5
+        "T...:::::::::::::......T",    // 6
+        "T.......:.,,....~~~~...T",    // 7
+        "T..,....:.++,..~~~~~~..T",    // 8
+        "T..^^^..:.,....~~~~~~..T",    // 9
+        "T..###..:.......~~~~...T",    // 10
+        "T..#D#..:..S...........T",    // 11
+        "T...:...:..............T",    // 12
+        "T...:::::....,.....T...T",    // 13
+        "T.......:.........TTT..T",    // 14
+        "T..,....:..........T...T",    // 15
+        "T.......:.....,........T",    // 16
+        "T.......:.....,........T",    // 17
+        "T.......:..............T",    // 18
+        "TTTTTTTT>TTTTTTTTTTTTTTT",    // 19
+    };
+
+    static_assert(valid_layout(village_rebuilt_rows), "Invalid rebuilt village layout");
+
+    constexpr bn::string_view elder_king_pages[] = {
+        "Elder: Long live the king.\nNow, the well needs\nmending, sire.",
+    };
+
+    constexpr bn::string_view survivor_rebuilt_pages[] = {
+        "It isn't the same.\nBut the bread is warm,\nand the door shuts.",
+    };
+
+    constexpr bn::string_view grave_rebuilt_pages[] = {
+        "Father and Mother rest\nhere. Flowers grow\naround them now.",
+    };
+
     constexpr bn::string_view villager_pages[] = {
         RPG_T("Welcome to " RPG_NAME_VILLAGE " Village!",
               RPG_NAME_VILLAGE_JA "村へようこそ！"),
@@ -245,15 +283,37 @@ namespace
         { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
           .min_progress = progress::ch1_ashes, .max_progress = progress::ch1_ashes, .story = StoryId::ch1_elder },
         { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1,
-          .min_progress = progress::ch1_departed, .max_progress = progress::game_clear - 1,
+          .min_progress = progress::ch1_departed, .max_progress = progress::ch10_ember_out - 1,
           .chapter_pages = elder_chapter_pages },
         { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1,
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1,
           .chapter_pages = survivor_chapter_pages },
+        // Chapter 10: the temptation at the graves (it comes before the grave signs of the same tiles on purpose).
+        { .type = EventType::story, .x = 10, .y = 8,
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_home, .story = StoryId::ch10_grave },
+        { .type = EventType::story, .x = 11, .y = 8,
+          .min_progress = progress::ch10_home, .max_progress = progress::ch10_home, .story = StoryId::ch10_grave },
         { .type = EventType::sign, .x = 10, .y = 8, .pages = grave_pages,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1 },
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1 },
         { .type = EventType::sign, .x = 11, .y = 8, .pages = grave_pages,
-          .min_progress = progress::ch1_ashes, .max_progress = progress::game_clear - 1 },
+          .min_progress = progress::ch1_ashes, .max_progress = progress::ch10_rebuilt - 1 },
+
+        // --- Chapter 10: rebuilding, the coronation, and after the ending ---
+        { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
+          .min_progress = progress::ch10_ember_out, .max_progress = progress::game_clear - 1,
+          .story = StoryId::ch10_elder },
+        { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1, .pages = elder_king_pages,
+          .min_progress = progress::game_clear },
+        { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0, .pages = survivor_rebuilt_pages,
+          .min_progress = progress::ch10_rebuilt },
+        { .type = EventType::sign, .x = 10, .y = 8, .pages = grave_rebuilt_pages,
+          .min_progress = progress::ch10_rebuilt },
+        { .type = EventType::sign, .x = 11, .y = 8, .pages = grave_rebuilt_pages,
+          .min_progress = progress::ch10_rebuilt },
+        { .type = EventType::inn, .x = 5, .y = 12, .npc_graphics = 2, .pages = innkeeper_pages,
+          .min_progress = progress::ch10_rebuilt },
+        { .type = EventType::shop, .x = 15, .y = 12, .npc_graphics = 5, .pages = shopkeeper_pages,
+          .stock = village_shop_stock, .min_progress = progress::ch10_rebuilt },
 
         // --- Always ---
         { .type = EventType::sign, .x = 11, .y = 11, .pages = sign_pages },
@@ -1288,7 +1348,10 @@ namespace
         { .type = EventType::trigger, .x = 20, .y = 6,
           .max_progress = progress::ch8_ship - 1, .story = StoryId::ch8_pier },
         { .type = EventType::warp, .x = 20, .y = 6, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 10,
-          .min_progress = progress::ch8_ship },
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch10_start - 1 },
+        // Chapter 10: the ship sails home instead.
+        { .type = EventType::trigger, .x = 20, .y = 6,
+          .min_progress = progress::ch10_start, .story = StoryId::ch10_voyage },
         { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::shop, .x = 11, .y = 5, .npc_graphics = 5, .pages = harbor_shop_pages,
           .stock = ashbell_shop_stock },
@@ -1575,7 +1638,7 @@ namespace
 
     // ---------------------------------------------------------------------------------------------------------------
     // Map states: a different layout of a map while the story progress is in a range. Outside of every range, the
-    // map of the table above is used (so the village looks peaceful again after game_clear: the "rebuilt" state).
+    // map of the table above is used (for the home village, that is only the peaceful morning of chapter 1).
     // ---------------------------------------------------------------------------------------------------------------
     struct MapState
     {
@@ -1598,7 +1661,16 @@ namespace
             },
         },
         {
-            MapId::village, progress::ch1_ashes, progress::game_clear - 1,
+            MapId::village, progress::ch10_rebuilt, 0xFF,
+            {
+                .name = RPG_T(RPG_NAME_VILLAGE " Village", RPG_NAME_VILLAGE_JA "村"),
+                .rows = village_rebuilt_rows,
+                .events = village_events,
+                .border = TileId::tree,
+            },
+        },
+        {
+            MapId::village, progress::ch1_ashes, progress::ch10_rebuilt - 1,
             {
                 .name = RPG_T(RPG_NAME_VILLAGE " Ruins", RPG_NAME_VILLAGE_JA "村の焼け跡"),
                 .rows = village_burnt_rows,
@@ -1618,6 +1690,8 @@ namespace
         { MapId::dorn, 4, 6 },              // Chapter 6: the same (the capital has no safe place).
         { MapId::refuge, 3, 6 },            // Chapter 7: in front of the inn of the refugee valley.
         { MapId::harbor, 3, 6 },            // Chapter 8 on: in front of the inn of the harbor town.
+        { MapId::harbor, 3, 6 },            // Chapter 9: the same.
+        { start_map, start_x, start_y },    // Chapter 10 and after the ending: home.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)

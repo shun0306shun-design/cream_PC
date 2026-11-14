@@ -78,8 +78,11 @@ namespace progress
     constexpr uint8_t ch9_visions = 81;     //!< Saw the fire's memories in the castle.
     constexpr uint8_t ch9_first_form = 82;  //!< The Emperor was beaten once: only his pyre form is left.
 
-    // Final chapter (90-99)
+    // Chapter 10 "Green in the Ash" (90-99)
     constexpr uint8_t ch10_start = 90;      //!< The Emperor fell and his fire went out.
+    constexpr uint8_t ch10_home = 91;       //!< Back in the home village, with the last ember of the pyre.
+    constexpr uint8_t ch10_ember_out = 92;  //!< The hero almost fed the ember, then put it out.
+    constexpr uint8_t ch10_rebuilt = 93;    //!< The village was rebuilt (another state of its map).
 
     constexpr uint8_t game_clear = 100;
 }
@@ -139,6 +142,11 @@ enum class StoryId : uint8_t
     ch9_visions,        //!< The fire's memories, in a corridor of the castle.
     ch9_emperor,        //!< Final boss, first form. Winning leads straight to ch9_pyre.
     ch9_pyre,           //!< Final boss, second form. Winning starts the final chapter.
+    ch10_voyage,        //!< The pier of the harbor after the Emperor's fall: the ship sails home.
+    ch10_homecoming,    //!< Arriving in the burnt home village (follows ch10_voyage).
+    ch10_grave,         //!< At the parents' graves: the temptation of the ember.
+    ch10_elder,         //!< The elder: rebuilding the village, then the coronation and the ending.
+    ch10_seasons,       //!< The village after it is rebuilt (follows ch10_elder).
     count,
     none = 0xFF
 };

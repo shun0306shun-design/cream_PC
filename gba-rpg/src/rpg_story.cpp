@@ -850,11 +850,62 @@ namespace
               PARTNER_JA "「……終わったな。」"),
         RPG_T(HERO ": No. Now we go\nhome, to what isn't\nthere.",
               HERO_JA "「いや。これから帰るんだ。\n　もう何もない、\n　あの場所へ。」"),
-        RPG_T("- Final Chapter -",
-              "- 最終章 -"),
+        RPG_T("- Final Chapter -\nGreen in the Ash",
+              "- 最終章 -\n灰に芽吹く"),
     };
 
     constexpr EncounterGroup emperor_battle = { { EnemyId::emperor }, 1 };
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 10 "Green in the Ash"
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view voyage_pages[] = {
+        "The " SHIP " is ready.\nShe sails south, around\nthe " GATE ", toward home.",
+    };
+
+    constexpr bn::string_view homecoming_pages[] = {
+        RPG_NAME_VILLAGE ". Nothing has\nchanged. Ash, and two\ngraves.",
+        HERO ": I killed him. I\nthought it would feel\nlike coming home.",
+        "In your pack, something\nis warm. An ember of the\nPyre. Still alive.",
+    };
+
+    constexpr bn::string_view grave_ember_pages[] = {
+        "The ember burns in your\nhand. A whisper: Feed me,\nand they walk out.",
+        HERO ": ...Father. Mother.",
+        "For one breath, the fire\ngrows. The ash of " RPG_NAME_VILLAGE "\nbegins to rise.",
+        PARTNER ": " HERO "!",
+        SEER ": Look down. Not at\nthe fire. Down.",
+        "By the graves, in the\nash: one green shoot.",
+        HERO ": ...No. They don't\ncome back.",
+        HERO " presses the ember\ninto the wet earth.\nIt goes out.",
+        HERO ": But something\nelse can.",
+    };
+
+    constexpr bn::string_view rebuild_pages[] = {
+        "Elder: You came back,\n" HERO ". All of you.",
+        "Elder: We meant to\nrebuild. We had no\nhands, and no heart.",
+        HERO ": You have hands\nnow. Where do we start?",
+        NOX ": I know how things\nburn. Let me learn how\nthey are built.",
+    };
+
+    constexpr bn::string_view seasons_pages[] = {
+        "Seasons pass. Walls rise.\nThe well runs clear.\nPeople come, and stay.",
+    };
+
+    constexpr bn::string_view coronation_pages[] = {
+        "Elder: They have come\nfrom " REFUGE ", " RPG_NAME_MINE_TOWN ",\n" RPG_NAME_HARBOR ". All of them.",
+        "Keeper: We dug this out\nof " CAPITAL ". The realm\nneeds a king.",
+        "A crown of gold, black\nwith soot.",
+        HERO ": Not that one.",
+        SEER " weaves a ring of\ngreen shoots from the\nash, and holds it out.",
+        PARTNER ": King of one\nvillage and a great\ndeal of ash.",
+        HERO ": It's a start.",
+        HERO " is crowned, in\nthe square of " RPG_NAME_VILLAGE ",\nbeside two graves.",
+        HERO ": Father. Mother.\nI'm home. You are\nnot here.",
+        HERO ": ...That's all\nright.",
+        "What burned will not\nreturn. What grows now\nis new.",
+        "- THE END -\nThank you for playing.",
+    };
+
     constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };
 
     constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
@@ -1249,6 +1300,55 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
     case StoryId::ch9_pyre:
         say_pages(ui, pyre_pages);
         result.battle = &pyre_battle;
+        break;
+
+    case StoryId::ch10_voyage:
+        // The ship takes the party home: the burnt village, just inside its gate.
+        say_pages(ui, voyage_pages);
+        ui.fade_out(60);
+        ui.wait(60);
+        state.map = MapId::village;
+        state.player_x = 8;
+        state.player_y = 17;
+        state.facing = Direction::up;
+        result.reload_map = true;
+        result.next = story_progress < progress::ch10_home ? StoryId::ch10_homecoming : StoryId::none;
+        break;
+
+    case StoryId::ch10_homecoming:
+        say_pages(ui, homecoming_pages);
+        story_progress = progress::ch10_home;
+        break;
+
+    case StoryId::ch10_grave:
+        say_pages(ui, grave_ember_pages);
+        story_progress = progress::ch10_ember_out;
+        break;
+
+    case StoryId::ch10_elder:
+        if(story_progress < progress::ch10_rebuilt)
+        {
+            // Rebuilding: the village becomes its rebuilt state, with the hero in front of the elder.
+            say_pages(ui, rebuild_pages);
+            ui.fade_out(60);
+            ui.wait(60);
+            story_progress = progress::ch10_rebuilt;
+            state.player_x = 12;
+            state.player_y = 10;
+            state.facing = Direction::up;
+            result.reload_map = true;
+            result.next = StoryId::ch10_seasons;
+        }
+        else
+        {
+            // The coronation and the ending: the game is cleared, and goes on in the rebuilt village.
+            say_pages(ui, coronation_pages);
+            story_progress = progress::game_clear;
+        }
+        break;
+
+    case StoryId::ch10_seasons:
+        say_pages(ui, seasons_pages);
         break;
 
     default:
