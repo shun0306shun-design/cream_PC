@@ -30,6 +30,7 @@ enum class ItemId : uint8_t
     iron_spear,
     star_sigil,     //!< Key item: opens the waterway under the gate (chapter 3).
     rico_charm,     //!< E701: keepsake from the child who saved the hero (meant to become an accessory).
+    compass,        //!< E802: the ship's compass from the Sunken Lighthouse (key item).
     count,
     none = 0xFF         //!< "Nothing": an empty equipment slot.
 };

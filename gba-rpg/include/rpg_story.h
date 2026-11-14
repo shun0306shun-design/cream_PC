@@ -76,16 +76,14 @@ namespace progress
     constexpr uint8_t ch7_vow = 66;         //!< E703: the vow by the campfire.
     constexpr uint8_t ch7_bardos = 68;      //!< E704: General Bardos was killed: the first Ash General to fall.
 
-    // Chapter 8 "Counterattack" (70-79)
-    constexpr uint8_t ch8_start = 70;       //!< General 1 was killed in the pass: the first Ash General to fall.
-    constexpr uint8_t ch8_ship_found = 71;  //!< The shipwright of the harbor has a hull, but no crew.
-    constexpr uint8_t ch8_rallied = 72;     //!< The refugees agreed to crew the ship.
-    constexpr uint8_t ch8_ship = 73;        //!< The ship was launched: the pier leads to the citadel.
-    constexpr uint8_t ch8_general_3 = 74;   //!< General 3 fell in the citadel.
-    constexpr uint8_t ch8_general_4 = 75;   //!< General 4 fell in the citadel.
+    // Chapter 8 "Counterattack" (70-79), E801-E805. The two generals (E803, E804) can be beaten in any order:
+    // they are tracked with FlagId::ryuze_defeated and FlagId::drake_defeated, not with the progress.
+    constexpr uint8_t ch8_start = 70;       //!< E705: the signal fires were lit.
+    constexpr uint8_t ch8_goals = 71;       //!< E801: the elder named the three goals: a ship and two generals.
+    constexpr uint8_t ch8_ship = 73;        //!< E802: got the compass in the Sunken Lighthouse: the ship can sail.
 
     // Chapter 9 "The Flame Emperor's Castle" (80-89)
-    constexpr uint8_t ch9_start = 80;       //!< General 2 fell: the four Ash Generals are gone. The rite circle opens.
+    constexpr uint8_t ch9_start = 80;       //!< E805: the send-off. The rite circle of the volcano fort opens (see ch9_circle).
     constexpr uint8_t ch9_visions = 81;     //!< Saw the fire's memories in the castle.
     constexpr uint8_t ch9_first_form = 82;  //!< The Emperor was beaten once: only his pyre form is left.
 
@@ -165,11 +163,13 @@ enum class StoryId : uint8_t
     ch7_campfire,       //!< E703: the vow by the campfire.
     ch7_bardos,         //!< E704: boss of the marsh fort. Winning leads to ch7_signal.
     ch7_signal,         //!< E705: the signal fires. Starts chapter 8.
-    ch8_shipwright,     //!< The shipwright of the harbor: needs a crew, then launches the ship.
-    ch8_pier,           //!< The pier of the harbor, empty until the ship is launched.
-    ch8_general_3,      //!< First boss of the citadel.
-    ch8_general_4,      //!< Second boss of the citadel.
-    ch8_general_2,      //!< Last boss of the citadel: General 2 again. Winning starts chapter 9.
+    ch8_lighthouse_gate,//!< The causeway to the Sunken Lighthouse, closed until the elder names the goals.
+    ch8_lighthouse,     //!< E802: boss of the Sunken Lighthouse. Winning gives the compass.
+    ch8_shipwright,     //!< The shipwright of the port town.
+    ch8_pier,           //!< The pier: once the ship can sail, where to (the ice tower or the volcano fort).
+    ch8_ryuze,          //!< E803: General Ryuze in the Tower of the Ice Wall.
+    ch8_drake,          //!< E804: General Drake in the Volcano Fort.
+    ch8_sendoff,        //!< E805: back in the village with both generals dead. Starts chapter 9.
     ch9_circle,         //!< The rite circle of the citadel: the way to the Emperor's castle.
     ch9_arrival,        //!< First steps in the castle (follows ch9_circle).
     ch9_visions,        //!< The fire's memories, in a corridor of the castle.

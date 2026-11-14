@@ -792,108 +792,115 @@ namespace
     #define GENERAL3 RPG_NAME_GENERAL_3
     #define GENERAL4 RPG_NAME_GENERAL_4
 
+    constexpr bn::string_view goals_pages[] = {
+        RPG_T("Elder: The fires were\nseen. Survivors gather.\nNow we need three things.",
+              "長老「狼煙はとどいた。\n　生き残りが集まっている。\n　必要なものは三つだ。」"),
+        RPG_T("Elder: A ship, from " RPG_NAME_HARBOR ".\nIts compass lies in the\nSunken Lighthouse.",
+              "長老「一つ、" RPG_NAME_HARBOR_JA "の船。\n　羅針盤は、沈んだ灯台の\n　中にある。」"),
+        RPG_T("Elder: " RPG_NAME_GENERAL_4 ", the general\nof the north, in the Tower\nof the Ice Wall.",
+              "長老「二つ、北の灰将" RPG_NAME_GENERAL_4_JA "。\n　氷壁の塔にいる。」"),
+        RPG_T("Elder: And " RPG_NAME_GENERAL_1 ", in the\nVolcano Fort.",
+              "長老「三つ、火山の砦の\n　灰将" RPG_NAME_GENERAL_1_JA "だ。」"),
+        RPG_T(RPG_NAME_HERO ": ..." RPG_NAME_GENERAL_1 ".",
+              RPG_NAME_HERO_JA "「……" RPG_NAME_GENERAL_1_JA "。」"),
+    };
+
+    constexpr bn::string_view goals_again_pages[] = {
+        RPG_T("Elder: A ship, the north,\nthe volcano. In the\norder you can manage.",
+              "長老「船、北、火山。\n　できる順でよい。」"),
+    };
+
+    constexpr bn::string_view lighthouse_gate_pages[] = {
+        RPG_T("A causeway leads out to\na drowned lighthouse.",
+              "沈んだ灯台へ、\n土手道がのびている。"),
+    };
+
     constexpr bn::string_view shipwright_pages[] = {
-        RPG_T("A shipwright planes a\nhull, alone, on a dead\nwaterfront.",
-              "人けのない波止場で、\n船大工がひとり、\n船体にかんなをかけている。"),
-        RPG_T("Shipwright: The " SHIP ". Last\nhull in " RPG_NAME_HARBOR ". No crew,\nno sail, no reason.",
-              "船大工「" RPG_NAME_SHIP_JA "だ。\n　" RPG_NAME_HARBOR_JA "最後の船さ。乗り手も\n　帆も、出す理由もない。」"),
-        RPG_T(HERO ": The generals sit in\nthe citadel across the\nstrait. That's a reason.",
-              HERO_JA "「将軍たちは、海峡の\n　向こうの城塞にいる。\n　それが理由だ。」"),
-        RPG_T("Shipwright: I need forty\nhands to launch her.\nI have two.",
-              "船大工「進水させるには\n　人手が四十は要る。\n　いるのは、おれひとりだ。」"),
-        RPG_T(SEER ": Forty lamps burn\nin " REFUGE ".",
-              RPG_NAME_SEER_JA "「" RPG_NAME_REFUGE_JA "には、\n　四十の灯火が\n　ともっています。」"),
-        RPG_T(HERO ": Then we ask them.",
-              HERO_JA "「なら、頼みに行こう。」"),
+        RPG_T("Shipwright: The " RPG_NAME_SHIP " floats.\nBut without a compass\nshe goes nowhere.",
+              "船大工「" RPG_NAME_SHIP_JA "は浮く。\n　だが羅針盤がなければ、\n　どこへも行けん。」"),
     };
 
-    constexpr bn::string_view shipwright_wait_pages[] = {
-        RPG_T("Shipwright: Forty hands.\nBring them, and the\n" SHIP " sails.",
-              "船大工「人手が四十だ。\n　連れてくれば、\n　" RPG_NAME_SHIP_JA "は海に出る。」"),
-    };
-
-    constexpr bn::string_view shipwright_launch_pages[] = {
-        RPG_T("The waterfront is full of\nvoices. " REFUGE " came.\nAnd " RPG_NAME_MINE_TOWN ". And more.",
-              "波止場は人の声であふれて\nいた。" RPG_NAME_REFUGE_JA "が来た。\n" RPG_NAME_MINE_TOWN_JA "も。さらに大勢が。"),
-        RPG_T("Shipwright: Well, I'll be.\nHaul! HAUL!",
-              "船大工「こいつはおどろいた。\n　引け！ 引けえ！」"),
-        RPG_T("The " SHIP " slides into\nthe water.",
-              RPG_NAME_SHIP_JA "が、\n海へすべり出していく。"),
-        RPG_T(PARTNER ": An army of\nbakers and miners.",
-              PARTNER_JA "「パン屋と坑夫の\n　軍隊か。」"),
-        RPG_T(HERO ": An army.",
-              HERO_JA "「軍隊だ。」"),
-        RPG_T("The " SHIP " waits at\nthe pier.",
-              RPG_NAME_SHIP_JA "は、\n桟橋で待っている。"),
-    };
-
-    constexpr bn::string_view shipwright_after_pages[] = {
-        RPG_T("Shipwright: She's yours.\nBring her back, or\ndon't come back.",
-              "船大工「船はあんたらのものだ。\n　連れて帰ってこい。でなきゃ\n　帰ってくるな。」"),
-    };
-
-    constexpr bn::string_view keeper_rally_pages[] = {
-        RPG_T(HERO ": We have a ship and\nno crew. I'm asking you\nall to stop hiding.",
-              HERO_JA "「船はある。乗り手がいない。\n　みんなに頼みたい。\n　隠れるのを、やめてくれ。」"),
-        RPG_T("Keeper: You ask a great\ndeal, wall-boy.",
-              "灯守り「ずいぶんなことを\n　頼むね、城壁の坊や。」"),
-        RPG_T("Keeper: ...But a lamp kept\nunder a bowl lights\nnothing. We will come.",
-              "灯守り「……だが、鉢をかぶせた\n　灯火は何も照らさない。\n　行くよ、わたしらも。」"),
-        RPG_T("The valley empties\ntoward the sea.",
-              "谷の人々が、\n海へ向かって動き出す。"),
+    constexpr bn::string_view shipwright_ready_pages[] = {
+        RPG_T("Shipwright: She's ready.\nBoard her from the pier.",
+              "船大工「準備はできた。\n　桟橋から乗りな。」"),
     };
 
     constexpr bn::string_view pier_pages[] = {
-        RPG_T("A long pier. No ship\nis moored here.",
-              "長い桟橋だ。\n船は一隻もつながれていない。"),
+        RPG_T("The " RPG_NAME_SHIP " is moored here.\nShe cannot sail without\na compass.",
+              RPG_NAME_SHIP_JA "がつながれている。\n羅針盤がなければ\n出航できない。"),
     };
 
-    constexpr bn::string_view general3_pages[] = {
-        RPG_T(GENERAL3 ": Bakers and miners,\non a boat. I will enjoy\nthe quiet after.",
-              RPG_NAME_GENERAL_3_JA "「パン屋と坑夫が、船でか。\n　片づけたあとの静けさが\n　楽しみだ。」"),
-        RPG_T(HERO ": Together. Go!",
-              HERO_JA "「一緒にだ。行くぞ！」"),
+    constexpr bn::string_view pier_ask_pages[] = {
+        RPG_T("Where does the " RPG_NAME_SHIP "\nsail?",
+              RPG_NAME_SHIP_JA "は、\nどこへ向かう？"),
     };
 
-    constexpr bn::string_view general3_victory_pages[] = {
-        RPG_T(GENERAL3 " falls. The second\nof the four.",
-              RPG_NAME_GENERAL_3_JA "がたおれた。\n四人のうちの、ふたりめ。"),
+    constexpr bn::string_view keeper_boss_pages[] = {
+        RPG_T("Something coils around\nthe great lamp. It has\nkept it dark for years.",
+              "大きな灯に、何かが\nからみついている。\n長いあいだ、光をふさいで。"),
     };
 
-    constexpr bn::string_view general4_pages[] = {
-        RPG_T(GENERAL4 ": Two of us dead?\nThen I will take both\ntheir shares of you.",
-              RPG_NAME_GENERAL_4_JA "「ふたりも死んだの？\n　なら、ふたりの取り分まで\n　私がもらうわ。」"),
+    constexpr bn::string_view keeper_boss_victory_pages[] = {
+        RPG_T("The lamp turns again.\nIn its base: a ship's\ncompass, still true.",
+              "灯が、ふたたび回りだす。\n台座の中に、まだ狂いのない\n羅針盤があった。"),
+        RPG_T("Got the Compass!",
+              "羅針盤を手に入れた！"),
     };
 
-    constexpr bn::string_view general4_victory_pages[] = {
-        RPG_T(GENERAL4 " falls.\nOne is left.",
-              RPG_NAME_GENERAL_4_JA "がたおれた。\n残るは、ひとり。"),
+    constexpr bn::string_view ryuze_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_4 ": You came by sea.\nThen the old man lit\nhis fires after all.",
+              RPG_NAME_GENERAL_4_JA "「海から来たか。\n　あの老人は、やはり\n　狼煙を上げたのだな。」"),
+        RPG_T(RPG_NAME_GENERAL_4 ": My wife. My son.\nThe Emperor swore the\nflame would return them.",
+              RPG_NAME_GENERAL_4_JA "「妻と、息子だ。\n　焔帝は、炎が二人を\n　返すとちかった。」"),
+        RPG_T(RPG_NAME_HERO ": Has it returned\nanyone?",
+              RPG_NAME_HERO_JA "「だれか一人でも、\n　戻ってきたのか。」"),
+        RPG_T(RPG_NAME_GENERAL_4 ": ...Do not make me\nanswer that.",
+              RPG_NAME_GENERAL_4_JA "「……それを、\n　答えさせるな。」"),
     };
 
-    constexpr bn::string_view general2_last_pages[] = {
-        RPG_T(GENERAL ": The ember.\nYou did not charge.",
-              GENERAL_JA "「火の粉ね。\n　斬りかかってこないの。」"),
-        RPG_T(HERO ": I'm not alone\nthis time.",
-              HERO_JA "「今度は、\n　ひとりじゃない。」"),
-        RPG_T(GENERAL ": No. You brought\nthe whole hearth.",
-              GENERAL_JA "「そうね。かまどごと\n　連れてきたのね。」"),
+    constexpr bn::string_view ryuze_victory_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_4 ": I knew. I think I\nalways knew. I could\nnot stop hoping.",
+              RPG_NAME_GENERAL_4_JA "「知っていた。きっと、\n　ずっと知っていた。\n　望むのをやめられなかった。」"),
+        RPG_T(RPG_NAME_GENERAL_4 " falls. The north\nis free.",
+              RPG_NAME_GENERAL_4_JA "がたおれた。\n北は解き放たれた。"),
     };
 
-    constexpr bn::string_view general2_last_victory_pages[] = {
-        RPG_T(GENERAL ": ...He never needed\ngenerals. We were\nkindling, too.",
-              GENERAL_JA "「……あの方に、将軍など\n　要らなかった。私たちも、\n　たきつけだったのよ。」"),
-        RPG_T(GENERAL " falls. The four\nAsh Generals are gone.",
-              GENERAL_JA "がたおれた。\n四人の灰の将軍は、\nもういない。"),
-        RPG_T(NOX ": The Emperor is alone\nin his tower now. He\nwill not mind.",
-              RPG_NAME_DEFECTOR_JA "「焔帝は今、塔にひとりだ。\n　気にもとめないだろうが。」"),
-        RPG_T(HERO ": Then we go to\nthe tower.",
-              HERO_JA "「なら、塔へ行く。」"),
+    constexpr bn::string_view drake_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_1 ": Another avenger.\nWhich village? I have\nburned so many.",
+              RPG_NAME_GENERAL_1_JA "「また仇討ちか。\n　どの村だ。あまりに多く\n　焼いたのでな。」"),
+        RPG_T(RPG_NAME_HERO ": " RPG_NAME_VILLAGE ".",
+              RPG_NAME_HERO_JA "「" RPG_NAME_VILLAGE_JA "村だ。」"),
+        RPG_T(RPG_NAME_GENERAL_1 ": ...No. Nothing.\nI do not remember it.",
+              RPG_NAME_GENERAL_1_JA "「……いや。\n　何も思い出せん。」"),
+        RPG_T(RPG_NAME_HERO ": That's fine. I cut\nyou down for the next\nvillage, not for mine.",
+              RPG_NAME_HERO_JA "「それでいい。お前を\n　斬るのは、次の村の\n　ためだ。」"),
+    };
+
+    constexpr bn::string_view drake_victory_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_1 " falls. He never\ndid remember.",
+              RPG_NAME_GENERAL_1_JA "がたおれた。\n最後まで、思い出さなかった。"),
+        RPG_T(RPG_NAME_HERO ": ...It's quiet.\nI thought there would\nbe more.",
+              RPG_NAME_HERO_JA "「……静かだな。\n　もっと何かあると\n　思っていた。」"),
+        RPG_T(RPG_NAME_PARTNER ": That's all there\never is, partner.",
+              RPG_NAME_PARTNER_JA "「そんなものだ、\n　相棒。」"),
+    };
+
+    constexpr bn::string_view sendoff_pages[] = {
+        RPG_T("The whole village waits\nat the gate. No one\nsays goodbye.",
+              "里じゅうの者が、門に\n集まっていた。だれも\n別れの言葉は言わない。"),
+        RPG_T("Rico: Come back. All\nfour. I counted.",
+              "リコ「帰ってきてね。\n　四人とも。数えたから。」"),
+        RPG_T("That night, by the fire,\n" RPG_NAME_PARTNER " sits down first.",
+              "その夜、焚き火のそばに\n最初にすわったのは\n" RPG_NAME_PARTNER_JA "だった。"),
+        RPG_T(RPG_NAME_PARTNER ": One more, partner.\nThen we rest.",
+              RPG_NAME_PARTNER_JA "「あと一人だ、相棒。\n　それで終わりだ。」"),
         RPG_T("- Chapter 9 -\nThe Flame Emperor's Castle",
               "- 第9章 -\n焔帝の城"),
     };
 
-    constexpr EncounterGroup general3_battle = { { EnemyId::general_3, EnemyId::cult_knight }, 2 };
-    constexpr EncounterGroup general4_battle = { { EnemyId::general_4, EnemyId::ash_zealot }, 2 };
+    constexpr EncounterGroup lighthouse_battle = { { EnemyId::drowned_keeper }, 1 };
+    constexpr EncounterGroup ryuze_battle = { { EnemyId::general_4, EnemyId::ash_zealot }, 2 };
+    constexpr EncounterGroup drake_battle = { { EnemyId::general_2_last, EnemyId::cult_knight }, 2 };
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 9 "The Flame Emperor's Castle"
     // ---------------------------------------------------------------------------------------------------------------
@@ -1102,7 +1109,6 @@ namespace
 
     constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };
 
-    constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
 
     constexpr EncounterGroup bardos_last_battle = { { EnemyId::bardos_last, EnemyId::cult_knight }, 2 };
 
@@ -1533,16 +1539,27 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         break;
 
     case StoryId::ch7_keeper:
-        if(story_progress == progress::ch8_ship_found)
+        if(story_progress == progress::ch8_start)
         {
-            // Chapter 8: the refugees are asked to crew the ship.
-            say_pages(ui, keeper_rally_pages);
-            story_progress = progress::ch8_rallied;
+            // E801: the three goals of chapter 8.
+            say_pages(ui, goals_pages);
+            story_progress = progress::ch8_goals;
+        }
+        else if(story_progress > progress::ch8_start && story_progress < progress::ch9_start)
+        {
+            if(state.flags.get(FlagId::ryuze_defeated) && state.flags.get(FlagId::drake_defeated))
+            {
+                result.next = StoryId::ch8_sendoff;     // E805 also starts here, for whoever missed the entrances.
+            }
+            else
+            {
+                say_pages(ui, goals_again_pages);
+            }
         }
         else
         {
-            say_pages(ui, story_progress < progress::ch8_rallied ? bn::span<const bn::string_view>(keeper_pages) :
-                                                                   bn::span<const bn::string_view>(keeper_after_pages));
+            say_pages(ui, story_progress < progress::ch8_start ? bn::span<const bn::string_view>(keeper_pages) :
+                                                                 bn::span<const bn::string_view>(keeper_after_pages));
         }
         break;
 
@@ -1585,45 +1602,73 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         story_progress = progress::ch8_start;
         break;
 
-    case StoryId::ch8_shipwright:
-        if(story_progress < progress::ch8_ship_found)
-        {
-            say_pages(ui, shipwright_pages);
-            story_progress = progress::ch8_ship_found;
-        }
-        else if(story_progress < progress::ch8_rallied)
-        {
-            say_pages(ui, shipwright_wait_pages);
-        }
-        else if(story_progress < progress::ch8_ship)
-        {
-            say_pages(ui, shipwright_launch_pages);
-            story_progress = progress::ch8_ship;
-        }
-        else
-        {
-            say_pages(ui, shipwright_after_pages);
-        }
-        break;
-
-    case StoryId::ch8_pier:
-        say_pages(ui, pier_pages);
+    // ----- Chapter 8 (E801-E805; E801 is in ch7_keeper) -----
+    case StoryId::ch8_lighthouse_gate:
+        say_pages(ui, lighthouse_gate_pages);
         result.step_back = true;
         break;
 
-    case StoryId::ch8_general_3:
-        say_pages(ui, general3_pages);
-        result.battle = &general3_battle;
+    case StoryId::ch8_lighthouse:
+        say_pages(ui, keeper_boss_pages);
+        result.battle = &lighthouse_battle;
         break;
 
-    case StoryId::ch8_general_4:
-        say_pages(ui, general4_pages);
-        result.battle = &general4_battle;
+    case StoryId::ch8_shipwright:
+        say_pages(ui, story_progress < progress::ch8_ship ? bn::span<const bn::string_view>(shipwright_pages) :
+                                                            bn::span<const bn::string_view>(shipwright_ready_pages));
         break;
 
-    case StoryId::ch8_general_2:
-        say_pages(ui, general2_last_pages);
-        result.battle = &general2_last_battle;
+    case StoryId::ch8_pier:
+        if(story_progress < progress::ch8_ship)
+        {
+            say_pages(ui, pier_pages);
+            result.step_back = true;
+        }
+        else
+        {
+            // The ship: north to the ice tower, or to the volcano fort. Both come back to this pier.
+            int choice;
+
+            {
+                MessageBox box(ui);
+                box.show(pier_ask_pages[0]);
+                choice = ask_option(ui, RPG_T("Ice Tower", "氷壁の塔"), RPG_T("Volcano", "火山の砦"));
+            }
+
+            if(choice < 0)
+            {
+                result.step_back = true;
+            }
+            else
+            {
+                ui.fade_out();
+                state.map = choice == 0 ? MapId::ice_tower : MapId::citadel;
+                state.player_x = 9;
+                state.player_y = choice == 0 ? 7 : 10;
+                state.facing = Direction::up;
+                result.reload_map = true;
+            }
+        }
+        break;
+
+    case StoryId::ch8_ryuze:
+        say_pages(ui, ryuze_pages);
+        result.battle = &ryuze_battle;
+        break;
+
+    case StoryId::ch8_drake:
+        say_pages(ui, drake_pages);
+        result.battle = &drake_battle;
+        break;
+
+    case StoryId::ch8_sendoff:
+        // E805: only when both generals are dead (the triggers are at the entrances of the village).
+        if(state.flags.get(FlagId::ryuze_defeated) && state.flags.get(FlagId::drake_defeated))
+        {
+            say_pages(ui, sendoff_pages);
+            state.party.restore_all();
+            story_progress = progress::ch9_start;
+        }
         break;
 
     case StoryId::ch9_circle:
@@ -1862,19 +1907,20 @@ StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameSt
         result.next = StoryId::ch7_signal;
         break;
 
-    case StoryId::ch8_general_3:
-        say_pages(ui, general3_victory_pages);
-        state.story_progress = progress::ch8_general_3;
+    case StoryId::ch8_lighthouse:
+        say_pages(ui, keeper_boss_victory_pages);
+        state.party.add_item(ItemId::compass);
+        state.story_progress = progress::ch8_ship;
         break;
 
-    case StoryId::ch8_general_4:
-        say_pages(ui, general4_victory_pages);
-        state.story_progress = progress::ch8_general_4;
+    case StoryId::ch8_ryuze:
+        say_pages(ui, ryuze_victory_pages);
+        state.flags.set(FlagId::ryuze_defeated);
         break;
 
-    case StoryId::ch8_general_2:
-        say_pages(ui, general2_last_victory_pages);
-        state.story_progress = progress::ch9_start;
+    case StoryId::ch8_drake:
+        say_pages(ui, drake_victory_pages);
+        state.flags.set(FlagId::drake_defeated);
         break;
 
     case StoryId::ch9_emperor:

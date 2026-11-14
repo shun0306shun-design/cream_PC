@@ -1374,6 +1374,19 @@ namespace
         { .type = EventType::story, .x = 6, .y = 6, .npc_graphics = 9,
           .min_progress = progress::ch7_awake, .max_progress = progress::ch7_seer - 1,
           .story = StoryId::ch7_seer },
+        // E805: coming back with both generals dead (every tile next to the two arrival tiles).
+        { .type = EventType::trigger, .x = 8, .y = 1,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
+        { .type = EventType::trigger, .x = 10, .y = 1,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
+        { .type = EventType::trigger, .x = 9, .y = 2,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
+        { .type = EventType::trigger, .x = 17, .y = 6,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
+        { .type = EventType::trigger, .x = 18, .y = 5,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
+        { .type = EventType::trigger, .x = 18, .y = 7,
+          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1, .story = StoryId::ch8_sendoff },
         // The elder of the refugees.
         { .type = EventType::story, .x = 11, .y = 5, .npc_graphics = 1, .story = StoryId::ch7_keeper },
         // E703: the campfire (the 'A' tile). The vow happens once the four are together again.
@@ -1477,7 +1490,7 @@ namespace
         "xaaFaaaa:aaaSaaaa~~~~~",    // 8
         "xaaaaaaa:aaaaaaaa~~~~~",    // 9
         "xaaaaaaaaaaaaaaaa~~~~~",    // 10
-        "xxxxxxxxxxxxxxxxxxxxxx",    // 11
+        "xxxxxxxx>xxxxxxxxxxxxx",    // 11
     };
 
     static_assert(valid_layout(harbor_rows), "Invalid harbor layout");
@@ -1511,13 +1524,17 @@ namespace
 
     constexpr MapEvent harbor_events[] = {
         { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::fort_marsh, .warp_x = 9, .warp_y = 2 },
+        // The pier: closed without the compass (E802), then the ship (ch8_pier chooses where it sails).
         { .type = EventType::trigger, .x = 20, .y = 6,
-          .max_progress = progress::ch8_ship - 1, .story = StoryId::ch8_pier },
-        { .type = EventType::warp, .x = 20, .y = 6, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 10,
-          .min_progress = progress::ch8_ship, .max_progress = progress::ch10_start - 1 },
+          .max_progress = progress::ch10_start - 1, .story = StoryId::ch8_pier },
         // Chapter 10: the ship sails home instead.
         { .type = EventType::trigger, .x = 20, .y = 6,
           .min_progress = progress::ch10_start, .story = StoryId::ch10_voyage },
+        // The causeway to the Sunken Lighthouse (D10).
+        { .type = EventType::trigger, .x = 8, .y = 11,
+          .max_progress = progress::ch8_goals - 1, .story = StoryId::ch8_lighthouse_gate },
+        { .type = EventType::warp, .x = 8, .y = 11, .warp_map = MapId::lighthouse, .warp_x = 9, .warp_y = 10,
+          .min_progress = progress::ch8_goals },
         { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::shop, .x = 11, .y = 5, .npc_graphics = 5, .pages = harbor_shop_pages,
           .stock = ashbell_shop_stock },
@@ -1526,6 +1543,82 @@ namespace
         { .type = EventType::talk, .x = 6, .y = 9, .npc_graphics = 0,
           .movement = NpcMovement::wander, .wander_radius = 2, .chapter_pages = harbor_fisher_chapter_pages },
         { .type = EventType::story, .x = 15, .y = 5, .npc_graphics = 1, .story = StoryId::ch8_shipwright },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D10: the Sunken Lighthouse, at the end of a causeway south of the port. The thing around the lamp (the 'A'
+    // tile; npc_graphics 10) holds the ship's compass.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view lighthouse_rows[] = {
+        "~~~~~~~~~~~~~~~~~~~~",    // 0
+        "~~~~~~~%%%%%%%~~~~~~",    // 1
+        "~~~~~~~%__A__%~~~~~~",    // 2
+        "~~~~~~~%_____%~~~~~~",    // 3
+        "~~~~~~~%%%_%%%~~~~~~",    // 4
+        "~~~%%%%%%%_%%%%%%~~~",    // 5
+        "~~~%____________%~~~",    // 6
+        "~~~%_%%%%~~%%%%_%~~~",    // 7
+        "~~~%____________%~~~",    // 8
+        "~~~%%%%%%_%%%%%%%~~~",    // 9
+        "~~~~~~~~~=~~~~~~~~~~",    // 10
+        "~~~~~~~~~>~~~~~~~~~~",    // 11
+    };
+
+    static_assert(valid_layout(lighthouse_rows), "Invalid lighthouse layout");
+
+    constexpr bn::string_view lighthouse_lamp_pages[] = {
+        RPG_T("The great lamp of the\nlighthouse.",
+              "灯台の、大きな灯だ。"),
+    };
+
+    constexpr MapEvent lighthouse_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::harbor, .warp_x = 8, .warp_y = 10 },
+        // E802.
+        { .type = EventType::story, .x = 10, .y = 4, .npc_graphics = 10,
+          .min_progress = progress::ch8_goals, .max_progress = progress::ch8_ship - 1,
+          .story = StoryId::ch8_lighthouse },
+        { .type = EventType::sign, .x = 10, .y = 2, .pages = lighthouse_lamp_pages },
+        { .type = EventType::chest, .x = 4, .y = 7, .npc_graphics = 3,
+          .flag = FlagId::chest_lighthouse, .item = ItemId::magic_water, .item_amount = 3 },
+    };
+
+    constexpr EncounterGroup lighthouse_encounters[] = {
+        { { EnemyId::skeleton, EnemyId::skeleton, EnemyId::bat }, 3 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
+        { { EnemyId::ash_zealot, EnemyId::skeleton }, 2 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D11: the Tower of the Ice Wall, in the north, reached by ship. General Ryuze (npc_graphics 8) waits in the
+    // top hall until he is beaten (FlagId::ryuze_defeated).
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view ice_tower_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%%%%%%%_____%%%%%%%%",    // 1
+        "%%%%%%%_____%%%%%%%%",    // 2
+        "%%%%%%%%%_%%%%%%%%%%",    // 3
+        "%%_______________%%%",    // 4
+        "%%_%%%%%%%%%%%%%_%%%",    // 5
+        "%%_______________%%%",    // 6
+        "%%%%%%%%%_%%%%%%%%%%",    // 7
+        "%%%%%%%%%>%%%%%%%%%%",    // 8
+    };
+
+    static_assert(valid_layout(ice_tower_rows), "Invalid ice tower layout");
+
+    constexpr MapEvent ice_tower_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 8, .warp_map = MapId::harbor, .warp_x = 19, .warp_y = 6 },
+        // E803.
+        { .type = EventType::story, .x = 9, .y = 2, .npc_graphics = 8,
+          .min_progress = progress::ch8_ship, .story = StoryId::ch8_ryuze, .gone_flag = FlagId::ryuze_defeated },
+        { .type = EventType::chest, .x = 16, .y = 5, .npc_graphics = 3,
+          .flag = FlagId::chest_ice_tower, .item = ItemId::herb, .item_amount = 5 },
+    };
+
+    constexpr EncounterGroup ice_tower_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
+        { { EnemyId::skeleton, EnemyId::skeleton, EnemyId::skeleton }, 3 },
+        { { EnemyId::ash_zealot, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1557,16 +1650,10 @@ namespace
 
     constexpr MapEvent citadel_events[] = {
         { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::harbor, .warp_x = 19, .warp_y = 6 },
-        { .type = EventType::story, .x = 9, .y = 8, .npc_graphics = 8,
-          .min_progress = progress::ch8_ship, .max_progress = progress::ch8_general_3 - 1,
-          .story = StoryId::ch8_general_3 },
+        // E804: General Drake (npc_graphics 8) in the hall, until he is beaten (FlagId::drake_defeated).
         { .type = EventType::story, .x = 9, .y = 3, .npc_graphics = 8,
-          .min_progress = progress::ch8_ship, .max_progress = progress::ch8_general_4 - 1,
-          .story = StoryId::ch8_general_4 },
-        { .type = EventType::story, .x = 9, .y = 2, .npc_graphics = 8,
-          .min_progress = progress::ch8_ship, .max_progress = progress::ch9_start - 1,
-          .story = StoryId::ch8_general_2 },
-        // Once the generals are gone, the circle is the way to the Emperor's castle (until he falls).
+          .min_progress = progress::ch8_ship, .story = StoryId::ch8_drake, .gone_flag = FlagId::drake_defeated },
+        // Chapter 9 as it is implemented now: the rite circle is the way to the Emperor's castle (until he falls).
         { .type = EventType::story, .x = 9, .y = 1,
           .min_progress = progress::ch9_start, .max_progress = progress::ch10_start - 1,
           .story = StoryId::ch9_circle },
@@ -1783,7 +1870,7 @@ namespace
             .border = TileId::water,
         },
         {
-            .name = RPG_T("Ember Citadel", "残り火の城塞"),
+            .name = RPG_T("Volcano Fort", "火山の砦"),
             .rows = citadel_rows,
             .events = citadel_events,
             .encounters = citadel_encounters,
@@ -1819,6 +1906,22 @@ namespace
             .encounters = fort_marsh_encounters,
             .encounter_rate = 12,
             .border = TileId::water,
+        },
+        {
+            .name = RPG_T("Sunken Lighthouse", "沈んだ灯台"),
+            .rows = lighthouse_rows,
+            .events = lighthouse_events,
+            .encounters = lighthouse_encounters,
+            .encounter_rate = 12,
+            .border = TileId::water,
+        },
+        {
+            .name = RPG_T("Ice Wall Tower", "氷壁の塔"),
+            .rows = ice_tower_rows,
+            .events = ice_tower_events,
+            .encounters = ice_tower_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
         },
     };
 
@@ -2025,7 +2128,7 @@ bool MapData::terrain_walkable(int x, int y) const
     return x >= 0 && y >= 0 && x < width() && y < height() && tile_info(tile(x, y)).walkable;
 }
 
-bool MapData::walkable(int x, int y, int story_progress) const
+bool MapData::walkable(int x, int y, int story_progress, const EventFlags& flags) const
 {
     if(! terrain_walkable(x, y))
     {
@@ -2037,7 +2140,7 @@ bool MapData::walkable(int x, int y, int story_progress) const
     for(const MapEvent& event : events)
     {
         if(event.x == x && event.y == y && event.npc_graphics >= 0 && event.movement == NpcMovement::stand &&
-           event.active(story_progress))
+           event.exists(story_progress, flags))
         {
             return false;
         }

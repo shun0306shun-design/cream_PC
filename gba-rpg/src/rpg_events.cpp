@@ -25,13 +25,18 @@ bool ask_yes_no(Ui& ui)
     return menu.run() == 0;
 }
 
-bool ask_choice(Ui& ui, const bn::string_view& first, const bn::string_view& second)
+int ask_option(Ui& ui, const bn::string_view& first, const bn::string_view& second)
 {
     constexpr int cols = 12;    // Wide enough for five full width characters.
 
     bn::string_view options[] = { first, second };
     Menu menu(ui, screen_columns - cols, yes_no_row, cols, options);
-    return menu.run() == 0;
+    return menu.run();
+}
+
+bool ask_choice(Ui& ui, const bn::string_view& first, const bn::string_view& second)
+{
+    return ask_option(ui, first, second) == 0;
 }
 
 void run_talk(const GameState& state, Ui& ui, const MapEvent& event)

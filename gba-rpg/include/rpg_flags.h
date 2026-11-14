@@ -40,6 +40,10 @@ enum class FlagId : uint8_t
     ch6_eve_partner,    //!< E602: who was already talked to.
     ch6_eve_seer,
     ch6_eve_defector,
+    ryuze_defeated,     //!< E803: the general of the north fell (E803 and E804 can be done in any order).
+    drake_defeated,     //!< E804: the general of the volcano fell.
+    chest_lighthouse,
+    chest_ice_tower,
     // Add new flags here.
     count,
     none = 0xFF         //!< "No flag": the default of MapEvent::flag.

@@ -85,6 +85,8 @@ enum class MapId : uint8_t
     mine,       //!< D06: the abandoned mine of the mining town (the secret way to the cathedral).
     throne,     //!< D08: the royal castle of the capital (throne room).
     fort_marsh, //!< D09: the Fort of the Weeping Marsh.
+    lighthouse, //!< D10: the Sunken Lighthouse.
+    ice_tower,  //!< D11: the Tower of the Ice Wall.
     count
 };
 
@@ -150,9 +152,19 @@ struct MapEvent
     /// chapter_index(story_progress). Later chapters reuse the last set.
     bn::span<const bn::span<const bn::string_view>> chapter_pages = {};
 
+    /// The event is gone for good once this flag is set (bosses that can be beaten in any order: the story
+    /// progress alone can't tell which ones are left).
+    FlagId gone_flag = FlagId::none;
+
     [[nodiscard]] constexpr bool active(int story_progress) const
     {
         return story_progress >= min_progress && story_progress <= max_progress;
+    }
+
+    /// active() and not removed by its gone_flag: what the game uses to decide if the event is there.
+    [[nodiscard]] bool exists(int story_progress, const EventFlags& flags) const
+    {
+        return active(story_progress) && (gone_flag == FlagId::none || ! flags.get(gone_flag));
     }
 
     /// The pages of a talk / sign event for the given story progress.
@@ -215,7 +227,7 @@ struct MapData
      * chest that stays in place there (walking NPCs are ignored). Used to check saved positions;
      * FieldScene handles the walking ones. Only the events that exist at `story_progress` count.
      */
-    [[nodiscard]] bool walkable(int x, int y, int story_progress) const;
+    [[nodiscard]] bool walkable(int x, int y, int story_progress, const EventFlags& flags) const;
 };
 
 /**

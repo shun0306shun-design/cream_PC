@@ -31,6 +31,7 @@ namespace
         { RPG_T("Iron Spear", "鉄の槍"),       {},     110,   ItemKind::weapon, class_bit(ClassId::lancer),                               { 0, 0, 6,  0,  2 } },
         { RPG_T("Star Sigil", "星の印章"),       {},     0,     ItemKind::key },
         { RPG_T("Rico's Charm", "リコのお守り"),   {},     0,     ItemKind::key },
+        { RPG_T("Compass", "羅針盤"),            {},     0,     ItemKind::key },
     };
 
     static_assert(sizeof(items) / sizeof(items[0]) == item_count, "Item table doesn't match ItemId");

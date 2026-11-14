@@ -156,7 +156,6 @@ const EncounterGroup& FieldScene::run()
     {
         StoryId fought = _state.story_battle;
         bool won = ! _state.story_battle_lost;
-        uint8_t old_progress = _state.story_progress;
         _state.story_battle = StoryId::none;
         _state.story_battle_lost = false;
 
@@ -170,9 +169,9 @@ const EncounterGroup& FieldScene::run()
             _ui.update();
             _ui.fade_in();
         }
-        else if(_state.story_progress != old_progress)
+        else
         {
-            _spawn_npcs();      // The boss is gone, allies may have appeared...
+            _spawn_npcs();      // The boss is gone (by progress or by flag), allies may have appeared...
         }
 
         start_story = result.next;
@@ -268,7 +267,7 @@ void FieldScene::_spawn_npcs()
 
     for(const MapEvent& event : _map->events)
     {
-        if(event.npc_graphics >= 0 && event.active(story_progress))
+        if(event.npc_graphics >= 0 && event.exists(story_progress, _state.flags))
         {
             BN_ASSERT(! _npcs.full(), "Too many NPCs in map: ", _map->name);
 
@@ -294,7 +293,7 @@ void FieldScene::_spawn_npcs()
 
     for(const MapEvent& event : _map->events)
     {
-        if(event.npc_graphics >= 0 && event.active(story_progress))
+        if(event.npc_graphics >= 0 && event.exists(story_progress, _state.flags))
         {
             if(event.movement != NpcMovement::stand)
             {
@@ -474,7 +473,7 @@ bool FieldScene::_can_walk(int tile_x, int tile_y) const
     for(const MapEvent& event : _map->events)
     {
         if(event.npc_graphics >= 0 && event.movement == NpcMovement::stand && event.x == tile_x &&
-           event.y == tile_y && event.active(_state.story_progress))
+           event.y == tile_y && event.exists(_state.story_progress, _state.flags))
         {
             return false;
         }
@@ -487,7 +486,7 @@ const MapEvent* FieldScene::_event_at(int tile_x, int tile_y) const
 {
     for(const MapEvent& event : _map->events)
     {
-        if(! event.active(_state.story_progress))
+        if(! event.exists(_state.story_progress, _state.flags))
         {
             continue;       // It doesn't exist at this point of the story.
         }
@@ -809,7 +808,7 @@ int FieldScene::_npc_sprite_index(const MapEvent& event) const
             return index;
         }
 
-        if(other.npc_graphics >= 0 && other.active(_state.story_progress))
+        if(other.npc_graphics >= 0 && other.exists(_state.story_progress, _state.flags))
         {
             ++index;
         }

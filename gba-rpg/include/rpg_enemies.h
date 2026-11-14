@@ -39,6 +39,7 @@ enum class EnemyId : uint8_t
     general_2_last,
     emperor,        //!< Final boss (chapter 9), first form.
     emperor_pyre,   //!< Final boss, second form.
+    drowned_keeper, //!< Boss of the Sunken Lighthouse (chapter 8, E802).
     count
 };
 

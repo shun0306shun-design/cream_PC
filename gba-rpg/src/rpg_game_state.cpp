@@ -10,7 +10,7 @@ namespace rpg
 namespace
 {
     constexpr uint32_t save_magic = 0x47505242;     // "BRPG"
-    constexpr uint32_t save_version = 8;            // Bump it when SaveData changes: old saves are then ignored.
+    constexpr uint32_t save_version = 9;            // Bump it when SaveData changes: old saves are then ignored.
 
     /// What is stored in SRAM. Must stay trivially copyable.
     struct SaveData
@@ -63,22 +63,22 @@ namespace
 {
     constexpr int respawn_search_radius = 4;    // Tiles around a blocked respawn point that are tried.
 
-    [[nodiscard]] bool tile_safe(MapId map, int x, int y, int story_progress)
+    [[nodiscard]] bool tile_safe(MapId map, int x, int y, int story_progress, const EventFlags& flags)
     {
         const MapData& data = map_data(map, story_progress);
 
-        if(! data.walkable(x, y, story_progress))
+        if(! data.walkable(x, y, story_progress, flags))
         {
             return false;
         }
 
         // Not walled in: there must be somewhere to go from here.
-        return data.walkable(x + 1, y, story_progress) || data.walkable(x - 1, y, story_progress) ||
-               data.walkable(x, y + 1, story_progress) || data.walkable(x, y - 1, story_progress);
+        return data.walkable(x + 1, y, story_progress, flags) || data.walkable(x - 1, y, story_progress, flags) ||
+               data.walkable(x, y + 1, story_progress, flags) || data.walkable(x, y - 1, story_progress, flags);
     }
 
     /// Looks for a safe tile at the given place or around it, closest first. Returns false if there's none.
-    [[nodiscard]] bool find_safe_tile(MapId map, int story_progress, uint8_t& x, uint8_t& y)
+    [[nodiscard]] bool find_safe_tile(MapId map, int story_progress, const EventFlags& flags, uint8_t& x, uint8_t& y)
     {
         for(int distance = 0; distance <= respawn_search_radius; ++distance)
         {
@@ -88,7 +88,7 @@ namespace
                 {
                     bool on_ring = dx == -distance || dx == distance || dy == -distance || dy == distance;
 
-                    if(on_ring && tile_safe(map, x + dx, y + dy, story_progress))
+                    if(on_ring && tile_safe(map, x + dx, y + dy, story_progress, flags))
                     {
                         x = uint8_t(x + dx);
                         y = uint8_t(y + dy);
@@ -112,19 +112,19 @@ void GameState::return_to_start()
 
     // The respawn points are checked at build time against the map layouts, but not against the events of every
     // story progress: if someone stands there now, use the closest free tile (towns have no closed areas).
-    if(! find_safe_tile(map, story_progress, player_x, player_y))
+    if(! find_safe_tile(map, story_progress, flags, player_x, player_y))
     {
         // Last resort: where a new game starts.
         map = start_map;
         player_x = start_x;
         player_y = start_y;
-        [[maybe_unused]] bool found = find_safe_tile(map, story_progress, player_x, player_y);
+        [[maybe_unused]] bool found = find_safe_tile(map, story_progress, flags, player_x, player_y);
     }
 }
 
 bool GameState::position_safe() const
 {
-    return tile_safe(map, player_x, player_y, story_progress);
+    return tile_safe(map, player_x, player_y, story_progress, flags);
 }
 
 void save_game(const GameState& state)
