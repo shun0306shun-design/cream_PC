@@ -894,15 +894,15 @@ namespace
               "その夜、焚き火のそばに\n最初にすわったのは\n" RPG_NAME_PARTNER_JA "だった。"),
         RPG_T(RPG_NAME_PARTNER ": One more, partner.\nThen we rest.",
               RPG_NAME_PARTNER_JA "「あと一人だ、相棒。\n　それで終わりだ。」"),
-        RPG_T("- Chapter 9 -\nThe Flame Emperor's Castle",
-              "- 第9章 -\n焔帝の城"),
+        RPG_T("- Chapter 9 -\nThe Last Ash General",
+              "- 第9章 -\n最後の灰将"),
     };
 
     constexpr EncounterGroup lighthouse_battle = { { EnemyId::drowned_keeper }, 1 };
     constexpr EncounterGroup ryuze_battle = { { EnemyId::general_4, EnemyId::ash_zealot }, 2 };
     constexpr EncounterGroup drake_battle = { { EnemyId::general_2_last, EnemyId::cult_knight }, 2 };
     // ---------------------------------------------------------------------------------------------------------------
-    // Chapter 9 "The Flame Emperor's Castle"
+    // Chapter 9 "The Last Ash General" (the design document calls it "The Flame Emperor's Castle")
     // ---------------------------------------------------------------------------------------------------------------
     #define EMPEROR RPG_NAME_EMPEROR
 
@@ -988,14 +988,14 @@ namespace
               "再誕の残り火を手に入れた。"),
         RPG_T(RPG_NAME_PARTNER ": ...It's over.",
               RPG_NAME_PARTNER_JA "「……終わったな。」"),
-        RPG_T("- Final Chapter -\nGreen in the Ash",
-              "- 最終章 -\n灰に芽吹く"),
+        RPG_T("- Chapter 10 -\nThe Flame Emperor",
+              "- 第10章 -\n焔帝"),
     };
 
     constexpr EncounterGroup zelma_last_battle = { { EnemyId::general_3, EnemyId::ash_zealot }, 2 };
     constexpr EncounterGroup emperor_battle = { { EnemyId::emperor }, 1 };
     // ---------------------------------------------------------------------------------------------------------------
-    // Chapter 10 "Green in the Ash"
+    // Chapter 10 "The Flame Emperor" (the design document calls it "Green in the Ash")
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view homecoming_pages[] = {
         RPG_T(RPG_NAME_VILLAGE ". Ash, and two\ngraves. Nothing has\nchanged.",

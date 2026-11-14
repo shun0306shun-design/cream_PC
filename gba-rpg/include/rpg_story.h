@@ -82,14 +82,14 @@ namespace progress
     constexpr uint8_t ch8_goals = 71;       //!< E801: the elder named the three goals: a ship and two generals.
     constexpr uint8_t ch8_ship = 73;        //!< E802: got the compass in the Sunken Lighthouse: the ship can sail.
 
-    // Chapter 9 "The Flame Emperor's Castle" (80-89), E901-E905.
+    // Chapter 9 "The Last Ash General" (80-89), E901-E905. (Design document title: "The Flame Emperor's Castle".)
     constexpr uint8_t ch9_start = 80;       //!< E805: the send-off. The ship can reach the Emperor's island.
     constexpr uint8_t ch9_landing = 81;     //!< E901: landed on the island: there is no way back.
     constexpr uint8_t ch9_zelma = 84;       //!< E902: General Zelma fell in the castle (the partner and the defector).
     constexpr uint8_t ch9_motive = 86;      //!< E903: the Emperor told why he burns the world. The altar opens.
     constexpr uint8_t ch9_final = 88;       //!< E904: the Emperor was beaten once; the flame wearing his crown is left.
 
-    // Chapter 10 "Green in the Ash" (90-99), E1001-E1006.
+    // Chapter 10 "The Flame Emperor" (90-99), E1001-E1006. (Design document title: "Green in the Ash".)
     constexpr uint8_t ch10_start = 90;      //!< E905: the Emperor fell; the last ember is in the hero's hand.
     constexpr uint8_t ch10_home = 91;       //!< E1001: back in the burnt village; the hero walks to the graves alone.
     constexpr uint8_t ch10_ember = 92;      //!< E1002: the ember's whisper: the hero faces his own shadow.
