@@ -352,11 +352,12 @@ void FieldScene::_update_minimap()
         return;
     }
 
-    // Redraw only when the player enters another tile (or the map changed): text sprites aren't free.
+    // Redraw only when the player enters another tile or turns (or the map changed): text sprites aren't free.
     int player_x = _state.player_x;
     int player_y = _state.player_y;
+    Direction facing = _state.facing;
 
-    if(! _minimap_dirty && player_x == _minimap_x && player_y == _minimap_y)
+    if(! _minimap_dirty && player_x == _minimap_x && player_y == _minimap_y && facing == _minimap_facing)
     {
         return;
     }
@@ -364,7 +365,13 @@ void FieldScene::_update_minimap()
     _minimap_dirty = false;
     _minimap_x = player_x;
     _minimap_y = player_y;
+    _minimap_facing = facing;
     _minimap->clear_text();
+
+    // Legend:  v ^ < >  the player, pointing where it faces      .  floor         #  wall
+    //          O        a way out (gate, stairs, door)           ~  water, lava   (blank) outside the map
+    //          !        someone or something to press A at (people, chests, signs, springs...)
+    static constexpr char player_symbols[] = { 'v', '^', '<', '>' };    // Indexed by Direction.
 
     for(int line = 0; line < minimap_lines; ++line)
     {
@@ -377,17 +384,53 @@ void FieldScene::_update_minimap()
 
             if(dx == 0 && dy == 0)
             {
-                text.push_back('@');
+                text.push_back(player_symbols[int(facing)]);
             }
             else
             {
-                // Same rule as the movement: out of the map, walls and NPCs block the way.
-                text.push_back(_can_walk(player_x + dx, player_y + dy) ? '.' : '#');
+                text.push_back(_minimap_symbol(player_x + dx, player_y + dy));
             }
         }
 
         _minimap->print_fixed(line, text);
     }
+}
+
+char FieldScene::_minimap_symbol(int tile_x, int tile_y) const
+{
+    if(tile_x < 0 || tile_y < 0 || tile_x >= _map->width() || tile_y >= _map->height())
+    {
+        return ' ';
+    }
+
+    // Events first: only the ones that exist now, with walking NPCs where they really are.
+    if(const MapEvent* event = _event_at(tile_x, tile_y))
+    {
+        if(event->type == EventType::warp)
+        {
+            return 'O';
+        }
+
+        if(event->type != EventType::trigger)   // Triggers are invisible: they look like the floor they are on.
+        {
+            return '!';
+        }
+    }
+
+    if(_walker_blocks(tile_x, tile_y))
+    {
+        return '!';     // The tile a walking NPC is leaving.
+    }
+
+    TileId tile = _map->tile(tile_x, tile_y);
+
+    if(tile == TileId::water || tile == TileId::lava)
+    {
+        return '~';
+    }
+
+    // Same rule as the movement for everything else.
+    return _can_walk(tile_x, tile_y) ? '.' : '#';
 }
 
 void FieldScene::_hide_hud()

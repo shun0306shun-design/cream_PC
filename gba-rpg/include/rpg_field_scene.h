@@ -67,6 +67,7 @@ private:
     bool _minimap_dirty = true;
     int _minimap_x = -1;                    //!< Player position the minimap was last drawn for.
     int _minimap_y = -1;
+    Direction _minimap_facing = Direction::down;    //!< Player facing the minimap was last drawn for.
 
     void _load_map();
 
@@ -85,6 +86,9 @@ private:
     void _show_map_name();
     void _update_map_name();
     void _update_minimap();
+
+    /// The minimap character of a tile (not the player's own one): see the legend in _update_minimap().
+    [[nodiscard]] char _minimap_symbol(int tile_x, int tile_y) const;
 
     /// Closes the corner windows and reopens them later: needed before opening bigger windows.
     void _hide_hud();
