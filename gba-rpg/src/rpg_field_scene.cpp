@@ -78,7 +78,13 @@ namespace
     constexpr int gfx_cave_torch = gfx_roof_left + 7;
     constexpr int gfx_ladder = gfx_roof_left + 8;           // stairs_up against a cave wall.
     constexpr int gfx_water_shore = gfx_roof_left + 9;      // Water under a bank.
-    constexpr int gfx_ground_objects = gfx_roof_left + 10;  // GroundObject x Ground tiles.
+    constexpr int gfx_stone_floor_lit = gfx_roof_left + 10; // Floor under a torch.
+    constexpr int gfx_cave_floor_lit = gfx_roof_left + 11;
+    constexpr int gfx_wall_lit_left = gfx_roof_left + 12;   // Wall with a torch at its left.
+    constexpr int gfx_wall_lit_right = gfx_roof_left + 13;
+    constexpr int gfx_cave_wall_lit_left = gfx_roof_left + 14;
+    constexpr int gfx_cave_wall_lit_right = gfx_roof_left + 15;
+    constexpr int gfx_ground_objects = gfx_roof_left + 16;  // GroundObject x Ground tiles.
 
     /// What the objects stand on.
     enum class Ground : uint8_t
@@ -197,11 +203,28 @@ namespace
         case 0:
             return cave ? gfx_cave_torch : gfx_wall_torch;
 
-        case 5:
+        case 7:
             return cave ? 0 : gfx_wall_chain;
 
         default:
             return 0;
+        }
+    }
+
+    /// Returns true if a torch hangs on the wall at the given position.
+    [[nodiscard]] bool torch_at(const MapData& map, int x, int y)
+    {
+        switch(map.tile(x, y))
+        {
+
+        case TileId::wall:
+            return ! under_roof(map, x, y) && wall_decoration(map, x, y, false) == gfx_wall_torch;
+
+        case TileId::cave_wall:
+            return wall_decoration(map, x, y, true) == gfx_cave_torch;
+
+        default:
+            return false;
         }
     }
 
@@ -237,6 +260,17 @@ namespace
             {
                 return decoration;
             }
+
+            // The light of a torch reaches the walls at its sides and the floor under it.
+            if(torch_at(map, x - 1, y))
+            {
+                return gfx_wall_lit_left;
+            }
+
+            if(torch_at(map, x + 1, y))
+            {
+                return gfx_wall_lit_right;
+            }
             break;
 
         case TileId::cave_wall:
@@ -244,9 +278,24 @@ namespace
             {
                 return decoration;
             }
+
+            if(torch_at(map, x - 1, y))
+            {
+                return gfx_cave_wall_lit_left;
+            }
+
+            if(torch_at(map, x + 1, y))
+            {
+                return gfx_cave_wall_lit_right;
+            }
             break;
 
         case TileId::cave_floor:
+            if(torch_at(map, x, y - 1))
+            {
+                return stone_style(map) ? gfx_stone_floor_lit : gfx_cave_floor_lit;
+            }
+
             if(stone_style(map))
             {
                 return gfx_stone_floor;

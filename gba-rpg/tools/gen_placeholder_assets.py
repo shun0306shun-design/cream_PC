@@ -131,23 +131,25 @@ def stack(frames):
 #      Their order MUST match the "gfx_" constants of rpg_field_scene.cpp.
 # ---------------------------------------------------------------------------
 
+# Muted on purpose: the GBA screen and its classic RPGs use soft, slightly warm colors. The grays are warm
+# too, so the ash of the burnt towns and the stone of the castles sit next to the greens without clashing.
 FIELD_PALETTE = [
     (255, 0, 255),    # 0 unused (transparent slot)
-    (24, 20, 37),     # 1 black (outlines, shadows)
-    (34, 92, 52),     # 2 dark green
-    (72, 150, 62),    # 3 green
-    (132, 196, 88),   # 4 light green
-    (122, 78, 44),    # 5 brown (wood)
-    (222, 188, 126),  # 6 sand
-    (34, 52, 120),    # 7 dark blue
-    (56, 112, 208),   # 8 blue
-    (140, 196, 248),  # 9 light blue
-    (104, 104, 120),  # 10 gray
-    (176, 176, 188),  # 11 light gray
-    (244, 244, 236),  # 12 white
-    (204, 68, 52),    # 13 red
-    (110, 44, 36),    # 14 dark red (roof shadow, dark wood)
-    (248, 208, 72),   # 15 yellow
+    (36, 32, 46),     # 1 black (outlines, shadows)
+    (46, 84, 62),     # 2 dark green
+    (86, 134, 76),    # 3 green
+    (142, 174, 100),  # 4 light green
+    (118, 84, 58),    # 5 brown (wood)
+    (206, 180, 132),  # 6 sand
+    (46, 62, 110),    # 7 dark blue
+    (76, 118, 176),   # 8 blue
+    (150, 188, 216),  # 9 light blue
+    (110, 104, 106),  # 10 gray
+    (170, 162, 154),  # 11 light gray
+    (234, 228, 210),  # 12 white
+    (180, 88, 64),    # 13 red
+    (110, 54, 46),    # 14 dark red (roof shadow, dark wood)
+    (232, 194, 92),   # 15 yellow
 ]
 
 # One character per pixel in the tile drawings below ('.' keeps what is under it).
@@ -166,6 +168,20 @@ def paint(c, rows, x0=0, y0=0):
     return c
 
 
+BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+WARMER = {7: 8, 10: 11, 11: 6, 12: 15}
+
+
+def glow(c, cx, cy, radius):
+    """Torch light: brightens the pixels around (cx, cy), fading out with an ordered dither."""
+    for y in range(16):
+        for x in range(16):
+            distance = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+            if distance < radius and (BAYER[y % 4][x % 4] + 0.5) / 16 < 1 - distance / radius:
+                c[y][x] = WARMER.get(c[y][x], c[y][x])
+    return c
+
+
 # --- Grounds -----------------------------------------------------------------
 
 def tile_void():
@@ -177,14 +193,14 @@ def tile_grass(seed=1):
     for y in range(16):
         for x in range(16):
             n = noise(x, y, seed)
-            if n < 14:
+            if n < 8:
                 c[y][x] = 2
-            elif n > 244:
+            elif n > 250:
                 c[y][x] = 4
-    # A few blades: a light tip over a dark root.
-    for (x, y) in ((2, 3), (10, 2), (6, 8), (13, 10), (3, 13), (9, 14)):
-        c[y][x] = 4
-        c[y + 1][x] = 2
+    # Tufts: two light blades over a dark root.
+    for (x, y) in ((2, 3), (10, 1), (6, 8), (13, 10), (3, 13), (9, 14)):
+        c[y][x] = c[y][x + 2] = 4
+        c[y + 1][x + 1] = 2
     return c
 
 
@@ -193,30 +209,35 @@ def tile_path():
     for y in range(16):
         for x in range(16):
             n = noise(x, y, 7)
-            if n < 10:
+            if n < 7:
                 c[y][x] = 5
-            elif n > 246:
+            elif n > 249:
                 c[y][x] = 12
-    for (x, y) in ((3, 4), (11, 6), (6, 12), (13, 13)):     # pebbles
-        c[y][x] = c[y][x + 1] = 11
-        c[y + 1][x] = c[y + 1][x + 1] = 5
+    for (x, y) in ((3, 4), (11, 7), (6, 12)):                # pebbles: lit from the top left
+        c[y][x] = 12
+        c[y][x + 1] = c[y + 1][x] = 11
+        c[y + 1][x + 1] = 5
     return c
 
 
 def tile_ash():
+    """Burnt ground: warm gray ash over scorched earth."""
     c = canvas(16, 16, 10)
     for y in range(16):
         for x in range(16):
             n = noise(x, y, 21)
-            if n < 16:
+            if n < 9:
                 c[y][x] = 1
-            elif n > 248:
+            elif n > 247:
                 c[y][x] = 11
-    for (x, y) in ((1, 2), (9, 5), (4, 9), (11, 12), (2, 14)):     # streaks of soot
-        rect(c, x, y, x + 3, y, 1)
-        rect(c, x + 1, y + 1, x + 4, y + 1, 1)
-    c[3][12] = c[11][7] = 13                                        # embers
-    c[3][13] = c[11][8] = 14
+    for (x, y) in ((1, 2), (9, 5), (4, 10), (11, 13)):      # patches of earth showing through
+        rect(c, x, y, x + 3, y, 5)
+        rect(c, x + 1, y + 1, x + 4, y + 1, 5)
+        c[y + 1][x] = 1
+    for (x, y) in ((6, 1), (13, 9), (1, 7)):                 # light flakes of ash
+        c[y][x] = c[y][x + 1] = 11
+    c[3][13] = c[12][8] = 13                                 # embers
+    c[4][13] = c[13][8] = 14
     return c
 
 
@@ -225,30 +246,29 @@ def tile_cave_floor():
     for y in range(16):
         for x in range(16):
             n = noise(x, y, 11)
-            if n < 16:
+            if n < 8:
                 c[y][x] = 11
-            elif n > 246:
+            elif n > 250:
                 c[y][x] = 1
-    for (x, y) in ((2, 5), (9, 3), (12, 11), (5, 13)):      # cracks
-        c[y][x] = c[y][x + 1] = c[y + 1][x + 2] = 1
-        c[y + 1][x] = 11
+    for (x, y) in ((2, 3), (11, 10)):                        # flat stones: lit edge above, shadow under
+        rect(c, x, y, x + 2, y, 11)
+        rect(c, x, y + 1, x + 2, y + 1, 1)
+    paint(c, ['k..', '.kk', '..k'], 10, 3)                   # cracks
+    paint(c, ['.k', 'k.', 'k.'], 5, 11)
     return c
 
 
 def tile_stone_floor():
-    """Flagstones of forts, castles and cathedrals."""
+    """Flagstones of forts, castles and cathedrals: every slab is lit from the top left."""
     c = canvas(16, 16, 11)
-    for y in (7, 15):
-        rect(c, 0, y, 15, y, 10)
-    for x in (7, 15):
-        rect(c, x, 0, x, 7, 10)
-    for x in (3, 11):
-        rect(c, x, 8, x, 15, 10)
-    for (x, y) in ((1, 1), (9, 1), (5, 9), (13, 9)):        # worn corners
-        c[y][x] = 12
-        c[y][x + 1] = 12
-    for (x, y) in ((5, 5), (12, 4), (1, 12), (8, 13)):
-        c[y][x] = 10
+    slabs = ((0, 0, 8, 7), (9, 0, 15, 7), (0, 8, 4, 15), (5, 8, 12, 15), (13, 8, 15, 15))
+    for (x0, y0, x1, y1) in slabs:
+        rect(c, x0, y1, x1, y1, 10)             # joints
+        rect(c, x1, y0, x1, y1, 10)
+        rect(c, x0, y0, x1 - 1, y0, 12)         # lit edges
+        rect(c, x0, y0, x0, y1 - 1, 12)
+        c[y1 - 1][x1 - 1] = 10
+    c[3][4] = c[4][5] = c[11][9] = 10                        # a little wear
     return c
 
 
@@ -260,19 +280,20 @@ GROUNDS = [tile_grass, tile_ash, tile_cave_floor, tile_stone_floor]    # Same or
 def tile_tree():
     return paint(tile_grass(2), [
         '.....kkkkkk.....',
-        '...kkGGgggGkk...',
-        '..kGGggglllgGk..',
-        '.kGGgggllllggGk.',
-        '.kGgggglllgggGk.',
-        'kGGgggggggggGGGk',
-        'kGGGggggggggGGGk',
-        'kGGGGgggggGgGGGk',
-        'kGGGGGGgGGGGGGGk',
-        '.kGGGGGGGGGGGGk.',
+        '...kkgglllgkk...',
+        '..kGgllglllggk..',
+        '.kGglgglgglgggk.',
+        '.kgglggGgllglgk.',
+        'kGgggGggglggggGk',
+        'kGglgGGglgGglgGk',
+        'kGgggGggggGgggGk',
+        'kGGgGGgglgGGgGGk',
+        'kGGGgGGgggGGGGGk',
+        '.kGGGgGGgGGGGGk.',
         '.kkGGGGGGGGGGkk.',
-        '..GkkkGbmkkkkG..',
-        '..GGGkkbmkGGG...',
-        '...GGkbbmmkGG...',
+        '..GkkkGbmGkkkG..',
+        '..GGGkbbmmkGGG..',
+        '...GkkbbbmkkG...',
         '.....kkkkkk.....',
     ])
 
@@ -330,18 +351,20 @@ def tile_tall_grass():
 
 def tile_water(shore=False):
     c = canvas(16, 16, 8)
-    for (x, y) in ((1, 3), (9, 6), (3, 11), (11, 14)):
-        rect(c, x, y, x + 3, y, 9)
-        rect(c, x + 4, y + 1, x + 5, y + 1, 9)
-        rect(c, x + 1, y + 1, x + 3, y + 1, 7)
-    c[8][6] = c[1][13] = 12
+    # Ripples: a light crest over a dark trough, in a loose diagonal so the tile repeats without stripes.
+    for (x, y, length) in ((1, 2, 5), (10, 5, 4), (4, 9, 5), (12, 12, 3), (0, 14, 3)):
+        rect(c, x, y, x + length - 1, y, 9)
+        c[y - 1][x + 1] = c[y - 1][x + length - 2] = 9
+        rect(c, x + 1, y + 1, x + length, y + 1, 7)
+    for (x, y) in ((7, 3), (14, 8), (2, 6), (9, 13)):       # glints
+        c[y][x] = 12
+        c[y][x + 1] = 9
     if shore:
         # The bank above casts a shadow, with a line of foam under it.
         rect(c, 0, 0, 15, 1, 7)
         for x in range(16):
-            c[2][x] = 12 if x % 4 < 2 else 9
-            if noise(x, 0, 41) < 90:
-                c[3][x] = 9
+            c[2][x] = 12 if x % 5 < 3 else 9
+            c[3][x] = 9 if x % 5 in (0, 4) else 8
     return c
 
 
@@ -376,30 +399,49 @@ def tile_bridge():
 def tile_wall():
     """Stone bricks: castle and town walls (houses use tile_house_wall)."""
     c = canvas(16, 16, 10)
-    for y in (3, 7, 11, 15):
-        rect(c, 0, y, 15, y, 1)
+    bricks = []
     for row, y in enumerate((0, 4, 8, 12)):
-        rect(c, 0, y, 15, y, 11)                # lit top of every brick
-        for x in ((3, 11) if row % 2 == 0 else (7, 15)):
-            rect(c, x, y, x, y + 2, 1)
+        edges = (-4, 4, 12, 20) if row % 2 == 0 else (0, 8, 16)
+        bricks += [(edges[i], y, edges[i + 1] - 1) for i in range(len(edges) - 1)]
+    for index, (x0, y, x1) in enumerate(bricks):
+        rect(c, x0, y, x1 - 1, y, 11)           # lit top
+        rect(c, x1, y, x1, y + 2, 1)            # mortar
+        rect(c, x0, y + 3, x1, y + 3, 1)
+        if index % 3 == 1:                      # some bricks are lighter, some are chipped
+            rect(c, x0, y + 1, x1 - 1, y + 1, 11)
+        elif index % 4 == 0:
+            rect(c, x0 + 2, y + 2, x0 + 3, y + 2, 1)
     return c
 
 
+TORCH = [
+    '................',
+    '.......y........',
+    '......yyy.......',
+    '......ywyy......',
+    '.....yywwy......',
+    '.....rywyr......',
+    '......ryr.......',
+    '.....kbbbk......',
+    '......kbk.......',
+    '......kbk.......',
+    '.....kkbkk......',
+    '......kkk.......',
+]
+
+
+def lit_floor(tile):
+    """The floor under a torch."""
+    return lambda: glow(tile(), 7.5, -5, 19)
+
+
+def lit_wall(tile, torch_side):
+    """The wall next to a torch (torch_side: -1 = the torch is at its left, 1 = at its right)."""
+    return lambda: glow(tile(), 7.5 - (16 * -torch_side), 4, 19)
+
+
 def tile_wall_torch():
-    return paint(tile_wall(), [
-        '................',
-        '.......y........',
-        '......yyy.......',
-        '......ywyy......',
-        '.....yywwy......',
-        '.....rywyr......',
-        '......ryr.......',
-        '.....kbbbk......',
-        '......kbk.......',
-        '......kbk.......',
-        '.....kkbkk......',
-        '......kkk.......',
-    ])
+    return paint(glow(tile_wall(), 7.5, 4, 11), TORCH)
 
 
 def tile_wall_chain():
@@ -421,39 +463,50 @@ def tile_wall_chain():
 
 
 def tile_roof(edge=None):
+    """Clay tiles in three rows, each lit at the top and shaded where the next row covers it."""
     c = canvas(16, 16, 13)
-    for y in range(2, 14):
-        for x in range(16):
-            # Round shingles, every other row shifted by half a shingle.
-            row = (y - 2) // 4
-            if (y - 2) % 4 == 3:
-                if (x + row * 4) % 8 not in (3, 4):
-                    c[y][x] = 14
-            elif (x + row * 4) % 8 in (3, 4) and (y - 2) % 4 == 2:
-                c[y][x] = 14
     rect(c, 0, 0, 15, 0, 1)                     # ridge
-    rect(c, 0, 1, 15, 1, 14)
-    rect(c, 0, 14, 15, 14, 14)                  # eaves
-    rect(c, 0, 15, 15, 15, 1)
+    rect(c, 0, 1, 15, 1, 6)
+    rect(c, 0, 2, 15, 2, 14)
+    for row in range(3):
+        y = 3 + row * 4
+        for x in range(16):
+            column = (x + row * 4) % 8
+            c[y][x] = 6 if column in (1, 2) else 13         # highlight
+            c[y + 3][x] = 1 if column == 7 else 14          # shadow of the row
+            if column == 7:
+                c[y][x] = c[y + 1][x] = c[y + 2][x] = 14    # gap between two tiles
+            elif column == 6:
+                c[y + 2][x] = 14
+    rect(c, 0, 15, 15, 15, 1)                   # eaves
     if edge == 'left':
         rect(c, 0, 0, 0, 15, 1)
-        rect(c, 1, 1, 2, 14, 6)
+        rect(c, 1, 1, 1, 14, 6)
+        rect(c, 2, 1, 2, 14, 5)
     elif edge == 'right':
         rect(c, 15, 0, 15, 15, 1)
-        rect(c, 13, 1, 14, 14, 6)
+        rect(c, 14, 1, 14, 14, 5)
+        rect(c, 13, 1, 13, 14, 6)
     return c
 
 
 def tile_house_wall():
+    """Half-timbered plaster over a stone base."""
     c = canvas(16, 16, 12)
     for y in range(16):
         for x in range(16):
-            if noise(x, y, 51) < 14:
+            if noise(x, y, 51) < 10:
                 c[y][x] = 11
-    rect(c, 0, 0, 15, 1, 11)                    # shadow of the roof
-    rect(c, 0, 12, 15, 12, 5)                   # beam
+    rect(c, 0, 0, 15, 0, 1)                     # shadow of the eaves
+    rect(c, 0, 1, 15, 1, 10)
+    rect(c, 0, 2, 15, 2, 11)
+    rect(c, 0, 2, 0, 11, 5)                     # posts
+    rect(c, 15, 2, 15, 11, 14)
+    rect(c, 0, 11, 15, 11, 5)                   # sill beam
+    rect(c, 0, 12, 15, 12, 14)
     rect(c, 0, 13, 15, 15, 10)                  # stone base
-    for x in (4, 12):
+    rect(c, 0, 13, 15, 13, 11)
+    for x in (5, 11):
         rect(c, x, 13, x, 14, 1)
     rect(c, 0, 15, 15, 15, 1)
     return c
@@ -464,36 +517,37 @@ def tile_house_window():
         '................',
         '................',
         '................',
-        '...bbbbbbbbbb...',
-        '...bccubbcuub...',
-        '...bcuubbuuub...',
-        '...buuubbuuNb...',
-        '...bbbbbbbbbb...',
-        '...buuubbuuNb...',
-        '...buuNbbuNNb...',
-        '..mbbbbbbbbbbm..',
-        '..mmmmmmmmmmmm..',
+        '...mmmmmmmmmm...',
+        '..bmcc8bbc88mb..'.replace('8', 'u'),
+        '..bmc88bb888mb..'.replace('8', 'u'),
+        '..bm888bb88Nmb..'.replace('8', 'u'),
+        '..bmbbbbbbbbmb..',
+        '..bm888bb8NNmb..'.replace('8', 'u'),
+        '..bm88NbbNNNmb..'.replace('8', 'u'),
+        '.kssssssssssssk.',
+        '.kgrgGgygGgrgGk.',
+        '..kkkkkkkkkkkk..',
     ])
 
 
 def tile_door():
     return paint(tile_house_wall(), [
         '................',
-        '....kkkkkkkk....',
-        '...kbbbmbbbbk...',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbbbbk..',
-        '..kmmmmmmmmmmk..',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbybbk..',
-        '..kbbbbmbbybbk..',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbbbbk..',
-        '..kbbbbmbbbbbk..',
-        '.eeeeeeeeeeeeee.',
-        '.dddddddddddddd.',
+        '.....kkkkkk.....',
+        '...kkeeeeeekk...',
+        '..keekkkkkkeek..',
+        '..kekbbmbbmkek..',
+        '.kekbbbmbbmbkek.',
+        '.kekbsbmbbmbkek.',
+        '.kekbbbmbbmbkek.',
+        '.kekmmmmmmmmkek.',
+        '.kekbbbmbbmbkek.',
+        '.kekbsbmbymbkek.',
+        '.kekbbbmbymbkek.',
+        '.kekbbbmbbmbkek.',
+        '.kekbbbmbbmbkek.',
+        'keeeeeeeeeeeeeek',
+        'kddddddddddddddk',
     ])
 
 
@@ -558,43 +612,30 @@ def tile_gate():
 # --- Dungeons ----------------------------------------------------------------
 
 def tile_cave_wall():
+    """Boulders: a lit rim at the top left, dark gaps between them."""
     c = canvas(16, 16, 1)
-    rocks = [
-        '..NNNN....NNN...',
-        '.NdNNNN..NdNNN..',
+    return paint(c, [
+        '..dNNN....ddNN..',
+        '.dNNNNN..dNNNNN.',
         '.NNNNNN..NNNNNN.',
-        '..NNNN....NNNN..',
-        '................',
-        'NN....NNNNN...NN',
-        'NNN..NddNNNN.NdN',
-        'NNN..NNNNNNN.NNN',
-        'NN....NNNNN...NN',
-        '................',
-        '..NNNNN...NNNN..',
-        '.NddNNNN.NdNNNN.',
+        '.NNNNNk...NNNNk.',
+        '..kkkk.....kkk..',
+        'NN...dddNN...dNN',
+        'NNN.dNNNNNN.dNNN',
+        'NNN.NNNNNNN.NNNN',
+        'NNk.NNNNNNk.NNNk',
+        'kk...kkkkk...kkk',
+        '..ddNNN...dNNN..',
+        '.dNNNNNN.dNNNNN.',
         '.NNNNNNN.NNNNNN.',
-        '..NNNNN...NNNN..',
-        '................',
-        'N.....NNN.....NN',
-    ]
-    return paint(c, rocks)
+        '.NNNNNNk..NNNNk.',
+        '..kkkkk....kkk..',
+        'N.....ddN.....dN',
+    ])
 
 
 def tile_cave_torch():
-    return paint(tile_cave_wall(), [
-        '................',
-        '.......y........',
-        '......yyy.......',
-        '......ywyy......',
-        '.....yywwy......',
-        '.....rywyr......',
-        '......ryr.......',
-        '.....kbbbk......',
-        '......kbk.......',
-        '......kbk.......',
-        '.....kkbkk......',
-        '......kkk.......',
-    ])
+    return paint(glow(tile_cave_wall(), 7.5, 4, 11), TORCH)
 
 
 def tile_stairs_down():
@@ -708,16 +749,16 @@ def tile_spring(ground=tile_grass):
     return paint(ground(), [
         '.......ww.......',
         '......wccw......',
-        '.....w.cc.w.....',
+        '.....c.ww.c.....',
         '....c..ee..c....',
-        '...kkkkeekkkk...',
-        '.kkeeeeeeeeeekk.',
-        'keeccccddcccceek',
-        'kecwcuuddcuucdek',
-        'keccuuwuuuucudek',
-        'kecuuuuuucwuudek',
-        'kedcuucuuuuuddek',
-        'kkeddduuuudddekk',
+        '...kkkkedkkkk...',
+        '.kkeeeeedeeeekk.',
+        'kewcccceecccccek',
+        'kecwuucwwcuucudk',
+        'kecuuccuuccuuudk',
+        'kecuwuuuuuucwudk',
+        'kedcuuccuccuuddk',
+        'kkeddcuuuucddekk',
         'kdkeeedddddeekdk',
         '.kddkeeeeeekddk.',
         '..kkddddddddkk..',
@@ -914,6 +955,8 @@ FIELD_EXTRA_TILES = [
     lambda: tile_roof('left'), lambda: tile_roof('right'), tile_house_wall, tile_house_window,
     tile_stone_floor, tile_wall_torch, tile_wall_chain, tile_cave_torch, tile_ladder,
     lambda: tile_water(shore=True),
+    lit_floor(tile_stone_floor), lit_floor(tile_cave_floor),
+    lit_wall(tile_wall, -1), lit_wall(tile_wall, 1), lit_wall(tile_cave_wall, -1), lit_wall(tile_cave_wall, 1),
 ]
 
 
