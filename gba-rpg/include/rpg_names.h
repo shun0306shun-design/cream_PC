@@ -4,6 +4,8 @@
  * Every name the script mentions is defined once here, as a string literal macro, so dialogue can be written as
  * RPG_NAME_HERO ": ..." and still be a compile time constant stored in ROM. To rename someone, edit this file.
  * (If the hero's name becomes player input, replace the uses of RPG_NAME_HERO with run time formatting.)
+ *
+ * Each name has an English and a Japanese (_JA) version, used by the two halves of RPG_T texts (rpg_text.h).
  */
 
 #ifndef RPG_NAMES_H
@@ -19,5 +21,13 @@
 #define RPG_NAME_CULT       "Ashen Cult"
 #define RPG_NAME_EMPEROR    "Valgren"   // The Flame Emperor, leader of the cult.
 #define RPG_NAME_GENERAL_1  "Drake"     // The first of the four Ash Generals.
+
+#define RPG_NAME_HERO_JA        "アレン"
+#define RPG_NAME_PARTNER_JA     "シオン"
+#define RPG_NAME_VILLAGE_JA     "ハルト"
+#define RPG_NAME_TOWN_JA        "ベルク"
+#define RPG_NAME_CULT_JA        "灰の教団"
+#define RPG_NAME_EMPEROR_JA     "ヴァルグレン"
+#define RPG_NAME_GENERAL_1_JA   "ドレイク"
 
 #endif

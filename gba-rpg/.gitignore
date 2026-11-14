@@ -3,3 +3,4 @@ build/
 *.elf
 *.sav
 *.ss?
+__pycache__/

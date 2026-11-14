@@ -10,39 +10,83 @@
 
 #include "bn_core.h"
 #include "bn_color.h"
+#include "bn_vector.h"
 #include "bn_bg_palettes.h"
 
 #include "rpg_ui.h"
+#include "rpg_text.h"
 #include "rpg_game_state.h"
 #include "rpg_field_scene.h"
 #include "rpg_battle_scene.h"
 
 namespace
 {
-    /// Title screen: new game / continue.
+    /// Title screen: new game / continue / language.
     void run_title(rpg::GameState& state, rpg::Ui& ui)
     {
-        static constexpr bn::string_view options[] = { "New Game", "Continue" };
-
-        rpg::Window title(ui, 3, 3, 24, rpg::Window::rows_for_lines(2));
-        title.print_centered(0, "BUTANO RPG FRAMEWORK");
-        title.print_centered(1, "Turn-based battle demo");
+        enum class Option
+        {
+            new_game,
+            continue_game,
+            language
+        };
 
         // "Continue" is only offered if there's a saved game in SRAM.
-        int options_count = rpg::has_saved_game() ? 2 : 1;
-        rpg::Menu menu(ui, 9, 11, 12, bn::span<const bn::string_view>(options, options_count));
+        bool has_save = rpg::has_saved_game();
+        bool language_chosen = false;
 
-        if(options_count == 2)
+        while(true)
         {
-            menu.set_index(1);
-        }
+            // The language entry shows the current language. It is not saved: Japanese is the default
+            // (rpg::default_language, rpg_text.h).
+            bn::vector<bn::string_view, 3> labels;
+            bn::vector<Option, 3> options;
+            labels.push_back(RPG_T("New Game", "はじめから"));
+            options.push_back(Option::new_game);
 
-        if(menu.run(false) == 0 || ! rpg::load_game(state))
-        {
-            state.init_new_game();
-        }
+            if(has_save)
+            {
+                labels.push_back(RPG_T("Continue", "つづきから"));
+                options.push_back(Option::continue_game);
+            }
 
-        ui.fade_out();
+            labels.push_back(RPG_T("Language: English", "Language: 日本語"));
+            options.push_back(Option::language);
+
+            rpg::Window title(ui, 3, 3, 24, rpg::Window::rows_for_lines(2));
+            title.print_centered(0, "BUTANO RPG FRAMEWORK");
+            title.print_centered(1, RPG_T("Turn-based battle demo", "ターン制バトル デモ"));
+
+            rpg::Menu menu(ui, 6, 11, 17, bn::span<const bn::string_view>(labels.data(), labels.size()));
+
+            if(language_chosen)
+            {
+                menu.set_index(labels.size() - 1);
+            }
+            else if(has_save)
+            {
+                menu.set_index(1);
+            }
+
+            Option option = options[menu.run(false)];
+
+            if(option == Option::language)
+            {
+                // Switch and draw the title again (the windows are erased at the end of this block).
+                bool english = rpg::language() == rpg::Language::english;
+                rpg::set_language(english ? rpg::Language::japanese : rpg::Language::english);
+                language_chosen = true;
+                continue;
+            }
+
+            if(option == Option::new_game || ! rpg::load_game(state))
+            {
+                state.init_new_game();
+            }
+
+            ui.fade_out();      // With the title still on screen.
+            break;
+        }
     }
 }
 

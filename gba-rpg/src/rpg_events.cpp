@@ -18,7 +18,7 @@ namespace
 
 bool ask_yes_no(Ui& ui)
 {
-    static constexpr bn::string_view options[] = { "Yes", "No" };
+    static constexpr bn::string_view options[] = { RPG_T("Yes", "はい"), RPG_T("No", "いいえ") };
 
     Menu menu(ui, yes_no_col, yes_no_row, yes_no_cols, options);
     return menu.run() == 0;
@@ -35,18 +35,28 @@ void run_inn(GameState& state, Ui& ui, const MapEvent& event)
     MessageBox box(ui);
     box.say_pages(event.pages);
 
-    bn::string<64> question;
+    // Japanese takes 3 bytes per character (UTF-8): text built at run time needs room for it.
+    bn::string<128> question;
     bn::ostringstream question_stream(question);
-    question_stream << "A night costs " << inn_price << " gold.\nDo you want to rest?";
+
+    if(language() == Language::english)
+    {
+        question_stream << "A night costs " << inn_price << " gold.\nDo you want to rest?";
+    }
+    else
+    {
+        question_stream << "一晩 " << inn_price << "ゴールドです。\nお泊まりになりますか？";
+    }
+
     box.show(question);
 
     if(! ask_yes_no(ui))
     {
-        box.say("Come back any time.");
+        box.say(RPG_T("Come back any time.", "またどうぞ。"));
     }
     else if(state.party.gold < inn_price)
     {
-        box.say("You don't have enough gold.");
+        box.say(RPG_T("You don't have enough gold.", "お金が足りない。"));
     }
     else
     {
@@ -55,7 +65,7 @@ void run_inn(GameState& state, Ui& ui, const MapEvent& event)
         state.party.restore_all();
         ui.wait(30);
         ui.fade_in();
-        box.say("The party is fully rested!");
+        box.say(RPG_T("The party is fully rested!", "みんな、すっかり元気になった！"));
     }
 }
 
@@ -84,17 +94,20 @@ void use_spring(GameState& state, Ui& ui, const MapEvent& event)
 
     if(! needs_healing)
     {
-        box.say(has_fallen ? "The water can't revive\nfallen allies." : "Everyone is already in\ngood shape.");
+        box.say(has_fallen ? RPG_T("The water can't revive\nfallen allies.",
+                                   "この水では、たおれた仲間は\n目をさまさない。") :
+                             RPG_T("Everyone is already in\ngood shape.",
+                                   "みんな元気いっぱいだ。"));
         return;
     }
 
-    bn::string<64> question;
+    bn::string<128> question;
     bn::ostringstream question_stream(question);
-    question_stream << "Drink from the spring?";
+    question_stream << tr("Drink from the spring?", "泉の水を飲みますか？");
 
     if(event.price > 0)
     {
-        question_stream << "\nIt costs " << int(event.price) << " gold.";
+        question_stream << tr("\nIt costs ", "\n") << int(event.price) << tr(" gold.", "ゴールドかかります。");
     }
 
     box.show(question);
@@ -106,7 +119,7 @@ void use_spring(GameState& state, Ui& ui, const MapEvent& event)
 
     if(party.gold < event.price)
     {
-        box.say("You don't have enough gold.");
+        box.say(RPG_T("You don't have enough gold.", "お金が足りない。"));
         return;
     }
 
@@ -123,7 +136,10 @@ void use_spring(GameState& state, Ui& ui, const MapEvent& event)
 
     ui.wait(20);
     ui.fade_in();
-    box.say(has_fallen ? "The party feels refreshed!\nBut the fallen stay down." : "The party feels refreshed!");
+    box.say(has_fallen ? RPG_T("The party feels refreshed!\nBut the fallen stay down.",
+                               "みんなの体力が回復した！\nだが、たおれた仲間は\nそのままだ。") :
+                         RPG_T("The party feels refreshed!",
+                               "みんなの体力が回復した！"));
 }
 
 bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr* chest_sprite)
@@ -135,14 +151,14 @@ bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr*
 
     if(state.flags.get(event.flag))
     {
-        box.say("The chest is empty.");
+        box.say(RPG_T("The chest is empty.", "宝箱は空っぽだ。"));
         return false;
     }
 
     // Don't waste the contents: leave the chest closed if the bag can't take the items.
     if(event.item_amount > 0 && party.item_amount(event.item) + event.item_amount > max_item_stack)
     {
-        box.say("You can't carry any more\nof that item.");
+        box.say(RPG_T("You can't carry any more\nof that item.", "これ以上は持てない。"));
         return false;
     }
 
@@ -155,21 +171,21 @@ bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr*
         chest_sprite->set_tiles(bn::sprite_items::npc.tiles_item(), event.npc_graphics + 1);
     }
 
-    bn::string<64> text;
+    bn::string<128> text;      // Room for UTF-8 Japanese (3 bytes per character).
 
     if(event.item_amount > 0)
     {
         party.add_item(event.item, event.item_amount);
 
         bn::ostringstream stream(text);
-        stream << "Found " << item_data(event.item).name;
+        stream << tr("Found ", "") << item_data(event.item).name;
 
         if(event.item_amount > 1)
         {
             stream << " x" << int(event.item_amount);
         }
 
-        stream << "!";
+        stream << tr("!", " を\n手に入れた！");
         box.say(text);
     }
 
@@ -179,13 +195,13 @@ bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr*
 
         text.clear();
         bn::ostringstream stream(text);
-        stream << "Found " << int(event.gold) << " gold!";
+        stream << tr("Found ", "") << int(event.gold) << tr(" gold!", "ゴールドを手に入れた！");
         box.say(text);
     }
 
     if(event.item_amount == 0 && event.gold == 0)
     {
-        box.say("It was empty...");
+        box.say(RPG_T("It was empty...", "中は空っぽだった……。"));
     }
 
     return true;

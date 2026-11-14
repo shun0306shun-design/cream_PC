@@ -5,7 +5,7 @@
 
 ## デモでできること
 
-- タイトル画面（New Game / セーブがあれば Continue）
+- タイトル画面（はじめから / セーブがあれば つづきから / Language で日本語⇔英語）
 - 村を歩く（十字キー、タイル単位の移動、壁・NPCとの衝突判定、カメラ追従）
 - NPC・看板と会話（A）、宿屋で全回復（10G）、宝箱（一度開けたら空。開封状態はセーブされる）、道具屋（購入・売却）、回復の泉（生存者のHP/MPを全回復。戦闘不能は蘇生できない）、最初のダンジョン「洞窟」（フィールド南東の岩山の門から入る。3フロア、階段で移動、宝箱3つ、フロアごとに強くなる敵、スケルトンは3Fのみ）、歩き回るNPC（村人と長老。ランダムに歩き、話しかけも可能）、装備（STARTメニュー > Equip。武器・防具で攻撃/防御などが変わり、戦闘にも反映。職業ごとに装備できる物が違う）
 - 南の門から外のフィールドへ（マップ間ワープ）
@@ -21,8 +21,9 @@
 | B | – | キャンセル / 前のキャラに戻る |
 | START | メニューを開く | – |
 
-> 表示テキストは英語です。同梱フォント（Butano の `common_variable_8x16_font`）が ASCII のみのためです。
-> 日本語化は「フォントを差し替える」の項を参照してください。
+> 既定の言語は日本語です。第1章〜第2章の会話・看板・宿屋/泉/宝箱のメッセージ・マップ名・タイトルが日本語になります。
+> タイトル画面の `Language` で英語と切り替えられます（「日本語対応」の項を参照）。
+> 戦闘・メニュー・アイテム名などはまだ英語のままです。
 
 ## セットアップ（devkitPro + Butano）
 
@@ -51,7 +52,9 @@ gba-rpg/
 ├── Makefile                    Butano テンプレートベースのビルド設定
 ├── graphics/                   画像アセット（BMP + JSON）。すべてプレースホルダー
 ├── tools/
-│   └── gen_placeholder_assets.py   プレースホルダー画像の生成スクリプト
+│   ├── gen_placeholder_assets.py   プレースホルダー画像の生成スクリプト
+│   ├── gen_japanese_font.py        日本語フォント（BMP + JSON + ヘッダー）の生成スクリプト
+│   └── fonts/                      PixelMplus12（M+ FONT LICENSE）
 ├── include/
 │   ├── rpg_common.h            定数、Stats、Effect（魔法・道具共通の効果定義）
 │   ├── rpg_spells.h            魔法データ
@@ -63,6 +66,8 @@ gba-rpg/
 │   ├── rpg_party.h             パーティの実行時状態（HP/MP/Lv/所持品/ゴールド）
 │   ├── rpg_game_state.h        シーン間で共有する状態 + セーブ/ロード
 │   ├── rpg_ui.h                ウィンドウ / メニュー / メッセージボックス
+│   ├── rpg_text.h              言語設定と2言語テキスト（`RPG_T` / `localized()` / `tr()`）
+│   ├── rpg_japanese_sprite_font.h   日本語フォント定義（自動生成。手で編集しない）
 │   ├── rpg_field_scene.h       マップ探索シーン
 │   ├── rpg_field_menu.h        フィールドメニュー
 │   ├── rpg_events.h            マップイベントの処理（会話・宿屋・宝箱・泉、共通の ask_yes_no）
@@ -158,10 +163,20 @@ gba-rpg/
 
 `python3 tools/gen_placeholder_assets.py` を実行するとプレースホルダーを再生成（上書き）します。
 
-### フォントを差し替える（日本語化）
-`Ui` のコンストラクタ（rpg_ui.cpp）で渡している `common::variable_8x16_sprite_font` を自作の `bn::sprite_font` に変えます。
-かな・漢字は UTF-8 文字として `bn::utf8_characters_map` に登録します（Butano の `examples/text` が参考になります）。
-16x16 の全角フォントは1文字1スプライトになりやすいので、上記のスプライト数制限に特に注意してください。
+### 日本語対応
+- **言語**: `rpg_text.h` の `Language`（既定は `default_language = Language::japanese`）。タイトル画面の `Language` で切り替え。セーブはされないので、起動のたびに既定値に戻ります。
+- **2言語テキスト**: `RPG_T("English", "日本語")` と書くと、2つの文字列リテラルを区切り文字（`\f`）でつないだ1つの `constexpr` 文字列になります（ROM に置かれ、`bn::string_view` の表の型はそのまま）。`Window` / `Menu` / `MessageBox` が表示時に `localized()` で現在の言語の側だけを取り出します。`RPG_T` を使っていない文字列はどちらの言語でもそのまま表示されるので、少しずつ訳していけます。
+- **実行時に組み立てる文**（数値やアイテム名を含むもの）は `tr("english", "日本語")` で部品を選びます。日本語は UTF-8 で1文字3バイトなので、`bn::string<N>` の容量に注意（`rpg_events.cpp` は 128 にしてあります）。
+- **固有名**: `rpg_names.h` に `RPG_NAME_HERO_JA` などの日本語版マクロがあります。
+- **フォント**: 日本語モードでは `graphics/rpg_japanese_16x16_font.bmp`（16x16 セルの可変幅スプライトフォント。半角 6px / 全角 12px）を使います。ASCII・ひらがな・カタカナ・記号は常に入っていて、漢字は **ソースで使っているものだけ** です。
+  **新しい漢字を使ったら**フォントを作り直してください（Pillow が必要）:
+  ```sh
+  python3 tools/gen_japanese_font.py
+  ```
+  フォントに無い文字を表示しようとすると Butano のエラー画面で止まります（文字化けはしません）。
+- **文字数の目安**: メッセージボックスは1行 全角18文字、1ページ3行まで（3行以下のページは行間 16px、4行のページは 12px に詰めて表示）。
+- **スプライト数**: 全角文字は1スプライトに2文字です（英語は4〜6文字）。全角18文字×3行で27スプライト。
+- **英語フォントに戻す・差し替える**: `Ui` のコンストラクタ（rpg_ui.cpp）で渡している `bn::sprite_font` を変えます。
 
 ### BGM・効果音を入れる
 `Makefile` の `AUDIOBACKEND` を `maxmod` に、`AUDIO := audio` にして、`audio/` に .mod/.xm/.it/.wav を置きます。
@@ -205,3 +220,7 @@ gba-rpg/
 
 `graphics/common_*_8x16_font.*` と `include/common_*_8x16_sprite_font.h` は Butano（zlib License,
 Copyright (c) 2020-2026 Gustavo Valiente）の `common` フォルダからのコピーです。
+
+日本語フォント（`graphics/rpg_japanese_16x16_font.bmp`）は `tools/fonts/PixelMplus12-Regular.ttf`
+（PixelMplus, Copyright (C) 2013 itouhiro / Copyright (C) 2002-2013 M+ FONTS PROJECT, M+ FONT LICENSE。
+`tools/fonts/PixelMplus-LICENSE.txt`）から生成しています。

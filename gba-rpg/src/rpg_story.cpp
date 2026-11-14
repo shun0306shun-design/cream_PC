@@ -3,6 +3,7 @@
 #include "bn_assert.h"
 
 #include "rpg_ui.h"
+#include "rpg_text.h"
 #include "rpg_names.h"
 #include "rpg_game_state.h"
 
@@ -10,7 +11,11 @@
  * The script of the main story. Every scene is a short function: show pages, change the progress, maybe start a
  * boss battle. All the text is constexpr (ROM); names come from rpg_names.h.
  *
- * Text limits: 3 lines per page (the box holds 4), about 28 characters per line.
+ * Every page is written in both languages with RPG_T(english, japanese), see rpg_text.h.
+ *
+ * Text limits: 3 lines per page (the box holds 4).
+ * English: about 28 characters per line. Japanese: 18 full width characters per line.
+ * After using new kanji, run tools/gen_japanese_font.py.
  */
 
 namespace rpg
@@ -24,6 +29,11 @@ namespace
     #define GENERAL RPG_NAME_GENERAL_1
     #define SEER RPG_NAME_SEER
     #define GATE RPG_NAME_GATE
+    #define HERO_JA RPG_NAME_HERO_JA
+    #define PARTNER_JA RPG_NAME_PARTNER_JA
+    #define GENERAL_JA RPG_NAME_GENERAL_1_JA
+    #define VILLAGE_JA RPG_NAME_VILLAGE_JA
+    #define TOWN_JA RPG_NAME_TOWN_JA
 
     void say_pages(Ui& ui, bn::span<const bn::string_view> pages)
     {
@@ -35,63 +45,93 @@ namespace
     // Chapter 1 "Morning of Ash"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view opening_pages[] = {
-        RPG_NAME_VILLAGE " Village.\nA quiet morning,\nlike any other.",
-        "Mother: " HERO "! Your father\nis calling you from\nthe south gate.",
+        RPG_T(RPG_NAME_VILLAGE " Village.\nA quiet morning,\nlike any other.",
+              VILLAGE_JA "村。\nいつもと変わらない、\n静かな朝だった。"),
+        RPG_T("Mother: " HERO "! Your father\nis calling you from\nthe south gate.",
+              "母「" HERO_JA "！\n　父さんが南の門で\n　呼んでいるわよ。」"),
     };
 
     constexpr bn::string_view father_pages[] = {
-        "Father: Morning, " HERO ".\nFetch some water from the\nspring, will you?",
-        "Father: It's in the north-\neast corner. Your mother's\nmaking stew tonight.",
+        RPG_T("Father: Morning, " HERO ".\nFetch some water from the\nspring, will you?",
+              "父「おはよう、" HERO_JA "。\n　泉で水をくんできて\n　くれないか。」"),
+        RPG_T("Father: It's in the north-\neast corner. Your mother's\nmaking stew tonight.",
+              "父「泉は村の北東のすみだ。\n　今夜は母さんの\n　シチューだぞ。」"),
     };
 
     constexpr bn::string_view father_again_pages[] = {
-        "Father: The spring is in\nthe northeast corner.\nGo on, don't dawdle.",
+        RPG_T("Father: The spring is in\nthe northeast corner.\nGo on, don't dawdle.",
+              "父「泉は北東のすみだ。\n　さあ、道草をくうなよ。」"),
     };
 
     constexpr bn::string_view attack_pages[] = {
-        "You fill the pail. The\nwater is cold and clear.",
-        "...Smoke?\nThe sky over the village\nis turning black.",
-        "Men in ash-gray armor pour\nthrough the gate, torches\nin their hands.",
-        "Father: " HERO ", run!\nTake your mother and--",
-        "A blade wrapped in flame.\nFather falls. Mother shields\nyou... and falls, too.",
-        "Soldier: Burn it all.\nFor the Flame Emperor.",
-        "Something strikes your\nhead. The world goes dark.",
+        RPG_T("You fill the pail. The\nwater is cold and clear.",
+              "おけに水をくんだ。\n冷たく、すんだ水だ。"),
+        RPG_T("...Smoke?\nThe sky over the village\nis turning black.",
+              "……けむり？\n村の空が、\n黒くそまっていく。"),
+        RPG_T("Men in ash-gray armor pour\nthrough the gate, torches\nin their hands.",
+              "灰色のよろいの男たちが、\nたいまつを手に\n門からなだれこんでくる。"),
+        RPG_T("Father: " HERO ", run!\nTake your mother and--",
+              "父「" HERO_JA "、にげろ！\n　母さんをつれて――」"),
+        RPG_T("A blade wrapped in flame.\nFather falls. Mother shields\nyou... and falls, too.",
+              "炎をまとった刃。\n父がたおれる。母はきみを\nかばい……そして、たおれた。"),
+        RPG_T("Soldier: Burn it all.\nFor the Flame Emperor.",
+              "兵士「すべて焼きはらえ。\n　炎帝さまのために。」"),
+        RPG_T("Something strikes your\nhead. The world goes dark.",
+              "頭に強いしょうげきが走る。\n目の前が、暗くなった。"),
     };
 
     constexpr bn::string_view awakening_pages[] = {
-        "Three days later.",
-        RPG_NAME_VILLAGE " is gone. Only ash\nand the smell of smoke\nremain.",
-        "Two fresh graves stand\nwhere the square used\nto be.",
+        RPG_T("Three days later.",
+              "三日後。"),
+        RPG_T(RPG_NAME_VILLAGE " is gone. Only ash\nand the smell of smoke\nremain.",
+              VILLAGE_JA "村は、もうない。\n残っているのは灰と、\nけむりのにおいだけだ。"),
+        RPG_T("Two fresh graves stand\nwhere the square used\nto be.",
+              "広場だった場所に、\n新しい墓が二つ\nならんでいる。"),
     };
 
     constexpr bn::string_view gate_peaceful_pages[] = {
-        HERO ": Not now.\nFather asked me for\nsomething first.",
+        RPG_T(HERO ": Not now.\nFather asked me for\nsomething first.",
+              HERO_JA "「今はだめだ。\n　先に父さんのたのみを\n　すませないと。」"),
     };
 
     constexpr bn::string_view gate_ashes_pages[] = {
-        HERO ": ...Not yet.\nI should speak to\nthe Elder first.",
+        RPG_T(HERO ": ...Not yet.\nI should speak to\nthe Elder first.",
+              HERO_JA "「……まだだ。\n　先に長老と\n　話しておこう。」"),
     };
 
     constexpr bn::string_view elder_pages[] = {
-        "Elder: You're awake, " HERO ".\nI buried them myself.\nForgive an old man.",
-        "Elder: The ones who did\nthis wore a crest. A crown\nwreathed in ash.",
-        "Elder: One of their scouts\nstill hides in the Watch\nCave, in the rocks south.",
-        HERO ": ...Then that is\nwhere I start.",
-        "Elder: Take your father's\nsword. And come back\nalive, boy.",
-        "Got Father's " "Bronze Sword!",
+        RPG_T("Elder: You're awake, " HERO ".\nI buried them myself.\nForgive an old man.",
+              "長老「目がさめたか、" HERO_JA "。\n　二人はわしがとむらった。\n　この老いぼれをゆるせ。」"),
+        RPG_T("Elder: The ones who did\nthis wore a crest. A crown\nwreathed in ash.",
+              "長老「やつらは紋章を\n　つけておった。\n　灰をまとった王冠じゃ。」"),
+        RPG_T("Elder: One of their scouts\nstill hides in the Watch\nCave, in the rocks south.",
+              "長老「南の岩山にある\n　見張りの洞窟に、やつらの\n　斥候がまだひそんでおる。」"),
+        RPG_T(HERO ": ...Then that is\nwhere I start.",
+              HERO_JA "「……なら、\n　そこから始める。」"),
+        RPG_T("Elder: Take your father's\nsword. And come back\nalive, boy.",
+              "長老「父の剣を持っていけ。\n　かならず、生きて\n　帰ってくるのじゃぞ。」"),
+        RPG_T("Got Father's " "Bronze Sword!",
+              "父の剣 (Bronze Sword) を\n手に入れた！"),
     };
 
     constexpr bn::string_view scout_pages[] = {
-        "Cult Scout: A survivor?\nFrom that little village?",
-        HERO ": You burned " RPG_NAME_VILLAGE ".\nWho gave the order?",
-        "Cult Scout: Ash asks no\nquestions, boy. Burn!",
+        RPG_T("Cult Scout: A survivor?\nFrom that little village?",
+              "教団の斥候「生き残りだと？\n　あのちっぽけな村の？」"),
+        RPG_T(HERO ": You burned " RPG_NAME_VILLAGE ".\nWho gave the order?",
+              HERO_JA "「" VILLAGE_JA "を焼いたな。\n　命じたのはだれだ。」"),
+        RPG_T("Cult Scout: Ash asks no\nquestions, boy. Burn!",
+              "教団の斥候「灰は何も\n　問わぬ。燃えろ、小僧！」"),
     };
 
     constexpr bn::string_view scout_victory_pages[] = {
-        "The scout falls. A crest\nslips from his cloak:\na crown wreathed in ash.",
-        "Cult Scout: Heh... General\n" GENERAL " rides for " RPG_NAME_TOWN ".\nYou're already too late.",
-        HERO ": The " RPG_NAME_CULT ".\n" GENERAL ". ..." RPG_NAME_TOWN ", then.",
-        "- Chapter 2 -\nBlades That Never Cross",
+        RPG_T("The scout falls. A crest\nslips from his cloak:\na crown wreathed in ash.",
+              "斥候がたおれた。マントから\n紋章がこぼれ落ちる。\n灰をまとった王冠だ。"),
+        RPG_T("Cult Scout: Heh... General\n" GENERAL " rides for " RPG_NAME_TOWN ".\nYou're already too late.",
+              "教団の斥候「へっ……\n　" GENERAL_JA "将軍は" TOWN_JA "へ\n　向かった。もう手おくれだ。」"),
+        RPG_T(HERO ": The " RPG_NAME_CULT ".\n" GENERAL ". ..." RPG_NAME_TOWN ", then.",
+              HERO_JA "「" RPG_NAME_CULT_JA "。\n　" GENERAL_JA "。\n　……次は、" TOWN_JA "か。」"),
+        RPG_T("- Chapter 2 -\nBlades That Never Cross",
+              "- 第2章 -\n交わらぬ刃"),
     };
 
     constexpr EncounterGroup scout_battle = { { EnemyId::cult_scout }, 1 };
@@ -100,46 +140,71 @@ namespace
     // Chapter 2 "Blades That Never Cross"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view road_pages[] = {
-        "The road east leads to\n" RPG_NAME_TOWN ". There is something\nto finish here first.",
+        RPG_T("The road east leads to\n" RPG_NAME_TOWN ". There is something\nto finish here first.",
+              "東の道は" TOWN_JA "へ続いている。\nだが、ここでやり残した\nことがある。"),
     };
 
     constexpr bn::string_view partner_town_pages[] = {
-        "A spearman watches you\nfrom under a traveler's\nhood.",
-        "???: You've been asking\nabout " GENERAL ". Stop.",
-        HERO ": He burned my\nvillage. I'm going to\nkill him.",
-        PARTNER ": Name's " PARTNER ". His\nbounty is mine, farm boy.",
-        PARTNER ": Revenge makes you\nslow. Slow gets you\nkilled.",
-        HERO ": Stay out of my way.",
-        PARTNER ": He camps in the old\nfort, east of here. Try not\nto die before I get paid.",
-        PARTNER " leaves through\nthe east gate.",
+        RPG_T("A spearman watches you\nfrom under a traveler's\nhood.",
+              "旅人のフードの下から、\n槍使いがこちらを\n見ている。"),
+        RPG_T("???: You've been asking\nabout " GENERAL ". Stop.",
+              "？？？「" GENERAL_JA "のことを\n　かぎ回っているな。\n　やめておけ。」"),
+        RPG_T(HERO ": He burned my\nvillage. I'm going to\nkill him.",
+              HERO_JA "「やつはおれの村を\n　焼いた。\n　この手でたおす。」"),
+        RPG_T(PARTNER ": Name's " PARTNER ". His\nbounty is mine, farm boy.",
+              PARTNER_JA "「おれは" PARTNER_JA "。\n　やつの賞金はおれのものだ、\n　いなか者。」"),
+        RPG_T(PARTNER ": Revenge makes you\nslow. Slow gets you\nkilled.",
+              PARTNER_JA "「ふくしゅうは\n　足をにぶらせる。\n　にぶいやつから死ぬ。」"),
+        RPG_T(HERO ": Stay out of my way.",
+              HERO_JA "「じゃまをするな。」"),
+        RPG_T(PARTNER ": He camps in the old\nfort, east of here. Try not\nto die before I get paid.",
+              PARTNER_JA "「やつは東の古い砦に\n　いる。おれが賞金をもらう\n　まで、死ぬなよ。」"),
+        RPG_T(PARTNER " leaves through\nthe east gate.",
+              PARTNER_JA "は東の門から\n去っていった。"),
     };
 
     constexpr bn::string_view east_gate_pages[] = {
-        "The old highway.\nNothing calls you\nthat way yet.",
+        RPG_T("The old highway.\nNothing calls you\nthat way yet.",
+              "古い街道だ。\n今はまだ、そちらへ\n行く用はない。"),
     };
 
     constexpr bn::string_view fort_pages[] = {
-        PARTNER " is on one knee.\nA man in red armor\nstands over him.",
-        GENERAL ": A bounty hunter\nand a stray. What small\nfoes the Emperor has.",
-        HERO ": " GENERAL "!!",
-        PARTNER ": Tch. You again...\nHe's too much for one.",
-        PARTNER ": Fine. Just this\nonce. Keep up, " HERO "!",
-        PARTNER " fights at\nyour side!",
+        RPG_T(PARTNER " is on one knee.\nA man in red armor\nstands over him.",
+              PARTNER_JA "がひざをついている。\n赤いよろいの男が、\nそれを見下ろしていた。"),
+        RPG_T(GENERAL ": A bounty hunter\nand a stray. What small\nfoes the Emperor has.",
+              GENERAL_JA "「賞金かせぎと\n　のら犬か。炎帝さまの敵も\n　小さくなったものだ。」"),
+        RPG_T(HERO ": " GENERAL "!!",
+              HERO_JA "「" GENERAL_JA "！！」"),
+        RPG_T(PARTNER ": Tch. You again...\nHe's too much for one.",
+              PARTNER_JA "「ちっ、またお前か……\n　こいつは一人じゃ\n　手におえない。」"),
+        RPG_T(PARTNER ": Fine. Just this\nonce. Keep up, " HERO "!",
+              PARTNER_JA "「いいだろう。\n　今回だけだ。\n　おくれるなよ、" HERO_JA "！」"),
+        RPG_T(PARTNER " fights at\nyour side!",
+              PARTNER_JA "がともに戦う！"),
     };
 
     constexpr bn::string_view fort_again_pages[] = {
-        PARTNER ": Again! And don't\nfall behind this time!",
+        RPG_T(PARTNER ": Again! And don't\nfall behind this time!",
+              PARTNER_JA "「もう一度だ！\n　今度はおくれるなよ！」"),
     };
 
     constexpr bn::string_view fort_victory_pages[] = {
-        GENERAL ": ...Enough. You have\nearned the Emperor's eye.\nPray you earn no more.",
-        GENERAL " vanishes in a\npillar of flame.",
-        PARTNER ": He got away.\nSo did my bounty.",
-        PARTNER ": ...You fight angry.\nBut you didn't run.",
-        PARTNER ": I owe you one, and\nI hate owing. I'm coming\nalong until it's repaid.",
-        HERO ": ...Do as you like.",
-        PARTNER " joined the party!",
-        "- Chapter 3 -\nThe Star-Reader Girl",
+        RPG_T(GENERAL ": ...Enough. You have\nearned the Emperor's eye.\nPray you earn no more.",
+              GENERAL_JA "「……そこまでだ。\n　炎帝さまの目にとまったな。\n　これ以上は望まぬことだ。」"),
+        RPG_T(GENERAL " vanishes in a\npillar of flame.",
+              GENERAL_JA "は火柱の中に\n消えた。"),
+        RPG_T(PARTNER ": He got away.\nSo did my bounty.",
+              PARTNER_JA "「にげられたか。\n　おれの賞金もな。」"),
+        RPG_T(PARTNER ": ...You fight angry.\nBut you didn't run.",
+              PARTNER_JA "「……お前の戦いは\n　いかりまかせだ。\n　だが、にげなかった。」"),
+        RPG_T(PARTNER ": I owe you one, and\nI hate owing. I'm coming\nalong until it's repaid.",
+              PARTNER_JA "「借りができた。\n　借りはきらいでな。\n　返すまでついていく。」"),
+        RPG_T(HERO ": ...Do as you like.",
+              HERO_JA "「……好きにしろ。」"),
+        RPG_T(PARTNER " joined the party!",
+              PARTNER_JA "が仲間になった！"),
+        RPG_T("- Chapter 3 -\nThe Star-Reader Girl",
+              "- 第3章 -\n星読みの少女"),
     };
 
     constexpr EncounterGroup fort_battle = { { EnemyId::drake, EnemyId::cult_soldier }, 2 };

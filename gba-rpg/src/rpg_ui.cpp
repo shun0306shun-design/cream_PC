@@ -16,6 +16,7 @@
 
 #include "common_fixed_8x16_sprite_font.h"
 #include "common_variable_8x16_sprite_font.h"
+#include "rpg_japanese_sprite_font.h"
 
 namespace rpg
 {
@@ -74,6 +75,7 @@ namespace
 
 Ui::Ui() :
     _text_generator(common::variable_8x16_sprite_font),
+    _japanese_text_generator(japanese_sprite_font),
     _fixed_text_generator(common::fixed_8x16_sprite_font),
     _map_item(ui_cells[0], bn::size(map_columns, map_rows)),
     _bg(create_bg(_map_item)),
@@ -81,6 +83,8 @@ Ui::Ui() :
 {
     _text_generator.set_bg_priority(ui_bg_priority);
     _text_generator.set_left_alignment();
+    _japanese_text_generator.set_bg_priority(ui_bg_priority);
+    _japanese_text_generator.set_left_alignment();
     _fixed_text_generator.set_bg_priority(ui_bg_priority);
     _fixed_text_generator.set_left_alignment();
 }
@@ -223,7 +227,7 @@ Window::~Window()
 void Window::print(int line, const bn::string_view& text, int x_offset)
 {
     // The "top_left" methods of Butano use screen coordinates with the origin in the top-left corner.
-    _ui.text_generator().generate_top_left(_text_x() + x_offset, _text_y(line), text, _sprites);
+    _ui.text_generator().generate_top_left(_text_x() + x_offset, _text_y(line), localized(text), _sprites);
 }
 
 void Window::print_fixed(int line, const bn::string_view& text, int x_offset)
@@ -233,13 +237,16 @@ void Window::print_fixed(int line, const bn::string_view& text, int x_offset)
 
 void Window::print_centered(int line, const bn::string_view& text)
 {
+    bn::string_view line_text = localized(text);
     int inner_width = (_cols * 8) - 16;
-    print(line, text, (inner_width - _ui.text_generator().width(text)) / 2);
+    print(line, line_text, (inner_width - _ui.text_generator().width(line_text)) / 2);
 }
 
-void Window::print_text(int first_line, const bn::string_view& text)
+void Window::print_text(int first_line, const bn::string_view& full_text, int line_pitch)
 {
-    int line = first_line;
+    // Choose the language first: a RPG_T text holds the lines of both.
+    bn::string_view text = localized(full_text);
+    int line = 0;
     int line_start = 0;
     int size = text.size();
 
@@ -249,7 +256,8 @@ void Window::print_text(int first_line, const bn::string_view& text)
         {
             if(index > line_start)
             {
-                print(line, text.substr(line_start, index - line_start));
+                _ui.text_generator().generate_top_left(_text_x(), _text_y(first_line) + (line * line_pitch),
+                                                       text.substr(line_start, index - line_start), _sprites);
             }
 
             line_start = index + 1;
@@ -371,8 +379,29 @@ MessageBox::MessageBox(Ui& ui) :
 
 void MessageBox::show(const bn::string_view& text)
 {
+    bn::string_view page = localized(text);
+    int line_pitch = line_height;
+
+    if(language() == Language::japanese)
+    {
+        int lines = 1;
+
+        for(char character : page)
+        {
+            if(character == '\n')
+            {
+                ++lines;
+            }
+        }
+
+        if(lines <= japanese_lines)
+        {
+            line_pitch = japanese_line_pitch;
+        }
+    }
+
     clear_text();
-    print_text(0, text);
+    print_text(0, page, line_pitch);
 }
 
 void MessageBox::say(const bn::string_view& text)

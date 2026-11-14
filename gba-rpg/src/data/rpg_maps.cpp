@@ -2,6 +2,7 @@
 
 #include "bn_assert.h"
 
+#include "rpg_text.h"
 #include "rpg_names.h"
 
 namespace rpg
@@ -138,50 +139,63 @@ namespace
     static_assert(valid_layout(village_burnt_rows), "Invalid burnt village layout");
 
     constexpr bn::string_view villager_pages[] = {
-        "Welcome to " RPG_NAME_VILLAGE " Village!",
-        "Monsters roam the fields\noutside the south gate.\nBe careful out there.",
-        "The old Watch Cave lies in\nthe rocks to the south.\nNobody goes there anymore.",
+        RPG_T("Welcome to " RPG_NAME_VILLAGE " Village!",
+              RPG_NAME_VILLAGE_JA "村へようこそ！"),
+        RPG_T("Monsters roam the fields\noutside the south gate.\nBe careful out there.",
+              "南の門の外には\nまものがうろついている。\n気をつけてね。"),
+        RPG_T("The old Watch Cave lies in\nthe rocks to the south.\nNobody goes there anymore.",
+              "南の岩山には古い\n見張りの洞窟があるんだ。\nもうだれも近づかないよ。"),
     };
 
     constexpr bn::string_view elder_pages[] = {
-        "Press START to open the menu.\nYou can check your party,\nuse items and save there.",
+        RPG_T("Press START to open the menu.\nYou can check your party,\nuse items and save there.",
+              "STARTでメニューが開く。\n仲間のようすを見たり、道具を\n使ったり、セーブができるぞ。"),
     };
 
     constexpr bn::string_view mother_pages[] = {
-        "Mother: Good morning,\n" RPG_NAME_HERO ". Your father is\nby the south gate.",
+        RPG_T("Mother: Good morning,\n" RPG_NAME_HERO ". Your father is\nby the south gate.",
+              "母「おはよう、" RPG_NAME_HERO_JA "。\n　父さんは南の門の\n　そばにいるわよ。」"),
     };
 
     constexpr bn::string_view innkeeper_pages[] = {
-        "Welcome to the inn.",
+        RPG_T("Welcome to the inn.",
+              "宿屋へようこそ。"),
     };
 
     constexpr bn::string_view sign_pages[] = {
-        RPG_NAME_VILLAGE " VILLAGE\nSouth: the fields",
+        RPG_T(RPG_NAME_VILLAGE " VILLAGE\nSouth: the fields",
+              RPG_NAME_VILLAGE_JA "村\n南: 草原"),
     };
 
     constexpr bn::string_view spring_pages[] = {
-        "Clear water wells up from\nthe ground. It looks\nrefreshing.",
+        RPG_T("Clear water wells up from\nthe ground. It looks\nrefreshing.",
+              "きれいな水が地面から\nわき出ている。\nつかれがとれそうだ。"),
     };
 
     constexpr bn::string_view shopkeeper_pages[] = {
-        "Welcome to the item shop!",
+        RPG_T("Welcome to the item shop!",
+              "道具屋へようこそ！"),
     };
 
     constexpr bn::string_view grave_pages[] = {
-        "Two fresh graves.\nFather and Mother\nrest here.",
+        RPG_T("Two fresh graves.\nFather and Mother\nrest here.",
+              "新しい墓が二つ。\n父と母が、ここに\nねむっている。"),
     };
 
     // NPC lines that change with the chapter: one set per chapter_index() (0 = chapter 1), the last one stays.
     constexpr bn::string_view elder_ch1_pages[] = {
-        "Elder: The Watch Cave is in\nthe rocks south of here.\nBe careful, " RPG_NAME_HERO ".",
+        RPG_T("Elder: The Watch Cave is in\nthe rocks south of here.\nBe careful, " RPG_NAME_HERO ".",
+              "長老「見張りの洞窟は\n　南の岩山の中じゃ。\n　気をつけるのじゃぞ、" RPG_NAME_HERO_JA "。」"),
     };
 
     constexpr bn::string_view elder_ch2_pages[] = {
-        "Elder: The crest of the\n" RPG_NAME_CULT "... So it was\nthem. " RPG_NAME_TOWN " lies to the east.",
+        RPG_T("Elder: The crest of the\n" RPG_NAME_CULT "... So it was\nthem. " RPG_NAME_TOWN " lies to the east.",
+              "長老「" RPG_NAME_CULT_JA "の紋章……\n　やはりやつらであったか。\n　" RPG_NAME_TOWN_JA "は東じゃ。」"),
     };
 
     constexpr bn::string_view elder_ch3_pages[] = {
-        "Elder: You travel with a\nfriend now? Good. Ash is\ntoo heavy to carry alone.",
+        RPG_T("Elder: You travel with a\nfriend now? Good. Ash is\ntoo heavy to carry alone.",
+              "長老「仲間ができたか。\n　それはよい。灰は一人で\n　せおうには重すぎる。」"),
     };
 
     constexpr bn::span<const bn::string_view> elder_chapter_pages[] = {
@@ -189,11 +203,13 @@ namespace
     };
 
     constexpr bn::string_view survivor_ch1_pages[] = {
-        "They came at dawn, with\ntorches. I hid in the well.\nI'm sorry... I'm so sorry.",
+        RPG_T("They came at dawn, with\ntorches. I hid in the well.\nI'm sorry... I'm so sorry.",
+              "夜明けに、たいまつを持った\nやつらが来た。わしは井戸に\nかくれて……すまん……。"),
     };
 
     constexpr bn::string_view survivor_ch2_pages[] = {
-        "We will rebuild " RPG_NAME_VILLAGE ".\nIt won't be the same.\nBut we will.",
+        RPG_T("We will rebuild " RPG_NAME_VILLAGE ".\nIt won't be the same.\nBut we will.",
+              RPG_NAME_VILLAGE_JA "は建て直す。\n元どおりにはならん。\nそれでも、建て直すんだ。"),
     };
 
     constexpr bn::span<const bn::string_view> survivor_chapter_pages[] = {
@@ -385,11 +401,13 @@ namespace
     static_assert(valid_layout(cave_3f_rows), "Invalid cave_3f layout");
 
     constexpr bn::string_view cave_1f_sign_pages[] = {
-        "Carved into the wall:\n\"Watchmen of " RPG_NAME_VILLAGE ",\nkeep the fire burning.\"",
+        RPG_T("Carved into the wall:\n\"Watchmen of " RPG_NAME_VILLAGE ",\nkeep the fire burning.\"",
+              "かべにほられた文字:\n「" RPG_NAME_VILLAGE_JA "の見張りたちよ、\n　火をたやすな。」"),
     };
 
     constexpr bn::string_view cave_3f_sign_pages[] = {
-        "Carved into the wall:\n\"The treasure of the cave\nlies ahead.\"",
+        RPG_T("Carved into the wall:\n\"The treasure of the cave\nlies ahead.\"",
+              "かべにほられた文字:\n「洞窟のたからは\n　この先にあり。」"),
     };
 
     constexpr MapEvent cave_1f_events[] = {
@@ -464,11 +482,13 @@ namespace
     static_assert(valid_layout(berg_rows), "Invalid berg layout");
 
     constexpr bn::string_view berg_sign_pages[] = {
-        RPG_NAME_TOWN " - POST TOWN\nWest: the fields\nEast: the old highway fort",
+        RPG_T(RPG_NAME_TOWN " - POST TOWN\nWest: the fields\nEast: the old highway fort",
+              "宿場町" RPG_NAME_TOWN_JA "\n西: 草原\n東: 旧街道の砦"),
     };
 
     constexpr bn::string_view berg_shop_pages[] = {
-        "Welcome! Travelers get\nthe best prices in " RPG_NAME_TOWN ".",
+        RPG_T("Welcome! Travelers get\nthe best prices in " RPG_NAME_TOWN ".",
+              "いらっしゃい！ 旅の人には\n" RPG_NAME_TOWN_JA "で一番の値をつけるよ。"),
     };
 
     constexpr ItemId berg_shop_stock[] = {
@@ -477,12 +497,15 @@ namespace
     };
 
     constexpr bn::string_view berg_townsman_ch1_pages[] = {
-        "This is " RPG_NAME_TOWN ", where the\nhighways meet.",
+        RPG_T("This is " RPG_NAME_TOWN ", where the\nhighways meet.",
+              "ここは" RPG_NAME_TOWN_JA "。\n街道がまじわる町さ。"),
     };
 
     constexpr bn::string_view berg_townsman_ch2_pages[] = {
-        "Men in ash-gray armor took\nthe old fort to the east.\nTheir general is a monster.",
-        "A bounty hunter with a\nspear was asking about\nhim, too.",
+        RPG_T("Men in ash-gray armor took\nthe old fort to the east.\nTheir general is a monster.",
+              "灰色のよろいの連中が、東の\n古い砦をのっとったんだ。\nやつらの将軍は化け物だよ。"),
+        RPG_T("A bounty hunter with a\nspear was asking about\nhim, too.",
+              "槍を持った賞金かせぎも、\nそいつのことを\nたずねていたな。"),
     };
 
     constexpr bn::string_view berg_townsman_ch3_pages[] = {
@@ -542,7 +565,8 @@ namespace
     static_assert(valid_layout(fort_rows), "Invalid fort layout");
 
     constexpr bn::string_view fort_sign_pages[] = {
-        "A banner hangs here:\na crown wreathed in ash.",
+        RPG_T("A banner hangs here:\na crown wreathed in ash.",
+              "旗がかかっている。\n灰をまとった王冠の紋章だ。"),
     };
 
     constexpr MapEvent fort_events[] = {
@@ -720,13 +744,13 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     constexpr MapData maps[] = {
         {
-            .name = RPG_NAME_VILLAGE " Village",
+            .name = RPG_T(RPG_NAME_VILLAGE " Village", RPG_NAME_VILLAGE_JA "村"),
             .rows = village_rows,
             .events = village_events,
             .border = TileId::tree,
         },
         {
-            .name = "Fields",
+            .name = RPG_T("Fields", "草原"),
             .rows = field_rows,
             .events = field_events,
             .encounters = field_encounters,
@@ -734,7 +758,7 @@ namespace
             .border = TileId::rock,
         },
         {
-            .name = "Watch Cave 1F",
+            .name = RPG_T("Watch Cave 1F", "見張りの洞窟 1F"),
             .rows = cave_1f_rows,
             .events = cave_1f_events,
             .encounters = cave_1f_encounters,
@@ -742,7 +766,7 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Watch Cave 2F",
+            .name = RPG_T("Watch Cave 2F", "見張りの洞窟 2F"),
             .rows = cave_2f_rows,
             .events = cave_2f_events,
             .encounters = cave_2f_encounters,
@@ -750,7 +774,7 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = "Watch Cave 3F",
+            .name = RPG_T("Watch Cave 3F", "見張りの洞窟 3F"),
             .rows = cave_3f_rows,
             .events = cave_3f_events,
             .encounters = cave_3f_encounters,
@@ -758,13 +782,13 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = RPG_NAME_TOWN,
+            .name = RPG_T(RPG_NAME_TOWN, RPG_NAME_TOWN_JA),
             .rows = berg_rows,
             .events = berg_events,
             .border = TileId::tree,
         },
         {
-            .name = "Ruined Fort",
+            .name = RPG_T("Ruined Fort", "廃砦"),
             .rows = fort_rows,
             .events = fort_events,
             .encounters = fort_encounters,
@@ -813,7 +837,7 @@ namespace
         {
             MapId::village, progress::ch1_ashes, progress::game_clear - 1,
             {
-                .name = RPG_NAME_VILLAGE " Ruins",
+                .name = RPG_T(RPG_NAME_VILLAGE " Ruins", RPG_NAME_VILLAGE_JA "村の焼け跡"),
                 .rows = village_burnt_rows,
                 .events = village_events,
                 .border = TileId::tree,

@@ -311,7 +311,7 @@ void FieldScene::_spawn_npcs()
 
 void FieldScene::_show_map_name()
 {
-    const bn::string_view name = _map->name;
+    const bn::string_view name = localized(_map->name);
 
     // Fit the window to the text (names use the proportional font), centered at the top of the screen.
     int cols = (_ui.text_generator().width(name) + 16 + 7) / 8;

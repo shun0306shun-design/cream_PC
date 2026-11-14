@@ -8,8 +8,10 @@
  * All the widgets are RAII: destroying a Window erases its frame and text.
  * Windows must not overlap, as erasing one would cut a hole in the other.
  *
- * Text is made of sprites (4-6 characters per sprite). The GBA shows up to 128 sprites,
- * so keep an eye on how much text is on screen at once.
+ * Text is made of sprites (4-6 characters per sprite, 2 for Japanese full width characters). The GBA shows
+ * up to 128 sprites, so keep an eye on how much text is on screen at once.
+ *
+ * Every text printed in a window goes through localized() (rpg_text.h): RPG_T texts show the current language.
  */
 
 #ifndef RPG_UI_H
@@ -24,6 +26,7 @@
 #include "bn_regular_bg_map_item.h"
 #include "bn_sprite_text_generator.h"
 
+#include "rpg_text.h"
 #include "rpg_common.h"
 
 namespace rpg
@@ -59,9 +62,11 @@ public:
     /// Makes a cells rectangle transparent again.
     void clear_cells(int col, int row, int cols, int rows);
 
+    /// Proportional font of the current language. The Japanese one also has ASCII, so text that
+    /// isn't translated yet can be shown with it.
     [[nodiscard]] const bn::sprite_text_generator& text_generator() const
     {
-        return _text_generator;
+        return language() == Language::english ? _text_generator : _japanese_text_generator;
     }
 
     /// Fixed width font (8 pixels per character): for text that must line up in columns, like the minimap.
@@ -87,6 +92,7 @@ public:
 
 private:
     bn::sprite_text_generator _text_generator;
+    bn::sprite_text_generator _japanese_text_generator;
     bn::sprite_text_generator _fixed_text_generator;
     bn::regular_bg_map_item _map_item;
     bn::regular_bg_ptr _bg;
@@ -130,8 +136,8 @@ public:
     /// Prints one line of text, horizontally centered in the window.
     void print_centered(int line, const bn::string_view& text);
 
-    /// Prints text starting at `first_line`. '\n' starts a new line.
-    void print_text(int first_line, const bn::string_view& text);
+    /// Prints text starting at `first_line`. '\n' starts a new line, `line_pitch` pixels below the previous one.
+    void print_text(int first_line, const bn::string_view& text, int line_pitch = line_height);
 
     void clear_text();
 
@@ -193,7 +199,14 @@ class MessageBox : public Window
 {
 
 public:
-    static constexpr int box_rows = rows_for_lines(4);
+    static constexpr int box_lines = 4;
+    static constexpr int box_rows = rows_for_lines(box_lines);
+
+    // Kanji are hard to read with only line_height pixels per line: in Japanese, pages of up to 3 lines
+    // are spread over the whole box (16 pixels per line). Longer pages fall back to line_height.
+    static constexpr int japanese_lines = 3;
+    static constexpr int japanese_line_pitch = 16;
+    static_assert(japanese_lines * japanese_line_pitch <= box_lines * line_height, "Japanese pages don't fit the box");
 
     explicit MessageBox(Ui& ui);
 
