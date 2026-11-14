@@ -5,6 +5,7 @@
 
 #include "rpg_ui.h"
 #include "rpg_text.h"
+#include "rpg_audio.h"
 #include "rpg_equip_menu.h"
 #include "rpg_game_state.h"
 
@@ -292,16 +293,73 @@ namespace
             }
         }
     }
+
+    /// Sound settings: A changes the chosen one (volumes go round from 0 to the maximum), B leaves.
+    /// They are stored at once (see rpg_audio.h), without saving the game.
+    void sound_settings(Ui& ui)
+    {
+        int index = 0;
+
+        while(true)
+        {
+            Label labels[3];
+            bn::string_view options[3];
+
+            {
+                bn::ostringstream stream(labels[0]);
+                stream << tr("Music  ", "BGM音量  ") << audio::bgm_volume_level() << "/" << audio::max_volume_level;
+            }
+            {
+                bn::ostringstream stream(labels[1]);
+                stream << tr("Sounds  ", "SE音量  ") << audio::se_volume_level() << "/" << audio::max_volume_level;
+            }
+            {
+                bn::ostringstream stream(labels[2]);
+                stream << tr("Mute  ", "ミュート  ") << (audio::muted() ? "ON" : "OFF");
+            }
+
+            for(int option = 0; option < 3; ++option)
+            {
+                options[option] = labels[option];
+            }
+
+            // The menu is built again after every change to show the new value.
+            Menu menu(ui, sub_col, 0, sub_cols, options);
+            menu.set_index(index);
+            index = menu.run();
+
+            switch(index)
+            {
+
+            case 0:
+                audio::set_bgm_volume_level((audio::bgm_volume_level() + 1) % (audio::max_volume_level + 1));
+                break;
+
+            case 1:
+                // The confirm sound of this key press was played with the old volume: play one with the new.
+                audio::set_se_volume_level((audio::se_volume_level() + 1) % (audio::max_volume_level + 1));
+                audio::play_se(SeId::confirm);
+                break;
+
+            case 2:
+                audio::set_muted(! audio::muted());
+                break;
+
+            default:
+                return;
+            }
+        }
+    }
 }
 
 void open_field_menu(GameState& state, Ui& ui)
 {
     static constexpr bn::string_view options[] = {
         RPG_T("Status", "つよさ"), RPG_T("Items", "どうぐ"), RPG_T("Skill", "わざ"), RPG_T("Equip", "そうび"),
-        RPG_T("Save", "セーブ")
+        RPG_T("Save", "セーブ"), RPG_T("Sound", "サウンド")
     };
 
-    Menu menu(ui, 0, 0, main_cols, options, 5);
+    Menu menu(ui, 0, 0, main_cols, options, 5);     // 6 options: the list scrolls.
 
     while(true)
     {
@@ -341,6 +399,10 @@ void open_field_menu(GameState& state, Ui& ui)
         case 4:
             save_game(state);
             say(ui, RPG_T("Game saved.", "セーブしました。"));
+            break;
+
+        case 5:
+            sound_settings(ui);
             break;
 
         default:

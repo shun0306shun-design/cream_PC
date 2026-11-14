@@ -15,6 +15,7 @@
 
 #include "rpg_ui.h"
 #include "rpg_text.h"
+#include "rpg_audio.h"
 #include "rpg_game_state.h"
 #include "rpg_field_scene.h"
 #include "rpg_battle_scene.h"
@@ -93,6 +94,7 @@ namespace
 int main()
 {
     bn::core::init();
+    rpg::audio::init();
 
     // Color shown where no background is drawn (for example behind the battle screen).
     bn::bg_palettes::set_transparent_color(bn::color(0, 0, 0));

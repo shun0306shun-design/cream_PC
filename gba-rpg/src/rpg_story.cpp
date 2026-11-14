@@ -1389,6 +1389,30 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
     return result;
 }
 
+BgmId story_bgm(StoryId id)
+{
+    switch(id)
+    {
+
+    case StoryId::ch1_attack:       // The village burns.
+    case StoryId::ch1_awakening:
+    case StoryId::ch5_ruins:        // The partner's past.
+    case StoryId::ch6_burning:      // The capital falls.
+    case StoryId::ch6_aftermath:
+    case StoryId::ch10_grave:       // The temptation of the ember.
+        return BgmId::event_dark;
+
+    case StoryId::ch7_shrine:       // The lantern is lit: the party is whole again.
+    case StoryId::ch10_homecoming:
+    case StoryId::ch10_elder:       // The coronation and the ending.
+    case StoryId::ch10_seasons:
+        return BgmId::event_hope;
+
+    default:
+        return BgmId::none;
+    }
+}
+
 bool story_defeat_continues(StoryId id)
 {
     return id == StoryId::ch6_general;
