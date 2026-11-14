@@ -76,6 +76,8 @@ enum class MapId : uint8_t
     kazami,     //!< Ruins of the partner's home village.
     cathedral,  //!< D06: Ash Cathedral.
     grancel,    //!< T06: the royal capital (peaceful, then burning).
+    refuge,     //!< T07: the valley of the refugees.
+    pass,       //!< D07: the pass east of the valley.
     count
 };
 

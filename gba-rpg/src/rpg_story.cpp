@@ -456,16 +456,16 @@ namespace
               GENERAL_JA "「灰は、死者を\n　覚えているというのか……」"),
         RPG_T(GENERAL ": I gave the orders.\nBut the fire is his.\nIt will eat you, too.",
               GENERAL_JA "「命じたのは私だ。\n　だが炎は炎帝さまのもの。\n　貴様らも食われるぞ。」"),
-        RPG_T(GENERAL " falls.\nThe pyre goes out.",
-              GENERAL_JA "がたおれた。\n火葬台の火が消える。"),
-        RPG_T(PARTNER ": ...It doesn't\nfeel like anything.",
-              PARTNER_JA "「……何も、\n　感じないものだな。」"),
+        RPG_T(GENERAL " vanishes into the\nsmoke. The pyre goes out.",
+              GENERAL_JA "は煙の中へ消えた。\n火葬台の火が消える。"),
+        RPG_T(PARTNER ": ...Gone. Again.",
+              PARTNER_JA "「……また、\n　逃げられたか。」"),
         RPG_T(PARTNER ": " NOX ". I won't\nforgive you. But I'll\nstand next to you.",
               PARTNER_JA "「" RPG_NAME_DEFECTOR_JA "。お前を許しは\n　しない。だが、\n　となりには立ってやる。」"),
         RPG_T(NOX ": That is more than\nI will ever ask.",
               RPG_NAME_DEFECTOR_JA "「それは、私が望める\n　以上のことだ。」"),
-        RPG_T(HERO ": One general.\nThree left. Then him.",
-              HERO_JA "「将軍をひとり。\n　残りは三人。\n　そして、あいつだ。」"),
+        RPG_T(HERO ": He bleeds. Next\ntime, he falls.",
+              HERO_JA "「奴も血を流す。\n　次は、たおす。」"),
         RPG_T("- Chapter 6 -\nThe Sinking Capital",
               "- 第6章 -\n沈む王都"),
     };
@@ -479,8 +479,8 @@ namespace
     constexpr bn::string_view captain_pages[] = {
         RPG_T("Captain: Halt! You came by\nthe pilgrim road? Then\nthe Cathedral has fallen.",
               "隊長「止まれ！ 巡礼路から\n　来たのか？ ならば、\n　聖堂は落ちたのだな。」"),
-        RPG_T(HERO ": " GENERAL " is dead.",
-              HERO_JA "「" GENERAL_JA "は死んだ。」"),
+        RPG_T(HERO ": " GENERAL " ran from it.",
+              HERO_JA "「" GENERAL_JA "は逃げた。」"),
         RPG_T("Captain: Then hear this.\n" CAPITAL " is the last city\nstanding. And they come.",
               "隊長「ならば聞け。" RPG_NAME_CAPITAL_JA "は\n　最後に残った都だ。\n　そこへ奴らが来る。」"),
         RPG_T("Captain: General " GENERAL2 "\nleads ten thousand to our\neast wall. Tonight.",
@@ -522,8 +522,8 @@ namespace
     };
 
     constexpr bn::string_view general2_pages[] = {
-        RPG_T(GENERAL2 ": So you are the\nember that killed " GENERAL ".",
-              RPG_NAME_GENERAL_2_JA "「あなたが、" GENERAL_JA "を\n　殺した火の粉ね。」"),
+        RPG_T(GENERAL2 ": So you are the\nember that burned " GENERAL ".",
+              RPG_NAME_GENERAL_2_JA "「あなたが、" GENERAL_JA "を\n　焼いた火の粉ね。」"),
         RPG_T(GENERAL2 ": " RPG_NAME_VILLAGE ", was it?\nI signed that order.\nA small one. I forget it.",
               RPG_NAME_GENERAL_2_JA "「" VILLAGE_JA "村、だったかしら。\n　あの命令書に署名したのは私。\n　小さな村よ。もう忘れたわ。」"),
         RPG_T(PARTNER ": " HERO ", don't!\nPeople are still getting\nout. Hold the line!",
@@ -566,14 +566,76 @@ namespace
               RPG_NAME_SEER_JA "「" HERO_JA "。昨夜、あなたの\n　星を探しました。\n　どこにも、なかった。」"),
         RPG_T(HERO ": ...I couldn't\nsave anything.",
               HERO_JA "「……何も、\n　守れなかった。」"),
-        RPG_T("- Chapter 7 -",
-              "- 第7章 -"),
+        RPG_T(NOX ": The survivors went\nsouth, into the hills.\nThey will need hands.",
+              RPG_NAME_DEFECTOR_JA "「生き残りは南の丘へ\n　向かった。\n　人手がいるはずだ。」"),
+        RPG_T("- Chapter 7 -\nThe Lamplight",
+              "- 第7章 -\n灯火"),
     };
 
     constexpr bn::string_view road_lost_pages[] = {
         RPG_T("The pilgrim road is choked\nwith smoke. There is no\ngoing back.",
               "巡礼路は煙でふさがっている。\nもう、戻れない。"),
     };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 7 "The Lamplight"
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view south_gate_pages[] = {
+        "A track south, into the\nhills. No reason to\ntake it yet.",
+    };
+
+    constexpr bn::string_view keeper_pages[] = {
+        "Lamps hang from every\nbranch. The fire never\nreached this valley.",
+        "Keeper: " CAPITAL " folk, all\nof us. You were on the\nwall. I remember you.",
+        HERO ": Then you know\nI left it.",
+        "Keeper: I know my grandson\nran through that gate\nwhile it still stood.",
+        "Keeper: Each night we\nlight one lamp for\nsomeone lost.",
+        "Keeper: Take this. Light\nit at the shrine, when you\nknow who it is for.",
+        HERO " took the lantern.",
+    };
+
+    constexpr bn::string_view keeper_again_pages[] = {
+        "Keeper: The shrine is up\nthe path, in the north-\neast of the valley.",
+    };
+
+    constexpr bn::string_view keeper_after_pages[] = {
+        "Keeper: A lamp is small.\nThat is why it takes\nso many of us.",
+    };
+
+    constexpr bn::string_view shrine_pages[] = {
+        HERO " lights the lantern.",
+        HERO ": For Father. For\nMother. ...For " CAPITAL ".",
+        PARTNER ": I lit one here for\n" RPG_NAME_PARTNER_HOME ", years ago.\nNever told anyone.",
+        NOX ": May I light one?\nFor those I burned.",
+        SEER ": " HERO ". Your star\nis back. Small. But\nit is there.",
+        HERO ": I had all of you\nbeside me, and I fought\nalone. I'm sorry.",
+        HERO ": No more revenge.\nI want there to be lamps\nleft to light.",
+        PARTNER ": ...Took you\nlong enough.",
+        "A runner: Torches in the\neast pass! " GENERAL "'s host,\nhunting us!",
+        HERO ": Not this time.\nTogether.",
+    };
+
+    constexpr bn::string_view east_gate_ch7_pages[] = {
+        "The east pass. The lamps\nare kept dark on\nthis side.",
+    };
+
+    constexpr bn::string_view pass_pages[] = {
+        GENERAL ": The ember. Come.\nCharge me, as you\ncharged her.",
+        HERO ": No.",
+        HERO ": " PARTNER ", left.\n" SEER ", light. " NOX ", with\nme. We hold the line.",
+        GENERAL ": ...So. You have\nlearned to burn slow.",
+    };
+
+    constexpr bn::string_view pass_victory_pages[] = {
+        GENERAL ": A wall... I broke\na hundred walls...",
+        GENERAL " falls, and does\nnot rise. The first of\nthe four.",
+        HERO ": It doesn't bring\nthem back.",
+        PARTNER ": No. But look\nbehind you.",
+        "Down in the valley,\nevery lamp is still lit.",
+        "- Chapter 8 -",
+    };
+
+    constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
 
     constexpr EncounterGroup general2_battle = { { EnemyId::general_2 }, 1 };
 
@@ -846,6 +908,40 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.step_back = true;
         break;
 
+    case StoryId::ch7_south_gate:
+        say_pages(ui, south_gate_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch7_keeper:
+        if(story_progress < progress::ch7_lantern)
+        {
+            say_pages(ui, keeper_pages);
+            story_progress = progress::ch7_lantern;
+        }
+        else
+        {
+            say_pages(ui, story_progress < progress::ch7_resolve ? bn::span<const bn::string_view>(keeper_again_pages) :
+                                                                   bn::span<const bn::string_view>(keeper_after_pages));
+        }
+        break;
+
+    case StoryId::ch7_shrine:
+        say_pages(ui, shrine_pages);
+        state.party.restore_all();      // The night in the valley.
+        story_progress = progress::ch7_resolve;
+        break;
+
+    case StoryId::ch7_east_gate:
+        say_pages(ui, east_gate_ch7_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch7_pass:
+        say_pages(ui, pass_pages);
+        result.battle = &pass_battle;
+        break;
+
     default:
         BN_ERROR("Invalid story id: ", int(id));
         break;
@@ -897,6 +993,11 @@ StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& u
     case StoryId::ch5_cathedral:
         say_pages(ui, cathedral_victory_pages);
         state.story_progress = progress::ch6_start;
+        break;
+
+    case StoryId::ch7_pass:
+        say_pages(ui, pass_victory_pages);
+        state.story_progress = progress::ch8_start;
         break;
 
     case StoryId::ch6_general:

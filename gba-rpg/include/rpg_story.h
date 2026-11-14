@@ -55,13 +55,18 @@ namespace progress
     constexpr uint8_t ch5_reunited = 43;    //!< The partner came back for the battle against General 1.
 
     // Chapter 6 "The Sinking Capital" (50-59)
-    constexpr uint8_t ch6_start = 50;       //!< General 1 was killed in the Ash Cathedral: the road to the capital opens.
+    constexpr uint8_t ch6_start = 50;       //!< General 1 was driven from the Ash Cathedral: the road to the capital opens.
     constexpr uint8_t ch6_muster = 51;      //!< The captain asked for help on the east wall.
     constexpr uint8_t ch6_siege = 52;       //!< The wall fell: the capital burns (another state of its map).
     constexpr uint8_t ch6_rout = 53;        //!< The hero broke the line, lost to General 2 and the party fled.
 
-    // Chapter 7 (60-69)
+    // Chapter 7 "The Lamplight" (60-69)
     constexpr uint8_t ch7_start = 60;       //!< The capital is lost. The party is back in the mining town, broken.
+    constexpr uint8_t ch7_lantern = 61;     //!< The keeper of the refugee valley gave the hero a lantern.
+    constexpr uint8_t ch7_resolve = 62;     //!< The hero lit it and made peace with the party: the east pass opens.
+
+    // Chapter 8 (70-79)
+    constexpr uint8_t ch8_start = 70;       //!< General 1 was killed in the pass: the first Ash General to fall.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -106,6 +111,11 @@ enum class StoryId : uint8_t
     ch6_general,        //!< General 2 at the palace: a battle that is meant to be lost. Then the rout.
     ch6_aftermath,      //!< Back in the mining town after the rout. Starts chapter 7.
     ch6_road_lost,      //!< The road to the capital after it fell.
+    ch7_south_gate,     //!< The track from the mining town to the refugee valley, closed until chapter 7.
+    ch7_keeper,         //!< The keeper of the lamps gives the hero a lantern.
+    ch7_shrine,         //!< Lighting the lantern: the party is whole again.
+    ch7_east_gate,      //!< The pass east of the valley, closed until the hero's resolve.
+    ch7_pass,           //!< Boss of the pass: General 1 dies. Winning starts chapter 8.
     count,
     none = 0xFF
 };

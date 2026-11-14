@@ -918,7 +918,7 @@ namespace
         "%_________:__xx______%",    // 9
         "%____________xx______%",    // 10
         "%____________________%",    // 11
-        "%%%%%%%%%%%%%%%%%%%%%%",    // 12
+        "%%%%%%%%%%>%%%%%%%%%%%",    // 12
     };
 
     static_assert(valid_layout(dorn_rows), "Invalid dorn layout");
@@ -948,6 +948,11 @@ namespace
           .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_east_gate },
         { .type = EventType::warp, .x = 21, .y = 6, .warp_map = MapId::cathedral, .warp_x = 9, .warp_y = 10,
           .min_progress = progress::ch5_split },
+        // The track south to the valley of the refugees opens in chapter 7.
+        { .type = EventType::trigger, .x = 10, .y = 12,
+          .max_progress = progress::ch7_start - 1, .story = StoryId::ch7_south_gate },
+        { .type = EventType::warp, .x = 10, .y = 12, .warp_map = MapId::refuge, .warp_x = 9, .warp_y = 1,
+          .min_progress = progress::ch7_start },
         { .type = EventType::inn, .x = 5, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::shop, .x = 16, .y = 5, .npc_graphics = 5, .pages = dorn_shop_pages,
           .stock = ashbell_shop_stock },
@@ -1128,6 +1133,103 @@ namespace
     };
 
     // ---------------------------------------------------------------------------------------------------------------
+    // T07: the valley of the refugees, south of the mining town. The fire never reached it: grass and trees again.
+    // The lantern shrine is the altar ('A').
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view refuge_rows[] = {
+        "TTTTTTTTT>TTTTTTTTTT",    // 0
+        "T........:.........T",    // 1
+        "T.^^^^...:....A....T",    // 2
+        "T.####...:....:....T",    // 3
+        "T.#D##...:....:....T",    // 4
+        "T..:.....:....:....T",    // 5
+        "T..::::::::::::::::>",    // 6
+        "T........:.........T",    // 7
+        "T..,..F..:...,.....T",    // 8
+        "T........:....S....T",    // 9
+        "T........:.........T",    // 10
+        "T..................T",    // 11
+        "TTTTTTTTTTTTTTTTTTTT",    // 12
+    };
+
+    static_assert(valid_layout(refuge_rows), "Invalid refuge layout");
+
+    constexpr bn::string_view refuge_sign_pages[] = {
+        RPG_NAME_REFUGE "\nKeep a lamp lit for\nthose still on the road.",
+    };
+
+    constexpr bn::string_view refuge_shop_pages[] = {
+        "Whatever we carried out\nof " RPG_NAME_CAPITAL ". Take what\nhelps.",
+    };
+
+    constexpr bn::string_view refuge_child_pages[] = {
+        "My brother says you were\non the wall. Is the wall\ncoming here, too?",
+    };
+
+    constexpr bn::string_view refuge_shrine_before_pages[] = {
+        "Dozens of small lamps.\nEach one has a name.",
+    };
+
+    constexpr bn::string_view refuge_shrine_after_pages[] = {
+        "Your lamp burns among\nthe others.",
+    };
+
+    constexpr MapEvent refuge_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 0, .warp_map = MapId::dorn, .warp_x = 10, .warp_y = 11 },
+        { .type = EventType::trigger, .x = 19, .y = 6,
+          .max_progress = progress::ch7_resolve - 1, .story = StoryId::ch7_east_gate },
+        { .type = EventType::warp, .x = 19, .y = 6, .warp_map = MapId::pass, .warp_x = 2, .warp_y = 1,
+          .min_progress = progress::ch7_resolve },
+        { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
+        { .type = EventType::shop, .x = 12, .y = 8, .npc_graphics = 5, .pages = refuge_shop_pages,
+          .stock = ashbell_shop_stock },
+        { .type = EventType::sign, .x = 14, .y = 9, .pages = refuge_sign_pages },
+        { .type = EventType::spring, .x = 6, .y = 8, .pages = spring_pages, .price = 0 },
+        { .type = EventType::talk, .x = 5, .y = 10, .npc_graphics = 0, .pages = refuge_child_pages,
+          .movement = NpcMovement::wander, .wander_radius = 2 },
+        { .type = EventType::story, .x = 11, .y = 5, .npc_graphics = 1, .story = StoryId::ch7_keeper },
+        // The shrine: just lamps, then the scene, then the hero's own lamp.
+        { .type = EventType::sign, .x = 14, .y = 2, .pages = refuge_shrine_before_pages,
+          .max_progress = progress::ch7_lantern - 1 },
+        { .type = EventType::story, .x = 14, .y = 2,
+          .min_progress = progress::ch7_lantern, .max_progress = progress::ch7_lantern,
+          .story = StoryId::ch7_shrine },
+        { .type = EventType::sign, .x = 14, .y = 2, .pages = refuge_shrine_after_pages,
+          .min_progress = progress::ch7_resolve },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D07: the pass east of the valley. General 1 (npc_graphics 8) comes up the last corridor.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view pass_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%u___%%%%%_______%%%",    // 1
+        "%____%%%%%_%%%%%_%%%",    // 2
+        "%_%%%%%%%%_%%%%%_%%%",    // 3
+        "%_%%%______%%%%%_%%%",    // 4
+        "%_%%%_%%%%%%%%___%%%",    // 5
+        "%_____%%%%%%%%___%%%",    // 6
+        "%%%%%%%%%%%%%%%%%%%%",    // 7
+    };
+
+    static_assert(valid_layout(pass_rows), "Invalid pass layout");
+
+    constexpr MapEvent pass_events[] = {
+        { .type = EventType::warp, .x = 1, .y = 1, .warp_map = MapId::refuge, .warp_x = 18, .warp_y = 6 },
+        { .type = EventType::story, .x = 16, .y = 3, .npc_graphics = 8,
+          .min_progress = progress::ch7_resolve, .max_progress = progress::ch8_start - 1,
+          .story = StoryId::ch7_pass },
+        { .type = EventType::chest, .x = 15, .y = 6, .npc_graphics = 3,
+          .flag = FlagId::chest_pass, .gold = 500 },
+    };
+
+    constexpr EncounterGroup pass_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
+        { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
     // Map table. The order must match MapId.
     // ---------------------------------------------------------------------------------------------------------------
     constexpr MapData maps[] = {
@@ -1253,6 +1355,20 @@ namespace
             .events = grancel_events,
             .border = TileId::wall,
         },
+        {
+            .name = RPG_NAME_REFUGE,
+            .rows = refuge_rows,
+            .events = refuge_events,
+            .border = TileId::tree,
+        },
+        {
+            .name = "Lantern Pass",
+            .rows = pass_rows,
+            .events = pass_events,
+            .encounters = pass_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1298,7 +1414,9 @@ namespace
         { MapId::berg, 4, 6 },              // Chapter 2: in front of the inn of the post town.
         { MapId::lunaris, 4, 6 },           // Chapter 3: in front of the inn of the seer's village.
         { MapId::ashbell, 3, 6 },           // Chapter 4: in front of the inn of the ash town.
-        { MapId::dorn, 4, 6 },              // Chapter 5 on: in front of the inn of the mining town.
+        { MapId::dorn, 4, 6 },              // Chapter 5: in front of the inn of the mining town.
+        { MapId::dorn, 4, 6 },              // Chapter 6: the same (the capital has no safe place).
+        { MapId::refuge, 3, 6 },            // Chapter 7 on: in front of the inn of the refugee valley.
     };
 
     [[nodiscard]] constexpr bool walkable_tile(bn::span<const bn::string_view> rows, int x, int y)

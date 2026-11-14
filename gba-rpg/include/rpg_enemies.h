@@ -32,6 +32,7 @@ enum class EnemyId : uint8_t
     ash_zealot,
     drake_true,     //!< Boss of the Ash Cathedral (chapter 5): General 1 at full strength.
     general_2,      //!< General 2 in the capital (chapter 6): not meant to be beaten.
+    drake_last,     //!< Boss of the pass (chapter 7): the first Ash General that dies.
     count
 };
 
