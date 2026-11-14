@@ -940,29 +940,46 @@ namespace
     // After the ending, part 1 "The Runaway Necklace"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view post_stranger_pages[] = {
-        "Someone stands in the\nsquare, flickering like\na candle in the wind.",
-        "???: It was morning. Then\nlast winter. Then this\nplace was ash. Is it ash?",
-        HERO ": Easy. This is " RPG_NAME_VILLAGE ".\nIt's rebuilt. You are\nstanding in it.",
-        "???: The necklace. It\nslips. A little forward,\na little back. Sideways.",
-        "???: Sideways is worst.\nA world where no one\nlit a single lamp.",
-        SEER ": Breathe. Look at\nme. One sky. This one.",
-        PARTNER ": Sit, before you\nfall through the floor.\nThere. Better.",
-        "The flickering slows.\nThe necklace still hums.",
-        "???: ...Thank you. I\ncan't make it stop. I\ndon't know when I am.",
-        SEER ": There are several\nskies in that stone. The\nElder of " RPG_NAME_SEER_TOWN " reads such.",
-        HERO ": Then we ask her.\nStay here. You are safe\nin " RPG_NAME_VILLAGE ".",
+        RPG_T("Someone stands in the\nsquare, flickering like\na candle in the wind.",
+              "広場に誰かが立っている。\n風の中のろうそくのように、\nゆらめきながら。"),
+        RPG_T("???: It was morning. Then\nlast winter. Then this\nplace was ash. Is it ash?",
+              "？？？「朝だった。次は去年の冬。\n　次は、ここが灰だった。\n　ここは、灰？」"),
+        RPG_T(HERO ": Easy. This is " RPG_NAME_VILLAGE ".\nIt's rebuilt. You are\nstanding in it.",
+              HERO_JA "「大丈夫だ。ここは" VILLAGE_JA "村だ。\n　建て直した。あんたは今、\n　その中に立っている。」"),
+        RPG_T("???: The necklace. It\nslips. A little forward,\na little back. Sideways.",
+              "？？？「首飾りが。すべるんだ。\n　少し先へ、少し昔へ。\n　それから、横へ。」"),
+        RPG_T("???: Sideways is worst.\nA world where no one\nlit a single lamp.",
+              "？？？「横がいちばんひどい。\n　誰ひとり灯火を\n　ともさなかった世界だ。」"),
+        RPG_T(SEER ": Breathe. Look at\nme. One sky. This one.",
+              RPG_NAME_SEER_JA "「息をして。私を見て。\n　空はひとつ。\n　この空だけです。」"),
+        RPG_T(PARTNER ": Sit, before you\nfall through the floor.\nThere. Better.",
+              PARTNER_JA "「座れ。床をすりぬけて\n　落ちる前にな。\n　……そうだ。それでいい。」"),
+        RPG_T("The flickering slows.\nThe necklace still hums.",
+              "ゆらめきが、ゆるやかになる。\n首飾りは、まだうなっている。"),
+        RPG_T("???: ...Thank you. I\ncan't make it stop. I\ndon't know when I am.",
+              "？？？「……ありがとう。\n　止められないんだ。自分が\n　いつにいるのか分からない。」"),
+        RPG_T(SEER ": There are several\nskies in that stone. The\nElder of " RPG_NAME_SEER_TOWN " reads such.",
+              RPG_NAME_SEER_JA "「その石の中には、空が\n　いくつもあります。" RPG_NAME_SEER_TOWN_JA "の\n　長なら、読み解けます。」"),
+        RPG_T(HERO ": Then we ask her.\nStay here. You are safe\nin " RPG_NAME_VILLAGE ".",
+              HERO_JA "「なら、長に頼もう。\n　ここにいてくれ。\n　" VILLAGE_JA "村なら安全だ。」"),
     };
 
     constexpr bn::string_view post_seer_elder_pages[] = {
-        "Elder Seer: " SEER ". You\nbring a strange star\nhome with you.",
-        SEER ": A necklace that\nslips through time.\nAnd across worlds.",
-        "Elder Seer: Forward, back\nand aside. Three threads\nnever meant to be tied.",
-        "Elder Seer: Its clasp is\n" RPG_NAME_SEER_TOWN " work. Older\nthan I am.",
-        "Elder Seer: I will read\nits sky. Come back when\nthe stars have turned.",
+        RPG_T("Elder Seer: " SEER ". You\nbring a strange star\nhome with you.",
+              "星読みの長「" RPG_NAME_SEER_JA "。\n　ふしぎな星を\n　連れて帰ってきたね。」"),
+        RPG_T(SEER ": A necklace that\nslips through time.\nAnd across worlds.",
+              RPG_NAME_SEER_JA "「時をすべる首飾りです。\n　そして、世界のあいだも。」"),
+        RPG_T("Elder Seer: Forward, back\nand aside. Three threads\nnever meant to be tied.",
+              "星読みの長「先へ、昔へ、横へ。\n　結ばれるはずのなかった、\n　三本の糸だね。」"),
+        RPG_T("Elder Seer: Its clasp is\n" RPG_NAME_SEER_TOWN " work. Older\nthan I am.",
+              "星読みの長「この留め金は\n　" RPG_NAME_SEER_TOWN_JA "の細工だよ。\n　私よりも古い。」"),
+        RPG_T("Elder Seer: I will read\nits sky. Come back when\nthe stars have turned.",
+              "星読みの長「その空を読んで\n　みよう。星がめぐったころに、\n　またおいで。」"),
     };
 
     constexpr bn::string_view post_seer_elder_wait_pages[] = {
-        "Elder Seer: The reading\nis not done. Patience.",
+        RPG_T("Elder Seer: The reading\nis not done. Patience.",
+              "星読みの長「読み解きは\n　まだ終わっていないよ。\n　あせらずにね。」"),
     };
 
     constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };

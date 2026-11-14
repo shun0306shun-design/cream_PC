@@ -171,7 +171,8 @@ namespace
     };
 
     constexpr bn::string_view stranger_pages[] = {
-        "???: I will stay. If I\nflicker, tell me what\nday it is.",
+        RPG_T("???: I will stay. If I\nflicker, tell me what\nday it is.",
+              "？？？「ここにいるよ。\n　もしゆらめいたら、\n　今日が何日か教えて。」"),
     };
 
     constexpr bn::string_view survivor_rebuilt_pages[] = {
