@@ -4,6 +4,7 @@
 #include "bn_sstream.h"
 
 #include "rpg_ui.h"
+#include "rpg_text.h"
 #include "rpg_equip_menu.h"
 #include "rpg_game_state.h"
 
@@ -12,7 +13,7 @@ namespace rpg
 
 namespace
 {
-    using Label = bn::string<32>;
+    using Label = bn::string<64>;      // Room for UTF-8 Japanese (3 bytes per character).
 
     // Layout, in cells. The submenus open at the right of the main menu.
     constexpr int main_cols = 10;
@@ -61,7 +62,7 @@ namespace
                 total += apply_heal(effect, member, state.random);
             }
 
-            stream << "The party recovers!";
+            stream << tr("The party recovers!", "みんなの体力が回復した！");
         }
         else
         {
@@ -74,10 +75,12 @@ namespace
 
             PartyMember& member = party.members[target];
             total = apply_heal(effect, member, state.random);
-            stream << member.name() << " recovers " << total << (effect.type == EffectType::heal_hp ? " HP." : " MP.");
+            bool heals_hp = effect.type == EffectType::heal_hp;
+            stream << member.name() << tr(" recovers ", heals_hp ? "のHPが" : "のMPが") << total
+                   << tr(heals_hp ? " HP." : " MP.", "回復した。");
         }
 
-        say(ui, total > 0 ? bn::string_view(text) : bn::string_view("It has no effect."));
+        say(ui, total > 0 ? bn::string_view(text) : bn::string_view(RPG_T("It has no effect.", "効果がなかった。")));
         return total > 0;
     }
 
@@ -111,13 +114,14 @@ namespace
             {
                 line.clear();
                 bn::ostringstream stream(line);
-                stream << "ATK " << stats.attack << "  DEF " << stats.defense << "  AGI " << stats.agility;
+                stream << tr("ATK ", "攻 ") << stats.attack << tr("  DEF ", "  守 ") << stats.defense
+                       << tr("  AGI ", "  速 ") << stats.agility;
                 window.print(2, line);
             }
             {
                 line.clear();
                 bn::ostringstream stream(line);
-                stream << "EXP " << member.exp << "   Next " << member.exp_to_next_level();
+                stream << tr("EXP ", "経験値 ") << member.exp << tr("   Next ", "  あと ") << member.exp_to_next_level();
                 window.print(3, line);
             }
 
@@ -127,7 +131,8 @@ namespace
                 ItemId worn = member.equipped(slot == 0 ? ItemKind::weapon : ItemKind::armor);
                 line.clear();
                 bn::ostringstream stream(line);
-                stream << (slot == 0 ? "W: " : "A: ") << (worn == ItemId::none ? "-" : item_data(worn).name);
+                stream << (slot == 0 ? tr("W: ", "武器: ") : tr("A: ", "防具: ")) << (worn == ItemId::none ? bn::string_view("-") :
+                                                                                        localized(item_data(worn).name));
                 window.print(4 + slot, line);
             }
 
@@ -153,7 +158,7 @@ namespace
                 if(int amount = party.item_amount(id); amount > 0 && item_data(id).kind == ItemKind::consumable)
                 {
                     bn::ostringstream stream(labels[ids.size()]);
-                    stream << item_data(id).name << "  x" << amount;
+                    stream << localized(item_data(id).name) << "  x" << amount;
                     options[ids.size()] = labels[ids.size()];
                     ids.push_back(id);
                 }
@@ -161,7 +166,7 @@ namespace
 
             if(ids.empty())
             {
-                say(ui, "You have no items.");
+                say(ui, RPG_T("You have no items.", "道具を持っていない。"));
                 return;
             }
 
@@ -181,7 +186,7 @@ namespace
 
             if(! item.effect.is_heal())
             {
-                say(ui, "You can't use that here.");
+                say(ui, RPG_T("You can't use that here.", "ここでは使えない。"));
             }
             else if(use_heal_effect(item.effect, state, ui))
             {
@@ -219,7 +224,7 @@ namespace
                     if(spell.effect.is_heal())
                     {
                         bn::ostringstream stream(labels[spells.size()]);
-                        stream << spell.name << "  " << spell.mp_cost << " MP";
+                        stream << localized(spell.name) << "  " << spell.mp_cost << " MP";
                         options[spells.size()] = labels[spells.size()];
                         spells.push_back(id);
                     }
@@ -228,7 +233,7 @@ namespace
 
             if(spells.empty())
             {
-                say(ui, "No spells to cast here.");
+                say(ui, RPG_T("No spells to cast here.", "ここで使える呪文がない。"));
                 continue;
             }
 
@@ -248,7 +253,7 @@ namespace
 
             if(caster.mp < spell.mp_cost)
             {
-                say(ui, "Not enough MP.");
+                say(ui, RPG_T("Not enough MP.", "MPが足りない。"));
             }
             else if(use_heal_effect(spell.effect, state, ui))
             {
@@ -260,7 +265,10 @@ namespace
 
 void open_field_menu(GameState& state, Ui& ui)
 {
-    static constexpr bn::string_view options[] = { "Status", "Items", "Magic", "Equip", "Save" };
+    static constexpr bn::string_view options[] = {
+        RPG_T("Status", "つよさ"), RPG_T("Items", "どうぐ"), RPG_T("Magic", "まほう"), RPG_T("Equip", "そうび"),
+        RPG_T("Save", "セーブ")
+    };
 
     Menu menu(ui, 0, 0, main_cols, options, 5);
 
@@ -301,7 +309,7 @@ void open_field_menu(GameState& state, Ui& ui)
 
         case 4:
             save_game(state);
-            say(ui, "Game saved.");
+            say(ui, RPG_T("Game saved.", "セーブしました。"));
             break;
 
         default:

@@ -859,51 +859,81 @@ namespace
     // Chapter 10 "Green in the Ash"
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view voyage_pages[] = {
-        "The " SHIP " is ready.\nShe sails south, around\nthe " GATE ", toward home.",
+        RPG_T("The " SHIP " is ready.\nShe sails south, around\nthe " GATE ", toward home.",
+              RPG_NAME_SHIP_JA "の準備はできた。\n船は南へ、" RPG_NAME_GATE_JA "を回って\n故郷へ向かう。"),
     };
 
     constexpr bn::string_view homecoming_pages[] = {
-        RPG_NAME_VILLAGE ". Nothing has\nchanged. Ash, and two\ngraves.",
-        HERO ": I killed him. I\nthought it would feel\nlike coming home.",
-        "In your pack, something\nis warm. An ember of the\nPyre. Still alive.",
+        RPG_T(RPG_NAME_VILLAGE ". Nothing has\nchanged. Ash, and two\ngraves.",
+              VILLAGE_JA "村。\n何も変わっていない。\n灰と、ふたつの墓。"),
+        RPG_T(HERO ": I killed him. I\nthought it would feel\nlike coming home.",
+              HERO_JA "「あいつをたおした。\n　帰ってきた気持ちになれると\n　思っていたんだ。」"),
+        RPG_T("In your pack, something\nis warm. An ember of the\nPyre. Still alive.",
+              "荷物の中で、何かが温かい。\n火葬台の残り火だ。\nまだ、生きている。"),
     };
 
     constexpr bn::string_view grave_ember_pages[] = {
-        "The ember burns in your\nhand. A whisper: Feed me,\nand they walk out.",
-        HERO ": ...Father. Mother.",
-        "For one breath, the fire\ngrows. The ash of " RPG_NAME_VILLAGE "\nbegins to rise.",
-        PARTNER ": " HERO "!",
-        SEER ": Look down. Not at\nthe fire. Down.",
-        "By the graves, in the\nash: one green shoot.",
-        HERO ": ...No. They don't\ncome back.",
-        HERO " presses the ember\ninto the wet earth.\nIt goes out.",
-        HERO ": But something\nelse can.",
+        RPG_T("The ember burns in your\nhand. A whisper: Feed me,\nand they walk out.",
+              "手の中で残り火が燃える。\nささやき声がする。\n「くべよ。さすれば歩み出る」"),
+        RPG_T(HERO ": ...Father. Mother.",
+              HERO_JA "「……父さん。母さん。」"),
+        RPG_T("For one breath, the fire\ngrows. The ash of " RPG_NAME_VILLAGE "\nbegins to rise.",
+              "ひと息の間、炎が大きくなる。\n" VILLAGE_JA "村の灰が、\n舞い上がりはじめる。"),
+        RPG_T(PARTNER ": " HERO "!",
+              PARTNER_JA "「" HERO_JA "！」"),
+        RPG_T(SEER ": Look down. Not at\nthe fire. Down.",
+              RPG_NAME_SEER_JA "「下を見て。\n　炎ではなく。足もとを。」"),
+        RPG_T("By the graves, in the\nash: one green shoot.",
+              "墓のそば、灰の中に、\n緑の芽がひとつ。"),
+        RPG_T(HERO ": ...No. They don't\ncome back.",
+              HERO_JA "「……いや。\n　ふたりは、帰ってこない。」"),
+        RPG_T(HERO " presses the ember\ninto the wet earth.\nIt goes out.",
+              HERO_JA "は残り火を、\nしめった土に押しこんだ。\n火が消える。"),
+        RPG_T(HERO ": But something\nelse can.",
+              HERO_JA "「でも、別のものなら\n　芽を出せる。」"),
     };
 
     constexpr bn::string_view rebuild_pages[] = {
-        "Elder: You came back,\n" HERO ". All of you.",
-        "Elder: We meant to\nrebuild. We had no\nhands, and no heart.",
-        HERO ": You have hands\nnow. Where do we start?",
-        NOX ": I know how things\nburn. Let me learn how\nthey are built.",
+        RPG_T("Elder: You came back,\n" HERO ". All of you.",
+              "長老「帰ってきたか、" HERO_JA "。\n　みな、そろってな。」"),
+        RPG_T("Elder: We meant to\nrebuild. We had no\nhands, and no heart.",
+              "長老「建て直すつもりじゃった。\n　だが人手も、気力も\n　なかったのじゃ。」"),
+        RPG_T(HERO ": You have hands\nnow. Where do we start?",
+              HERO_JA "「人手なら、今はある。\n　どこから始める？」"),
+        RPG_T(NOX ": I know how things\nburn. Let me learn how\nthey are built.",
+              RPG_NAME_DEFECTOR_JA "「燃やし方なら知っている。\n　建て方を、\n　学ばせてほしい。」"),
     };
 
     constexpr bn::string_view seasons_pages[] = {
-        "Seasons pass. Walls rise.\nThe well runs clear.\nPeople come, and stay.",
+        RPG_T("Seasons pass. Walls rise.\nThe well runs clear.\nPeople come, and stay.",
+              "季節がめぐる。壁が立つ。\n井戸の水がすむ。\n人が来て、住みつく。"),
     };
 
     constexpr bn::string_view coronation_pages[] = {
-        "Elder: They have come\nfrom " REFUGE ", " RPG_NAME_MINE_TOWN ",\n" RPG_NAME_HARBOR ". All of them.",
-        "Keeper: We dug this out\nof " CAPITAL ". The realm\nneeds a king.",
-        "A crown of gold, black\nwith soot.",
-        HERO ": Not that one.",
-        SEER " weaves a ring of\ngreen shoots from the\nash, and holds it out.",
-        PARTNER ": King of one\nvillage and a great\ndeal of ash.",
-        HERO ": It's a start.",
-        HERO " is crowned, in\nthe square of " RPG_NAME_VILLAGE ",\nbeside two graves.",
-        HERO ": Father. Mother.\nI'm home. You are\nnot here.",
-        HERO ": ...That's all\nright.",
-        "What burned will not\nreturn. What grows now\nis new.",
-        "- THE END -\nThank you for playing.",
+        RPG_T("Elder: They have come\nfrom " REFUGE ", " RPG_NAME_MINE_TOWN ",\n" RPG_NAME_HARBOR ". All of them.",
+              "長老「" RPG_NAME_REFUGE_JA "から、\n　" RPG_NAME_MINE_TOWN_JA "から、" RPG_NAME_HARBOR_JA "から。\n　みな、来てくれたぞ。」"),
+        RPG_T("Keeper: We dug this out\nof " CAPITAL ". The realm\nneeds a king.",
+              "灯守り「" RPG_NAME_CAPITAL_JA "から\n　掘り出してきたよ。\n　国には、王が要る。」"),
+        RPG_T("A crown of gold, black\nwith soot.",
+              "すすで黒ずんだ、\n金の王冠。"),
+        RPG_T(HERO ": Not that one.",
+              HERO_JA "「それじゃない。」"),
+        RPG_T(SEER " weaves a ring of\ngreen shoots from the\nash, and holds it out.",
+              RPG_NAME_SEER_JA "が、灰から出た緑の芽で\n輪をあみ、さし出した。"),
+        RPG_T(PARTNER ": King of one\nvillage and a great\ndeal of ash.",
+              PARTNER_JA "「村ひとつと、\n　山ほどの灰の王さまか。」"),
+        RPG_T(HERO ": It's a start.",
+              HERO_JA "「ここから始めるさ。」"),
+        RPG_T(HERO " is crowned, in\nthe square of " RPG_NAME_VILLAGE ",\nbeside two graves.",
+              HERO_JA "は、" VILLAGE_JA "村の広場で\n王冠をいただいた。\nふたつの墓のそばで。"),
+        RPG_T(HERO ": Father. Mother.\nI'm home. You are\nnot here.",
+              HERO_JA "「父さん。母さん。\n　ただいま。\n　ふたりは、ここにいない。」"),
+        RPG_T(HERO ": ...That's all\nright.",
+              HERO_JA "「……それで、いいんだ。」"),
+        RPG_T("What burned will not\nreturn. What grows now\nis new.",
+              "燃えたものは、戻らない。\n今、育つものは、\n新しいものだ。"),
+        RPG_T("- THE END -\nThank you for playing.",
+              "- おわり -\n遊んでくれてありがとう。"),
     };
 
     constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };

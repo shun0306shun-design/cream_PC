@@ -5,6 +5,7 @@
 #include "bn_sstream.h"
 
 #include "rpg_ui.h"
+#include "rpg_text.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -12,7 +13,7 @@ namespace rpg
 
 namespace
 {
-    using Label = bn::string<32>;
+    using Label = bn::string<64>;      // Room for UTF-8 Japanese (3 bytes per character).
 
     // Same area as the other field submenus: right of the main menu. Everything stays above row 12,
     // where the message box (used for the result messages) starts.
@@ -22,12 +23,12 @@ namespace
 
     static_assert(Window::rows_for_lines(list_lines) + 1 <= screen_rows - MessageBox::box_rows, "List too tall");
 
-    /// Writes the stat changes of an item: "ATK+5 DEF+2".
+    /// Writes the stat changes of an item: "ATK+5 DEF+2" (in Japanese, one kanji per stat).
     void print_bonus(bn::ostringstream& stream, const Stats& bonus)
     {
         bool first = true;
 
-        auto add = [&](const char* name, int value)
+        auto add = [&](const bn::string_view& name, int value)
         {
             if(value != 0)
             {
@@ -38,9 +39,9 @@ namespace
 
         add("HP", bonus.max_hp);
         add("MP", bonus.max_mp);
-        add("ATK", bonus.attack);
-        add("DEF", bonus.defense);
-        add("AGI", bonus.agility);
+        add(tr("ATK", "攻"), bonus.attack);
+        add(tr("DEF", "守"), bonus.defense);
+        add(tr("AGI", "速"), bonus.agility);
     }
 
     /// Returns the index of the chosen member or -1.
@@ -70,7 +71,7 @@ namespace
 
         if(worn != ItemId::none)
         {
-            labels[0] = "(Take off)";
+            labels[0] = RPG_T("(Take off)", "（はずす）");
             options[0] = labels[0];
             ids.push_back(ItemId::none);
         }
@@ -83,7 +84,7 @@ namespace
             if(item.kind == slot && (item.classes & class_bit(member.class_id)) && party.item_amount(id) > 0)
             {
                 bn::ostringstream stream(labels[ids.size()]);
-                stream << item.name << "  ";
+                stream << localized(item.name) << "  ";
                 print_bonus(stream, item.bonus);
                 options[ids.size()] = labels[ids.size()];
                 ids.push_back(id);
@@ -94,7 +95,7 @@ namespace
 
         if(ids.empty())
         {
-            box.say("Nothing to equip.");
+            box.say(RPG_T("Nothing to equip.", "装備できるものがない。"));
             return;
         }
 
@@ -119,16 +120,16 @@ namespace
         {
             if(id == ItemId::none)
             {
-                stream << member.name() << " took off\n" << item_data(worn).name << ".";
+                stream << member.name() << tr(" took off\n", "は\n") << localized(item_data(worn).name) << tr(".", "をはずした。");
             }
             else
             {
-                stream << member.name() << " equipped\n" << item_data(id).name << ".";
+                stream << member.name() << tr(" equipped\n", "は\n") << localized(item_data(id).name) << tr(".", "を装備した。");
             }
         }
         else
         {
-            stream << "Your bag is full.";      // The other results can't happen with this menu.
+            stream << tr("Your bag is full.", "道具袋がいっぱいだ。");      // The other results can't happen with this menu.
         }
 
         box.say(text);
@@ -152,7 +153,8 @@ namespace
                 {
                     ItemId worn = member.equipped(index == 0 ? ItemKind::weapon : ItemKind::armor);
                     bn::ostringstream stream(labels[index]);
-                    stream << (index == 0 ? "W: " : "A: ") << (worn == ItemId::none ? "-" : item_data(worn).name);
+                    stream << (index == 0 ? tr("W: ", "武器: ") : tr("A: ", "防具: ")) << (worn == ItemId::none ? bn::string_view("-") :
+                                                                                            localized(item_data(worn).name));
                     options[index] = labels[index];
                 }
 
@@ -171,7 +173,8 @@ namespace
                 {
                     line.clear();
                     bn::ostringstream stream(line);
-                    stream << "ATK " << stats.attack << "  DEF " << stats.defense << "  AGI " << stats.agility;
+                    stream << tr("ATK ", "攻 ") << stats.attack << tr("  DEF ", "  守 ") << stats.defense
+                           << tr("  AGI ", "  速 ") << stats.agility;
                     stats_window.print(1, line);
                 }
 

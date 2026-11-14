@@ -3,6 +3,7 @@
 #include "bn_sstream.h"
 #include "bn_sprite_item.h"
 
+#include "rpg_text.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -10,8 +11,9 @@ namespace rpg
 
 namespace
 {
-    using Text = bn::string<96>;
-    using Label = bn::string<32>;
+    // Room for UTF-8 Japanese (3 bytes per character).
+    using Text = bn::string<192>;
+    using Label = bn::string<64>;
 
     // Screen layout, in cells:
     //   rows 0-6:   party status window
@@ -19,7 +21,7 @@ namespace
     //   rows 12-19: command menu (left) + submenus (right), or the message box
     constexpr int status_rows = Window::rows_for_lines(3);
     constexpr int bottom_row = screen_rows - MessageBox::box_rows;
-    constexpr int command_cols = 9;
+    constexpr int command_cols = 10;     // 4 full width characters + the cursor.
     constexpr int sub_col = command_cols;
     constexpr int sub_cols = screen_columns - command_cols;
     constexpr int status_column_width = (screen_width - 16) / max_party_size;     // In pixels.
@@ -58,7 +60,7 @@ BattleScene::BattleScene(GameState& state, Ui& ui, const EncounterGroup& group, 
             }
         }
 
-        bn::string<16> name(data.name);
+        bn::string<32> name(localized(data.name));     // In the language of the battle start.
 
         if(same_kind > 1)
         {
@@ -95,11 +97,11 @@ BattleResult BattleScene::_run_battle()
 
         if(_enemies.size() == 1)
         {
-            stream << _enemies[0].name << " appears!";
+            stream << _enemies[0].name << tr(" appears!", "があらわれた！");
         }
         else
         {
-            stream << _enemies[0].name << " and company\nappear!";
+            stream << _enemies[0].name << tr(" and company\nappear!", "たちが\nあらわれた！");
         }
 
         box.say(text);
@@ -129,7 +131,7 @@ BattleResult BattleScene::_run_battle()
 
         if(_party.all_dead())
         {
-            box.say("The party was wiped out...");
+            box.say(RPG_T("The party was wiped out...", "パーティは全滅した……"));
             return BattleResult::defeat;
         }
     }
@@ -218,7 +220,9 @@ bool BattleScene::_select_commands()
 
 BattleScene::CommandResult BattleScene::_select_command(int member_index)
 {
-    static constexpr bn::string_view commands[] = { "Fight", "Magic", "Item", "Run" };
+    static constexpr bn::string_view commands[] = {
+        RPG_T("Fight", "たたかう"), RPG_T("Magic", "まほう"), RPG_T("Item", "どうぐ"), RPG_T("Run", "にげる")
+    };
 
     const PartyMember& member = _party.members[member_index];
     Action& action = _actions[member_index];
@@ -232,7 +236,7 @@ BattleScene::CommandResult BattleScene::_select_command(int member_index)
             // Shown only while the command menu has the focus: the submenus use the same space.
             Window info(_ui, sub_col, bottom_row, sub_cols, MessageBox::box_rows);
             info.print(0, member.name());
-            info.print(1, "What will you do?");
+            info.print(1, RPG_T("What will you do?", "どうする？"));
             command = command_menu.run();
         }
 
@@ -279,7 +283,7 @@ bool BattleScene::_choose_spell(int member_index, Action& action)
 
     if(spells.empty())
     {
-        _notice("No spells learned yet.");
+        _notice(RPG_T("No spells learned yet.", "まだ呪文を\n覚えていない。"));
         return false;
     }
 
@@ -290,7 +294,7 @@ bool BattleScene::_choose_spell(int member_index, Action& action)
     {
         const SpellData& spell = spell_data(spells[index]);
         bn::ostringstream stream(labels[index]);
-        stream << spell.name << "  " << spell.mp_cost << " MP";
+        stream << localized(spell.name) << "  " << spell.mp_cost << " MP";
         options[index] = labels[index];
     }
 
@@ -312,7 +316,7 @@ bool BattleScene::_choose_spell(int member_index, Action& action)
 
         if(member.mp < spell.mp_cost)
         {
-            _notice("Not enough MP.");
+            _notice(RPG_T("Not enough MP.", "MPが足りない。"));
         }
         else if(_choose_target(spell.effect, action))
         {
@@ -336,7 +340,7 @@ bool BattleScene::_choose_item(Action& action)
         if(int amount = _party.item_amount(id); amount > 0 && item_data(id).kind == ItemKind::consumable)
         {
             bn::ostringstream stream(labels[ids.size()]);
-            stream << item_data(id).name << "  x" << amount;
+            stream << localized(item_data(id).name) << "  x" << amount;
             options[ids.size()] = labels[ids.size()];
             ids.push_back(id);
         }
@@ -344,7 +348,7 @@ bool BattleScene::_choose_item(Action& action)
 
     if(ids.empty())
     {
-        _notice("You have no items.");
+        _notice(RPG_T("You have no items.", "道具を持っていない。"));
         return false;
     }
 
@@ -518,7 +522,7 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
 
             if(target >= 0)
             {
-                stream << member.name() << " attacks!";
+                stream << member.name() << tr(" attacks!", "の攻撃！");
                 box.say_timed(text);
 
                 int defense = _enemies[target].data->stats.defense;
@@ -530,7 +534,7 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
     case ActionType::spell:
         {
             const SpellData& spell = spell_data(SpellId(action.id));
-            stream << member.name() << " casts " << spell.name << "!";
+            stream << member.name() << tr(" casts ", "は") << localized(spell.name) << tr("!", "をとなえた！");
             box.say_timed(text);
 
             member.mp = int16_t(member.mp - spell.mp_cost);
@@ -547,13 +551,14 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
             // Two members may have chosen the last unit of the same item.
             if(_party.remove_item(id))
             {
-                stream << member.name() << " uses " << item.name << "!";
+                stream << member.name() << tr(" uses ", "は") << localized(item.name) << tr("!", "を使った！");
                 box.say_timed(text);
                 _apply_party_effect(item.effect, action.target, box);
             }
             else
             {
-                stream << member.name() << " looks for " << item.name << ",\nbut there are none left!";
+                stream << member.name() << tr(" looks for ", "は") << localized(item.name)
+                       << tr(",\nbut there are none left!", "を探したが、\nもう残っていない！");
                 box.say_timed(text);
             }
         }
@@ -582,14 +587,14 @@ void BattleScene::_enemy_turn(int enemy_index, MessageBox& box)
     if(data.spell_chance > 0 && _state.random.get_int(100) < data.spell_chance)
     {
         const SpellData& spell = spell_data(data.spell);
-        stream << enemy.name << " casts " << spell.name << "!";
+        stream << enemy.name << tr(" casts ", "は") << localized(spell.name) << tr("!", "をとなえた！");
         box.say_timed(text);
         _apply_enemy_effect(spell.effect, enemy_index, box);
     }
     else
     {
         int target = _random_alive_member();
-        stream << enemy.name << " attacks!";
+        stream << enemy.name << tr(" attacks!", "の攻撃！");
         box.say_timed(text);
 
         int defense = _party.members[target].stats().defense;
@@ -692,12 +697,12 @@ void BattleScene::_damage_enemy(int enemy_index, int amount, MessageBox& box)
 
     Text text;
     bn::ostringstream stream(text);
-    stream << enemy.name << " takes " << amount << " damage!";
+    stream << enemy.name << tr(" takes ", "に") << amount << tr(" damage!", "のダメージ！");
 
     if(! enemy.alive())
     {
         enemy.sprite.set_visible(false);
-        stream << "\n" << enemy.name << " is defeated!";
+        stream << "\n" << enemy.name << tr(" is defeated!", "をたおした！");
     }
 
     box.say_timed(text);
@@ -711,11 +716,11 @@ void BattleScene::_damage_member(int member_index, int amount, MessageBox& box)
 
     Text text;
     bn::ostringstream stream(text);
-    stream << member.name() << " takes " << amount << " damage!";
+    stream << member.name() << tr(" takes ", "は") << amount << tr(" damage!", "のダメージを受けた！");
 
     if(! member.alive())
     {
-        stream << "\n" << member.name() << " falls!";
+        stream << "\n" << member.name() << tr(" falls!", "はたおれた！");
     }
 
     box.say_timed(text);
@@ -731,11 +736,13 @@ void BattleScene::_heal_member(int member_index, const Effect& effect, MessageBo
     {
         int amount = apply_heal(effect, member, _state.random);
         _refresh_status();
-        stream << member.name() << " recovers " << amount << (effect.type == EffectType::heal_hp ? " HP." : " MP.");
+        bool heals_hp = effect.type == EffectType::heal_hp;
+        stream << member.name() << tr(" recovers ", heals_hp ? "のHPが" : "のMPが") << amount
+               << tr(heals_hp ? " HP." : " MP.", "回復した。");
     }
     else
     {
-        stream << "It has no effect on " << member.name() << ".";
+        stream << tr("It has no effect on ", "") << member.name() << tr(".", "には効果がなかった。");
     }
 
     box.say_timed(text);
@@ -755,27 +762,27 @@ void BattleScene::_heal_enemy(int enemy_index, int amount, MessageBox& box)
 
     Text text;
     bn::ostringstream stream(text);
-    stream << enemy.name << " recovers " << amount << " HP.";
+    stream << enemy.name << tr(" recovers ", "のHPが") << amount << tr(" HP.", "回復した。");
     box.say_timed(text);
 }
 
 bool BattleScene::_try_escape(MessageBox& box)
 {
-    box.say_timed("The party tries to run away...");
+    box.say_timed(RPG_T("The party tries to run away...", "パーティは逃げ出した……"));
 
     if(! _can_escape)
     {
-        box.say_timed("There is no escape\nfrom this fight!");
+        box.say_timed(RPG_T("There is no escape\nfrom this fight!", "この戦いからは\n逃げられない！"));
         return false;
     }
 
     if(_state.random.get_int(100) < 60)
     {
-        box.say("Got away safely!");
+        box.say(RPG_T("Got away safely!", "うまく逃げきれた！"));
         return true;
     }
 
-    box.say_timed("But the enemies block the way!");
+    box.say_timed(RPG_T("But the enemies block the way!", "だが、敵に道をふさがれた！"));
     return false;
 }
 
@@ -795,7 +802,8 @@ void BattleScene::_victory(MessageBox& box)
     {
         Text text;
         bn::ostringstream stream(text);
-        stream << "You won the battle!\nGained " << exp << " EXP and " << gold << " gold.";
+        stream << tr("You won the battle!\nGained ", "戦いに勝った！\n経験値") << exp << tr(" EXP and ", "と") << gold
+               << tr(" gold.", "ゴールドを得た。");
         box.say(text);
     }
 
@@ -815,13 +823,13 @@ void BattleScene::_victory(MessageBox& box)
 
             Text text;
             bn::ostringstream stream(text);
-            stream << member.name() << " reached level " << member.level << "!";
+            stream << member.name() << tr(" reached level ", "はレベル") << member.level << tr("!", "になった！");
 
             for(const SpellLearn& learn : class_data(member.class_id).spells)
             {
                 if(learn.level > old_level && learn.level <= member.level)
                 {
-                    stream << "\nLearned " << spell_data(learn.spell).name << "!";
+                    stream << tr("\nLearned ", "\n") << localized(spell_data(learn.spell).name) << tr("!", "を覚えた！");
                 }
             }
 

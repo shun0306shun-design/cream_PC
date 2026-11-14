@@ -2,6 +2,7 @@
 
 #include "bn_assert.h"
 
+#include "rpg_text.h"
 #include "rpg_names.h"
 
 namespace rpg
@@ -30,12 +31,12 @@ namespace
     constexpr ClassData classes[] = {
         //              level 1 stats            growth per level x10
         //  name        HP  MP  ATK DEF AGI      HP  MP  ATK DEF AGI     spells
-        { RPG_NAME_HERO, { 30, 8,  14, 10, 8  },  { 60, 20, 25, 20, 15 },   hero_spells },
-        { "Samurai",  { 36, 0,  18, 9,  10 },  { 70, 0,  32, 18, 20 },   {} },
-        { RPG_NAME_DEFECTOR, { 24, 14, 9,  8,  7  },  { 45, 35, 14, 16, 14 },   priest_spells },
-        { RPG_NAME_SEER, { 20, 18, 6,  6,  9  },  { 38, 42, 10, 12, 18 },   mage_spells },
+        { RPG_T(RPG_NAME_HERO, RPG_NAME_HERO_JA), { 30, 8,  14, 10, 8  },  { 60, 20, 25, 20, 15 },   hero_spells },
+        { RPG_T("Samurai", "サムライ"),  { 36, 0,  18, 9,  10 },  { 70, 0,  32, 18, 20 },   {} },
+        { RPG_T(RPG_NAME_DEFECTOR, RPG_NAME_DEFECTOR_JA), { 24, 14, 9,  8,  7  },  { 45, 35, 14, 16, 14 },   priest_spells },
+        { RPG_T(RPG_NAME_SEER, RPG_NAME_SEER_JA), { 20, 18, 6,  6,  9  },  { 38, 42, 10, 12, 18 },   mage_spells },
         // The partner: strikes first and hard, but has less defense than the hero and no magic.
-        { RPG_NAME_PARTNER, { 28, 0, 16, 8, 14 }, { 55, 0, 28, 15, 28 }, {} },
+        { RPG_T(RPG_NAME_PARTNER, RPG_NAME_PARTNER_JA), { 28, 0, 16, 8, 14 }, { 55, 0, 28, 15, 28 }, {} },
     };
 
     static_assert(sizeof(classes) / sizeof(classes[0]) == int(ClassId::count), "Class table doesn't match ClassId");

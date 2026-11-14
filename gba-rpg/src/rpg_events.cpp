@@ -178,7 +178,7 @@ bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr*
         party.add_item(event.item, event.item_amount);
 
         bn::ostringstream stream(text);
-        stream << tr("Found ", "") << item_data(event.item).name;
+        stream << tr("Found ", "") << localized(item_data(event.item).name);
 
         if(event.item_amount > 1)
         {

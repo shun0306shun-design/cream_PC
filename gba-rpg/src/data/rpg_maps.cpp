@@ -166,15 +166,18 @@ namespace
     static_assert(valid_layout(village_rebuilt_rows), "Invalid rebuilt village layout");
 
     constexpr bn::string_view elder_king_pages[] = {
-        "Elder: Long live the king.\nNow, the well needs\nmending, sire.",
+        RPG_T("Elder: Long live the king.\nNow, the well needs\nmending, sire.",
+              "長老「王さま、ばんざい。\n　さて、井戸の修理が\n　残っておりますぞ、陛下。」"),
     };
 
     constexpr bn::string_view survivor_rebuilt_pages[] = {
-        "It isn't the same.\nBut the bread is warm,\nand the door shuts.",
+        RPG_T("It isn't the same.\nBut the bread is warm,\nand the door shuts.",
+              "元どおりじゃない。\nでもパンは温かいし、\n戸はちゃんと閉まる。"),
     };
 
     constexpr bn::string_view grave_rebuilt_pages[] = {
-        "Father and Mother rest\nhere. Flowers grow\naround them now.",
+        RPG_T("Father and Mother rest\nhere. Flowers grow\naround them now.",
+              "父と母が、ここに眠る。\n今は、まわりに\n花が咲いている。"),
     };
 
     constexpr bn::string_view villager_pages[] = {

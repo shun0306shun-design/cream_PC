@@ -40,7 +40,7 @@ private:
     {
         const EnemyData* data;
         int16_t hp;
-        bn::string<16> name;        //!< With a letter suffix if there are several of the same kind.
+        bn::string<32> name;        //!< With a letter suffix if there are several of the same kind.
         bn::sprite_ptr sprite;
 
         [[nodiscard]] bool alive() const

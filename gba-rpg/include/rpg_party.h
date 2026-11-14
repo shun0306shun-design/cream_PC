@@ -9,6 +9,7 @@
 #include "bn_span.h"
 #include "bn_vector.h"
 
+#include "rpg_text.h"
 #include "rpg_classes.h"
 #include "rpg_items.h"
 
@@ -32,9 +33,10 @@ struct PartyMember
     /// Sets class and level, with full HP and MP.
     void init(ClassId new_class_id, int new_level);
 
+    /// The name in the current language (class names are RPG_T texts).
     [[nodiscard]] bn::string_view name() const
     {
-        return class_data(class_id).name;
+        return localized(class_data(class_id).name);
     }
 
     /// Class and level stats plus the bonus of the equipment. Battles and menus always use this.

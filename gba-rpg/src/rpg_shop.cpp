@@ -5,6 +5,7 @@
 #include "bn_sstream.h"
 
 #include "rpg_ui.h"
+#include "rpg_text.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -12,7 +13,7 @@ namespace rpg
 
 namespace
 {
-    using Label = bn::string<32>;
+    using Label = bn::string<64>;      // Room for UTF-8 Japanese (3 bytes per character).
 
     // Layout, in cells (the message box takes the bottom 8 rows, so nothing here goes past row 11):
     //   command menu (Buy / Sell / Exit) and gold at the left, item list at the right.
@@ -41,7 +42,7 @@ namespace
 
         if(stock.empty())
         {
-            box.say("Sorry, we're sold out.");
+            box.say(RPG_T("Sorry, we're sold out.", "すまない、売り切れだ。"));
             return;
         }
 
@@ -53,7 +54,7 @@ namespace
         {
             const ItemData& item = item_data(stock[index]);
             bn::ostringstream stream(labels[index]);
-            stream << item.name << "  " << item.price << " G";
+            stream << localized(item.name) << "  " << item.price << " G";
             options[index] = labels[index];
         }
 
@@ -62,7 +63,7 @@ namespace
 
         while(true)
         {
-            box.show("What would you like to buy?");
+            box.show(RPG_T("What would you like to buy?", "何を買うんだい？"));
             int choice = menu.run();
 
             if(choice < 0)
@@ -76,18 +77,18 @@ namespace
             // Always check before changing anything: gold first, then room in the bag.
             if(party.gold < item.price)
             {
-                box.say("You don't have enough gold.");
+                box.say(RPG_T("You don't have enough gold.", "お金が足りないよ。"));
             }
             else if(party.item_amount(id) >= max_item_stack)
             {
-                box.say("You can't carry any more\nof that item.");
+                box.say(RPG_T("You can't carry any more\nof that item.", "それはもう持てないよ。"));
             }
             else
             {
                 party.gold -= item.price;
                 party.add_item(id);
                 print_gold(gold_window, party.gold);
-                box.say("Thank you!");
+                box.say(RPG_T("Thank you!", "まいどあり！"));
             }
         }
     }
@@ -111,7 +112,7 @@ namespace
                 if(int amount = party.item_amount(id))
                 {
                     bn::ostringstream stream(labels[ids.size()]);
-                    stream << item_data(id).name << " x" << amount << "  " << sell_price(id) << " G";
+                    stream << localized(item_data(id).name) << " x" << amount << "  " << sell_price(id) << " G";
                     options[ids.size()] = labels[ids.size()];
                     ids.push_back(id);
                 }
@@ -119,11 +120,11 @@ namespace
 
             if(ids.empty())
             {
-                box.say("You have nothing to sell.");
+                box.say(RPG_T("You have nothing to sell.", "売れるものがないね。"));
                 return;
             }
 
-            box.show("What would you like to sell?");
+            box.show(RPG_T("What would you like to sell?", "何を売るんだい？"));
             int choice;
 
             {
@@ -147,13 +148,13 @@ namespace
 
             if(price <= 0)
             {
-                box.say("Sorry, I can't buy that.");
+                box.say(RPG_T("Sorry, I can't buy that.", "すまない、それは\n買い取れないんだ。"));
             }
             else if(party.remove_item(id))
             {
                 party.gold += price;
                 print_gold(gold_window, party.gold);
-                box.say("Thank you!");
+                box.say(RPG_T("Thank you!", "まいどあり！"));
             }
         }
     }
@@ -167,13 +168,13 @@ int sell_price(ItemId id)
 void open_shop(GameState& state, Ui& ui, const bn::span<const ItemId>& stock,
                const bn::span<const bn::string_view>& greeting)
 {
-    static constexpr bn::string_view commands[] = { "Buy", "Sell", "Exit" };
+    static constexpr bn::string_view commands[] = { RPG_T("Buy", "買う"), RPG_T("Sell", "売る"), RPG_T("Exit", "やめる") };
 
     MessageBox box(ui);
 
     if(greeting.empty())
     {
-        box.say("Welcome!");
+        box.say(RPG_T("Welcome!", "いらっしゃい！"));
     }
     else
     {
@@ -188,7 +189,7 @@ void open_shop(GameState& state, Ui& ui, const bn::span<const ItemId>& stock,
 
         while(true)
         {
-            box.show("What can I do for you?");
+            box.show(RPG_T("What can I do for you?", "何の用だい？"));
 
             int command = command_menu.run();
 
@@ -207,7 +208,7 @@ void open_shop(GameState& state, Ui& ui, const bn::span<const ItemId>& stock,
         }
     }
 
-    box.say("Thank you! Come again!");
+    box.say(RPG_T("Thank you! Come again!", "まいどあり！ またどうぞ！"));
 }
 
 }
