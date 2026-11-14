@@ -20,6 +20,7 @@ struct GameState
     EventFlags flags;       //!< Opened chests and other optional events (saved).
     uint8_t story_progress = progress::ch1_start;   //!< Main story position (saved), see rpg_story.h.
     StoryId story_battle = StoryId::none;   //!< Scene whose boss battle is being fought. Not saved.
+    bool story_battle_lost = false;         //!< That battle was lost and the story goes on anyway. Not saved.
     MapId map = start_map;
     uint8_t player_x = start_x;
     uint8_t player_y = start_y;

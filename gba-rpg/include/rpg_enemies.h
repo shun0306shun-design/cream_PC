@@ -31,6 +31,7 @@ enum class EnemyId : uint8_t
     ember_wyrm,     //!< Boss of the Searing Canyon (chapter 4).
     ash_zealot,
     drake_true,     //!< Boss of the Ash Cathedral (chapter 5): General 1 at full strength.
+    general_2,      //!< General 2 in the capital (chapter 6): not meant to be beaten.
     count
 };
 

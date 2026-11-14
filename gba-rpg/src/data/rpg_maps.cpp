@@ -995,7 +995,7 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view cathedral_rows[] = {
         "####################",    // 0
-        "########_A_#########",    // 1
+        "########_A>#########",    // 1
         "#######_____########",    // 2
         "#######_____########",    // 3
         "#########_##########",    // 4
@@ -1022,6 +1022,11 @@ namespace
           .min_progress = progress::ch5_split, .max_progress = progress::ch6_start - 1,
           .story = StoryId::ch5_cathedral },
         { .type = EventType::sign, .x = 9, .y = 1, .pages = cathedral_pyre_pages },
+        // Behind the pyre: the pilgrim road to the capital, until the capital falls.
+        { .type = EventType::warp, .x = 10, .y = 1, .warp_map = MapId::grancel, .warp_x = 8, .warp_y = 12,
+          .max_progress = progress::ch6_rout - 1 },
+        { .type = EventType::trigger, .x = 10, .y = 1,
+          .min_progress = progress::ch6_rout, .story = StoryId::ch6_road_lost },
         { .type = EventType::chest, .x = 17, .y = 5, .npc_graphics = 3,
           .flag = FlagId::chest_cathedral, .item = ItemId::herb, .item_amount = 5 },
     };
@@ -1031,6 +1036,92 @@ namespace
         { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
         { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
         { { EnemyId::ash_zealot, EnemyId::skeleton, EnemyId::skeleton }, 3 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // T06: the royal capital. Peaceful until the siege, then burning: same size, the streets ('_') have battles
+    // and the east gate is gone. Both layouts share the event list.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view grancel_rows[] = {
+        "########################",    // 0
+        "#....^^^^^^....^^^^....#",    // 1
+        "#....######....####....#",    // 2
+        "#....##DD##....#D##....#",    // 3
+        "#......::.......:......#",    // 4
+        "#..F...::.......:...S..#",    // 5
+        "#::::::::::::::::::::::>",    // 6
+        "#......::..............#",    // 7
+        "#.^^^^.::...^^^^.......#",    // 8
+        "#.####.::...####...,...#",    // 9
+        "#.#D##.::...#D##.......#",    // 10
+        "#..:...::....:.........#",    // 11
+        "#..:::::::::::.........#",    // 12
+        "########>###############",    // 13
+    };
+
+    static_assert(valid_layout(grancel_rows), "Invalid grancel layout");
+
+    constexpr bn::string_view grancel_burning_rows[] = {
+        "########################",    // 0
+        "#aaaa^^^^^^aaaaxxxxaaaa#",    // 1
+        "#aaaa######aaaaxxxxaaaa#",    // 2
+        "#aaaa##DD##aaaaxxxxaaaa#",    // 3
+        "#aaaaaa__aaaaaaa_aaaaaa#",    // 4
+        "#aaFaaa__aaaaaaa_aaaSaa#",    // 5
+        "#______________________x",    // 6
+        "#aaaaaa__aaaaaaaaaaaaaa#",    // 7
+        "#axxxxa__aaaxxxxaaaaaaa#",    // 8
+        "#axxxxa__aaaxxxxaaaaaaa#",    // 9
+        "#axxxxa__aaaxxxxaaaaaaa#",    // 10
+        "#aa_aaa__aaaa_aaaaaaaaa#",    // 11
+        "#aa___________aaaaaaaaa#",    // 12
+        "########>###############",    // 13
+    };
+
+    static_assert(valid_layout(grancel_burning_rows), "Invalid burning grancel layout");
+
+    constexpr bn::string_view grancel_sign_pages[] = {
+        RPG_NAME_CAPITAL " - ROYAL CAPITAL\nNorth: the palace\nEast: the great wall",
+    };
+
+    constexpr bn::string_view grancel_shop_pages[] = {
+        "The royal armory is open\nto anyone who will stand\non the wall.",
+    };
+
+    constexpr bn::string_view grancel_citizen_pages[] = {
+        "The king says the wall\nhas never fallen.\nIt has never been tried.",
+    };
+
+    constexpr uint8_t last_before_siege = progress::ch6_siege - 1;
+
+    constexpr MapEvent grancel_events[] = {
+        { .type = EventType::warp, .x = 8, .y = 13, .warp_map = MapId::cathedral, .warp_x = 10, .warp_y = 2 },
+        { .type = EventType::spring, .x = 3, .y = 5, .pages = spring_pages, .price = 0 },
+        { .type = EventType::sign, .x = 20, .y = 5, .pages = grancel_sign_pages },
+
+        // --- Before the siege ---
+        { .type = EventType::inn, .x = 4, .y = 11, .npc_graphics = 2, .pages = innkeeper_pages,
+          .max_progress = last_before_siege },
+        { .type = EventType::shop, .x = 14, .y = 11, .npc_graphics = 5, .pages = grancel_shop_pages,
+          .stock = ashbell_shop_stock, .max_progress = last_before_siege },
+        { .type = EventType::talk, .x = 18, .y = 9, .npc_graphics = 0, .pages = grancel_citizen_pages,
+          .movement = NpcMovement::wander, .wander_radius = 2, .max_progress = last_before_siege },
+        { .type = EventType::story, .x = 9, .y = 5, .npc_graphics = 1,
+          .max_progress = last_before_siege, .story = StoryId::ch6_captain },
+        // Going to the east gate starts the siege (once the captain has asked).
+        { .type = EventType::trigger, .x = 23, .y = 6,
+          .max_progress = last_before_siege, .story = StoryId::ch6_east_gate },
+
+        // --- The burning city ---
+        // General 2 (npc_graphics 8) stands at the palace doors.
+        { .type = EventType::story, .x = 7, .y = 4, .npc_graphics = 8,
+          .min_progress = progress::ch6_siege, .max_progress = progress::ch6_siege, .story = StoryId::ch6_general },
+    };
+
+    constexpr EncounterGroup grancel_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 },
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1153,6 +1244,12 @@ namespace
             .encounter_rate = 12,
             .border = TileId::wall,
         },
+        {
+            .name = RPG_NAME_CAPITAL,
+            .rows = grancel_rows,
+            .events = grancel_events,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1170,6 +1267,17 @@ namespace
     };
 
     constexpr MapState map_states[] = {
+        {
+            MapId::grancel, progress::ch6_siege, progress::game_clear,
+            {
+                .name = RPG_NAME_CAPITAL,
+                .rows = grancel_burning_rows,
+                .events = grancel_events,
+                .encounters = grancel_encounters,
+                .encounter_rate = 10,
+                .border = TileId::rubble,
+            },
+        },
         {
             MapId::village, progress::ch1_ashes, progress::game_clear - 1,
             {

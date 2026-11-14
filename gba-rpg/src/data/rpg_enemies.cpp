@@ -38,6 +38,8 @@ namespace
         // Chapter 5: the Ash Cathedral. The general is fought by four this time, and dies.
         { "Ash Zealot", &bn::sprite_items::enemy_cultist, { 95, 0, 40, 15, 11 }, 55, 45, SpellId::fire, 30 },
         { RPG_NAME_GENERAL_1, &bn::sprite_items::enemy_drake, { 520, 0, 54, 20, 14 }, 500, 400, SpellId::blizzard, 35 },
+        // Chapter 6: a battle the story expects to be lost (see story_defeat_continues()).
+        { RPG_NAME_GENERAL_2, &bn::sprite_items::enemy_drake, { 6000, 0, 140, 70, 40 }, 0, 0, SpellId::blizzard, 40 },
     };
 
     static_assert(sizeof(enemies) / sizeof(enemies[0]) == int(EnemyId::count), "Enemy table doesn't match EnemyId");

@@ -121,10 +121,20 @@ int main()
             result = battle.run();
         }
 
+        state.story_battle_lost = false;
+
+        if(result == rpg::BattleResult::defeat && rpg::story_defeat_continues(state.story_battle))
+        {
+            // A battle the story expects to be lost: no penalty, the next FieldScene shows what follows.
+            state.party.restore_all();
+            state.story_battle_lost = true;
+            continue;
+        }
+
         if(result != rpg::BattleResult::victory)
         {
             // Lost a story battle: the scene that started it can be tried again.
-            // After a victory, the next FieldScene shows what follows (rpg::run_story_victory).
+            // After a victory, the next FieldScene shows what follows (rpg::run_story_after_battle).
             state.story_battle = rpg::StoryId::none;
         }
 

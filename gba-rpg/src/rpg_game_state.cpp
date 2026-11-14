@@ -47,6 +47,7 @@ void GameState::init_new_game()
     flags = EventFlags();
     story_progress = progress::ch1_start;
     story_battle = StoryId::none;
+    story_battle_lost = false;
     map = start_map;
     player_x = start_x;
     player_y = start_y;
@@ -95,6 +96,7 @@ bool load_game(GameState& state)
     state.facing = data.facing;
     state.story_progress = data.story_progress;
     state.story_battle = StoryId::none;
+    state.story_battle_lost = false;
 
     // Equipment or class data may have changed since the save: keep HP/MP within the current maximums.
     for(PartyMember& member : state.party.active())

@@ -466,9 +466,83 @@ namespace
               RPG_NAME_DEFECTOR_JA "「それは、私が望める\n　以上のことだ。」"),
         RPG_T(HERO ": One general.\nThree left. Then him.",
               HERO_JA "「将軍をひとり。\n　残りは三人。\n　そして、あいつだ。」"),
-        RPG_T("- Chapter 6 -",
-              "- 第6章 -"),
+        RPG_T("- Chapter 6 -\nThe Sinking Capital",
+              "- 第6章 -\n沈む王都"),
     };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Chapter 6 "The Sinking Capital"
+    // ---------------------------------------------------------------------------------------------------------------
+    #define CAPITAL RPG_NAME_CAPITAL
+    #define GENERAL2 RPG_NAME_GENERAL_2
+
+    constexpr bn::string_view captain_pages[] = {
+        "Captain: Halt! You came by\nthe pilgrim road? Then\nthe Cathedral has fallen.",
+        HERO ": " GENERAL " is dead.",
+        "Captain: Then hear this.\n" CAPITAL " is the last city\nstanding. And they come.",
+        "Captain: General " GENERAL2 "\nleads ten thousand to our\neast wall. Tonight.",
+        SEER ": The stars over this\ncity... I cannot find\nthem.",
+        HERO ": A general. Here.\nGood.",
+        PARTNER ": " HERO ". We hold\nthe wall. We don't hunt.",
+        "Captain: Rest, arm, then\ncome to the east gate.\nWe need every blade.",
+    };
+
+    constexpr bn::string_view captain_again_pages[] = {
+        "Captain: The east gate,\nwhen you are ready.\nThere is little time.",
+    };
+
+    constexpr bn::string_view east_gate_closed_pages[] = {
+        "The east gate. Guards\nwave you back from\nthe wall.",
+    };
+
+    constexpr bn::string_view siege_pages[] = {
+        "Horns. The plain beyond\nthe wall is a sea of\ntorches.",
+        "Captain: Hold the gate!\nHold--",
+        "The wall does not break.\nIt melts.",
+    };
+
+    constexpr bn::string_view burning_pages[] = {
+        "Within the hour, " CAPITAL "\nis burning.",
+        NOX ": The palace. She will\ngo for the king. That is\nhow it is done.",
+    };
+
+    constexpr bn::string_view general2_pages[] = {
+        GENERAL2 ": So you are the\nember that killed " GENERAL ".",
+        GENERAL2 ": " RPG_NAME_VILLAGE ", was it?\nI signed that order.\nA small one. I forget it.",
+        PARTNER ": " HERO ", don't!\nPeople are still getting\nout. Hold the line!",
+        HERO ": ...She signed it.",
+        HERO " breaks from the\nline and charges alone.",
+    };
+
+    constexpr bn::string_view rout_lost_pages[] = {
+        "The flames close in.\nYour sword arm will\nnot rise.",
+    };
+
+    constexpr bn::string_view rout_won_pages[] = {
+        GENERAL2 " steps back,\nunhurt, and laughs. Behind\nher, the palace roof falls.",
+    };
+
+    constexpr bn::string_view rout_pages[] = {
+        "The line you left is\ngone. So are the people\nbehind it.",
+        "Hands drag you away.\nBehind you, the palace\nsinks into the fire.",
+        GENERAL2 ": Run, ember. Tell\nthe ashes what you saw.",
+    };
+
+    constexpr bn::string_view aftermath_pages[] = {
+        RPG_NAME_MINE_TOWN ". Three days later.\n" CAPITAL " is gone.",
+        PARTNER ": The gate held\nuntil you left it. Do you\nknow how many we lost?",
+        HERO ": ...I saw her, and\nI couldn't see anything\nelse.",
+        PARTNER ": You didn't fight\nfor " CAPITAL ". You fought\nfor " RPG_NAME_VILLAGE ". Again.",
+        SEER ": " HERO ". I looked for\nyour star last night.\nIt was not there.",
+        HERO ": ...I couldn't\nsave anything.",
+        "- Chapter 7 -",
+    };
+
+    constexpr bn::string_view road_lost_pages[] = {
+        "The pilgrim road is choked\nwith smoke. There is no\ngoing back.",
+    };
+
+    constexpr EncounterGroup general2_battle = { { EnemyId::general_2 }, 1 };
 
     constexpr EncounterGroup cathedral_battle = { { EnemyId::drake_true, EnemyId::ash_zealot }, 2 };
     constexpr int defector_min_level = 12;
@@ -687,6 +761,58 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle = &cathedral_battle;
         break;
 
+    case StoryId::ch6_captain:
+        if(story_progress < progress::ch6_muster)
+        {
+            say_pages(ui, captain_pages);
+            story_progress = progress::ch6_muster;
+        }
+        else
+        {
+            say_pages(ui, captain_again_pages);
+        }
+        break;
+
+    case StoryId::ch6_east_gate:
+        if(story_progress < progress::ch6_muster)
+        {
+            say_pages(ui, east_gate_closed_pages);
+            result.step_back = true;
+        }
+        else
+        {
+            // The siege: the capital becomes its burning state, with the party just inside the fallen wall.
+            say_pages(ui, siege_pages);
+            ui.fade_out(60);
+            ui.wait(60);
+            story_progress = progress::ch6_siege;
+            state.player_x = 21;
+            state.player_y = 6;
+            state.facing = Direction::left;
+            result.reload_map = true;
+            result.next = StoryId::ch6_burning;
+        }
+        break;
+
+    case StoryId::ch6_burning:
+        say_pages(ui, burning_pages);
+        break;
+
+    case StoryId::ch6_general:
+        say_pages(ui, general2_pages);
+        result.battle = &general2_battle;
+        break;
+
+    case StoryId::ch6_aftermath:
+        say_pages(ui, aftermath_pages);
+        story_progress = progress::ch7_start;
+        break;
+
+    case StoryId::ch6_road_lost:
+        say_pages(ui, road_lost_pages);
+        result.step_back = true;
+        break;
+
     default:
         BN_ERROR("Invalid story id: ", int(id));
         break;
@@ -695,8 +821,15 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
     return result;
 }
 
-void run_story_victory(StoryId id, GameState& state, Ui& ui)
+bool story_defeat_continues(StoryId id)
 {
+    return id == StoryId::ch6_general;
+}
+
+StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& ui)
+{
+    StoryResult result;
+
     switch(id)
     {
 
@@ -733,9 +866,25 @@ void run_story_victory(StoryId id, GameState& state, Ui& ui)
         state.story_progress = progress::ch6_start;
         break;
 
+    case StoryId::ch6_general:
+        // Won or lost (it is meant to be lost), the capital falls and the party flees to the mining town.
+        say_pages(ui, won ? bn::span<const bn::string_view>(rout_won_pages) :
+                            bn::span<const bn::string_view>(rout_lost_pages));
+        say_pages(ui, rout_pages);
+        ui.fade_out(60);
+        ui.wait(60);
+        state.story_progress = progress::ch6_rout;
+        state.party.restore_all();
+        state.return_to_start();
+        result.reload_map = true;
+        result.next = StoryId::ch6_aftermath;
+        break;
+
     default:
         break;
     }
+
+    return result;
 }
 
 }

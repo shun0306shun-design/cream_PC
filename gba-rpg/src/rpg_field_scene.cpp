@@ -154,15 +154,28 @@ const EncounterGroup& FieldScene::run()
 
     if(_state.story_battle != StoryId::none)
     {
-        StoryId won = _state.story_battle;
+        StoryId fought = _state.story_battle;
+        bool won = ! _state.story_battle_lost;
         uint8_t old_progress = _state.story_progress;
         _state.story_battle = StoryId::none;
-        run_story_victory(won, _state, _ui);
+        _state.story_battle_lost = false;
 
-        if(_state.story_progress != old_progress)
+        StoryResult result = run_story_after_battle(fought, won, _state, _ui);
+
+        if(result.reload_map)
+        {
+            // The scene faded the screen out and may have taken the party to another map.
+            _load_map();
+            _update_minimap();
+            _ui.update();
+            _ui.fade_in();
+        }
+        else if(_state.story_progress != old_progress)
         {
             _spawn_npcs();      // The boss is gone, allies may have appeared...
         }
+
+        start_story = result.next;
     }
     else if(_state.story_progress == progress::ch1_start)
     {

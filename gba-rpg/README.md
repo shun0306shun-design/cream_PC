@@ -181,7 +181,7 @@ gba-rpg/
 ### BGM・効果音を入れる
 `Makefile` の `AUDIOBACKEND` を `maxmod` に、`AUDIO := audio` にして、`audio/` に .mod/.xm/.it/.wav を置きます。
 
-## ストーリー進行（第1章〜第5章）
+## ストーリー進行（第1章〜第6章）
 
 メインストーリーは `GameState::story_progress`（u8、セーブ対象）1つで管理します。章ごとに10刻み（第1章 0–9 / 第2章 10–19 / … / クリア = 100）。
 ビットフラグ（`FlagId`）は宝箱などの任意イベント専用です。
@@ -206,13 +206,18 @@ gba-rpg/
 | 41 | `ch5_defector` | ドルンで元教団員ノクス加入。北のカザミ村跡が開く |
 | 42 | `ch5_split` | カザミ村跡でシオンの過去が判明し、シオンがパーティを離脱。東の灰の聖堂が開く |
 | 43 | `ch5_reunited` | 灰の聖堂のボス戦直前にシオンが復帰（負けても復帰状態は維持） |
-| 50 | `ch6_start` | 灰将ドレイクを撃破（第6章のマップは未実装） |
+| 50 | `ch6_start` | 灰将ドレイクを撃破。聖堂の火葬壇の裏から王都グランセルへの巡礼路が開く |
+| 51 | `ch6_muster` | 王都の隊長から東の城壁の防衛を頼まれる |
+| 52 | `ch6_siege` | 東門へ行くと攻城戦が始まり城壁が陥落。王都マップが「炎上」状態に切り替わる |
+| 53 | `ch6_rout` | 宮殿前で第二の灰将に単身突撃して敗北（負けイベント）、ドルンへ敗走。王都への道は閉ざされる |
+| 60 | `ch7_start` | ドルンでの事後会話（第7章のマップは未実装） |
 
 仕組み:
 
 - **イベントの出現条件**: `MapEvent::min_progress` / `max_progress`。範囲外のイベントは存在しません（スプライト・当たり判定・会話すべて）。同じタイルに複数置いた場合は先に書いたものが優先。
 - **章ごとの台詞**: `MapEvent::chapter_pages` に章ごとのページ集合を並べると、`chapter_index(story_progress)`（= `story_progress / 10`、0 が第1章）で切り替わります。
-- **スクリプトイベント**: `EventType::story`（Aボタン）/ `EventType::trigger`（踏む）+ `StoryId`。台本は `src/rpg_story.cpp` に集約。ボス戦は `StoryResult::battle` で開始（逃走不可）、勝利後の処理は `run_story_victory()`。
+- **スクリプトイベント**: `EventType::story`（Aボタン）/ `EventType::trigger`（踏む）+ `StoryId`。台本は `src/rpg_story.cpp` に集約。ボス戦は `StoryResult::battle` で開始（逃走不可）、戦闘後の処理は `run_story_after_battle()`。
+- **負けイベント**: `story_defeat_continues()` が true を返すシーンのボス戦は、負けてもペナルティなしで進行します。勝敗どちらの後処理も `run_story_after_battle()`。
 - **マップの状態差分**: `rpg_maps.cpp` の `map_states[]`。ハルト村は平和（基本）／焼け跡（3〜99）。クリア後（100）は基本レイアウトに戻るので、これが「再建」状態の仮置きです。
 - **パーティ**: `Party::size` 人だけが在籍（開始時は主人公1人）。`Party::join()` で加入、`Party::leave()` で離脱（装備は道具袋に戻る）。
 - **固有名**: `include/rpg_names.h` のマクロ1か所（アレン / シオン / ハルト / ベルク / ドレイク…）。差し替えはここだけ。

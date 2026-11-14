@@ -75,6 +75,7 @@ enum class MapId : uint8_t
     dorn,       //!< T05: mining town.
     kazami,     //!< Ruins of the partner's home village.
     cathedral,  //!< D06: Ash Cathedral.
+    grancel,    //!< T06: the royal capital (peaceful, then burning).
     count
 };
 

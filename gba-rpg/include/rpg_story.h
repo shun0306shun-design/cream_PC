@@ -54,8 +54,14 @@ namespace progress
     constexpr uint8_t ch5_split = 42;       //!< The partner's past came out and he left the party: the cathedral opens.
     constexpr uint8_t ch5_reunited = 43;    //!< The partner came back for the battle against General 1.
 
-    // Chapter 6 (50-59)
-    constexpr uint8_t ch6_start = 50;       //!< General 1 was killed in the Ash Cathedral.
+    // Chapter 6 "The Sinking Capital" (50-59)
+    constexpr uint8_t ch6_start = 50;       //!< General 1 was killed in the Ash Cathedral: the road to the capital opens.
+    constexpr uint8_t ch6_muster = 51;      //!< The captain asked for help on the east wall.
+    constexpr uint8_t ch6_siege = 52;       //!< The wall fell: the capital burns (another state of its map).
+    constexpr uint8_t ch6_rout = 53;        //!< The hero broke the line, lost to General 2 and the party fled.
+
+    // Chapter 7 (60-69)
+    constexpr uint8_t ch7_start = 60;       //!< The capital is lost. The party is back in the mining town, broken.
 
     constexpr uint8_t game_clear = 100;
 }
@@ -94,6 +100,12 @@ enum class StoryId : uint8_t
     ch5_ruins,          //!< At the grave of the ruined village: the partner's past. He leaves the party.
     ch5_east_gate,      //!< The way to the Ash Cathedral, closed until the party splits.
     ch5_cathedral,      //!< Boss of the Ash Cathedral: the partner returns. Winning starts chapter 6.
+    ch6_captain,        //!< The captain of the capital asks for help.
+    ch6_east_gate,      //!< The east gate of the capital: going there starts the siege.
+    ch6_burning,        //!< The capital burns (follows ch6_east_gate).
+    ch6_general,        //!< General 2 at the palace: a battle that is meant to be lost. Then the rout.
+    ch6_aftermath,      //!< Back in the mining town after the rout. Starts chapter 7.
+    ch6_road_lost,      //!< The road to the capital after it fell.
     count,
     none = 0xFF
 };
@@ -110,8 +122,17 @@ struct StoryResult
 /// Runs a scene (blocks until it ends). It may change the story progress, the party and the player position.
 [[nodiscard]] StoryResult run_story(StoryId id, GameState& state, Ui& ui);
 
-/// Runs what follows the victory in the boss battle started by a scene.
-void run_story_victory(StoryId id, GameState& state, Ui& ui);
+/**
+ * Returns true if losing the boss battle of this scene is part of the story: instead of the usual penalty
+ * (half the gold, back to town), the party is restored and run_story_after_battle() tells what happens.
+ */
+[[nodiscard]] bool story_defeat_continues(StoryId id);
+
+/**
+ * Runs what follows the boss battle started by a scene.
+ * @param won false only for the scenes of story_defeat_continues() (other defeats never get here).
+ */
+[[nodiscard]] StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& ui);
 
 }
 
