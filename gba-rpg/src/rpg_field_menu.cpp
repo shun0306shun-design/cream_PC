@@ -55,6 +55,37 @@ namespace
         bn::ostringstream stream(text);
         int total = 0;
 
+        if(effect.type == EffectType::revive)
+        {
+            int target = choose_member(party, ui);
+
+            if(target < 0)
+            {
+                return false;
+            }
+
+            PartyMember& member = party.members[target];
+
+            if(member.alive())
+            {
+                say(ui, RPG_T("It has no effect.", "効果がなかった。"));
+                return false;
+            }
+
+            // A failed attempt is spent too.
+            if(apply_revive(effect, member, state.random))
+            {
+                stream << member.name() << tr(" is revived!", "は生き返った！");
+            }
+            else
+            {
+                stream << tr("But ", "しかし") << member.name() << tr(" didn't wake up...", "は\n生き返らなかった…");
+            }
+
+            say(ui, text);
+            return true;
+        }
+
         if(effect.targets_all())
         {
             for(PartyMember& member : party.active())
@@ -210,7 +241,7 @@ namespace
 
             PartyMember& caster = party.members[caster_index];
 
-            // Only healing spells can be cast outside of battle.
+            // Only healing skills can be used outside of battle.
             SpellList spells;
             Label labels[max_known_spells];
             bn::string_view options[max_known_spells];
@@ -233,7 +264,7 @@ namespace
 
             if(spells.empty())
             {
-                say(ui, RPG_T("No spells to cast here.", "ここで使える呪文がない。"));
+                say(ui, RPG_T("No skills to use here.", "ここで使える技がない。"));
                 continue;
             }
 
@@ -266,7 +297,7 @@ namespace
 void open_field_menu(GameState& state, Ui& ui)
 {
     static constexpr bn::string_view options[] = {
-        RPG_T("Status", "つよさ"), RPG_T("Items", "どうぐ"), RPG_T("Magic", "まほう"), RPG_T("Equip", "そうび"),
+        RPG_T("Status", "つよさ"), RPG_T("Items", "どうぐ"), RPG_T("Skill", "わざ"), RPG_T("Equip", "そうび"),
         RPG_T("Save", "セーブ")
     };
 

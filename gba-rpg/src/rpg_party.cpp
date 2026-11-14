@@ -393,4 +393,19 @@ int apply_heal(const Effect& effect, PartyMember& target, bn::random& random)
     }
 }
 
+bool apply_revive(const Effect& effect, PartyMember& target, bn::random& random)
+{
+    BN_ASSERT(effect.type == EffectType::revive, "Not a revive effect");
+    BN_ASSERT(! target.alive(), "The target is not fallen");
+
+    if(random.get_int(100) >= effect.chance)
+    {
+        return false;
+    }
+
+    int hp = (target.stats().max_hp * effect.power) / 100;
+    target.hp = int16_t(hp < 1 ? 1 : hp);
+    return true;
+}
+
 }

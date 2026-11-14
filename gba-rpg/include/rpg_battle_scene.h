@@ -42,6 +42,7 @@ private:
         int16_t hp;
         bn::string<32> name;        //!< With a letter suffix if there are several of the same kind.
         bn::sprite_ptr sprite;
+        bool stunned = false;       //!< Loses its next turn.
 
         [[nodiscard]] bool alive() const
         {
@@ -86,6 +87,7 @@ private:
     Window _status_window;
     Action _actions[max_party_size];
     bool _can_escape;
+    bool _charged[max_party_size] = {};     //!< Members whose next weapon attack is powered up (Charge).
 
     [[nodiscard]] BattleResult _run_battle();
     void _refresh_status();
@@ -104,11 +106,13 @@ private:
     void _execute_round(MessageBox& box);
     void _party_turn(int member_index, MessageBox& box);
     void _enemy_turn(int enemy_index, MessageBox& box);
-    void _apply_party_effect(const Effect& effect, int target, MessageBox& box);
+    void _apply_party_effect(int member_index, const Effect& effect, int target, MessageBox& box);
+    void _physical_hit(int member_index, const Effect& effect, int enemy_index, int multiplier, MessageBox& box);
     void _apply_enemy_effect(const Effect& effect, int enemy_index, MessageBox& box);
     void _damage_enemy(int enemy_index, int amount, MessageBox& box);
     void _damage_member(int member_index, int amount, MessageBox& box);
     void _heal_member(int member_index, const Effect& effect, MessageBox& box);
+    void _revive_member(int member_index, const Effect& effect, MessageBox& box);
     void _heal_enemy(int enemy_index, int amount, MessageBox& box);
 
     [[nodiscard]] bool _try_escape(MessageBox& box);
@@ -117,7 +121,16 @@ private:
     // --- Helpers ---
     [[nodiscard]] bool _all_enemies_dead() const;
     [[nodiscard]] int _valid_enemy_target(int enemy_index) const;
-    [[nodiscard]] int _random_alive_member() const;
+    [[nodiscard]] int _random_alive_enemy() const;
+
+    /// @param avoid Member that isn't chosen if there's someone else standing (-1 for none).
+    [[nodiscard]] int _random_alive_member(int avoid = -1) const;
+
+    /// Returns 2 (and spends the charge) if the member's weapon attack is powered up, 1 otherwise.
+    [[nodiscard]] int _take_charge(int member_index);
+
+    /// How many times an enemy of the given rank acts this round.
+    [[nodiscard]] int _roll_enemy_actions(EnemyRank rank) const;
 };
 
 }

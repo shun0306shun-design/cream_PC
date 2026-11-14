@@ -139,6 +139,12 @@ struct Party
  */
 int apply_heal(const Effect& effect, PartyMember& target, bn::random& random);
 
+/**
+ * Tries a revive effect on a fallen member: it comes back with `power` percent of its HP.
+ * Returns false if the roll fails (see Effect::chance).
+ */
+bool apply_revive(const Effect& effect, PartyMember& target, bn::random& random);
+
 }
 
 #endif
