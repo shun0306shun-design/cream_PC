@@ -29,6 +29,7 @@ enum class ItemId : uint8_t
     steel_sword,
     iron_spear,
     star_sigil,     //!< Key item: opens the waterway under the gate (chapter 3).
+    rico_charm,     //!< E701: keepsake from the child who saved the hero (meant to become an accessory).
     count,
     none = 0xFF         //!< "Nothing": an empty equipment slot.
 };

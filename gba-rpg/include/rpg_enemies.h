@@ -33,7 +33,7 @@ enum class EnemyId : uint8_t
     zelma,          //!< Boss of the Ash Cathedral (chapter 5): she escapes.
     mine_overseer,  //!< Boss of the abandoned mine (chapter 5).
     general_2,      //!< General 2 in the capital (chapter 6): not meant to be beaten.
-    drake_last,     //!< Boss of the pass (chapter 7): the first Ash General that dies.
+    bardos_last,    //!< Boss of the marsh fort (chapter 7, E704): the first Ash General that dies.
     general_3,      //!< Bosses of the citadel (chapter 8).
     general_4,
     general_2_last,

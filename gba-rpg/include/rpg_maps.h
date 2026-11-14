@@ -84,6 +84,7 @@ enum class MapId : uint8_t
     castle,     //!< D09: the Flame Emperor's castle (last dungeon).
     mine,       //!< D06: the abandoned mine of the mining town (the secret way to the cathedral).
     throne,     //!< D08: the royal castle of the capital (throne room).
+    fort_marsh, //!< D09: the Fort of the Weeping Marsh.
     count
 };
 

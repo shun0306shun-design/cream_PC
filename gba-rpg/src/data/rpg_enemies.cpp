@@ -71,14 +71,14 @@ namespace
         { RPG_T(RPG_NAME_GENERAL_2, RPG_NAME_GENERAL_2_JA), &bn::sprite_items::enemy_drake,
               { 6000, 0, 140, 70, 40 }, R::boss,      0,                                      0,    SpellId::blizzard, 40 },
         // Chapter 7: General 1 for the last time.
-        { RPG_T(RPG_NAME_GENERAL_1, RPG_NAME_GENERAL_1_JA), &bn::sprite_items::enemy_drake,
+        { RPG_T(RPG_NAME_GENERAL_2, RPG_NAME_GENERAL_2_JA), &bn::sprite_items::enemy_drake,
               { 700,  0, 60,  22, 15 }, R::boss,      enemy_exp_for_level(45, 5000),          600,  SpellId::blizzard, 35 },
         // Chapter 8: the three remaining generals, in the citadel. General 2 can be beaten this time.
         { RPG_T(RPG_NAME_GENERAL_3, RPG_NAME_GENERAL_3_JA), &bn::sprite_items::enemy_drake,
               { 800,  0, 64,  26, 10 }, R::boss,      enemy_exp_for_level(52, 5000),          700,  SpellId::blizzard, 25 },
         { RPG_T(RPG_NAME_GENERAL_4, RPG_NAME_GENERAL_4_JA), &bn::sprite_items::enemy_drake,
               { 650,  0, 58,  18, 24 }, R::boss,      enemy_exp_for_level(54, 5000),          700,  SpellId::fire,     45 },
-        { RPG_T(RPG_NAME_GENERAL_2, RPG_NAME_GENERAL_2_JA), &bn::sprite_items::enemy_drake,
+        { RPG_T(RPG_NAME_GENERAL_1, RPG_NAME_GENERAL_1_JA), &bn::sprite_items::enemy_drake,
               { 1000, 0, 70,  26, 18 }, R::boss,      enemy_exp_for_level(56, 6000),          1000, SpellId::blizzard, 40 },
         // Chapter 9: the Flame Emperor, two battles in a row (the party is restored in between).
         { RPG_T(RPG_NAME_EMPEROR, RPG_NAME_EMPEROR_JA), &bn::sprite_items::enemy_drake,

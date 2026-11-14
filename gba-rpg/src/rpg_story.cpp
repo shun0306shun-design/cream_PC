@@ -550,8 +550,8 @@ namespace
     };
 
     constexpr bn::string_view eve_partner_pages[] = {
-        RPG_T(RPG_NAME_PARTNER ": Don't chase the\ngeneral tomorrow. Hold\nthe gate, " RPG_NAME_HERO ".",
-              RPG_NAME_PARTNER_JA "「あした、灰将を\n　追うなよ。門を守れ、\n　" RPG_NAME_HERO_JA "。」"),
+        RPG_T(RPG_NAME_PARTNER ": Don't chase the\ngeneral tomorrow.\nHold the gate.",
+              RPG_NAME_PARTNER_JA "「あした、灰将を\n　追うなよ。\n　門を守れ。」"),
     };
 
     constexpr bn::string_view eve_seer_pages[] = {
@@ -621,21 +621,10 @@ namespace
               RPG_NAME_HERO_JA "「" RPG_NAME_GENERAL_2_JA "！！」"),
         RPG_T(RPG_NAME_HERO " runs at him, alone.\n" RPG_NAME_PARTNER "'s fist stops\nhim cold.",
               RPG_NAME_HERO_JA "は一人で\n斬りかかろうとした。\n" RPG_NAME_PARTNER_JA "のこぶしが止めた。"),
-        RPG_T(RPG_NAME_PARTNER ": You'll die for\nnothing! " RPG_NAME_HERO "!",
-              RPG_NAME_PARTNER_JA "「むだ死にする気か！\n　" RPG_NAME_HERO_JA "！」"),
+        RPG_T(RPG_NAME_PARTNER ": You'll die for\nnothing, you fool!",
+              RPG_NAME_PARTNER_JA "「むだ死にする気か！\n　この大ばか野郎！」"),
         RPG_T("The ceiling gives way.\nFire and stone fall\nbetween you all.",
               "天井がくずれ落ちる。\n炎と石が、みんなの\n間をへだてた。"),
-    };
-
-    constexpr bn::string_view aftermath_pages[] = {
-        RPG_T(RPG_NAME_CAPITAL " has fallen. The\nfour are scattered\nby the fire.",
-              "王都" RPG_NAME_CAPITAL_JA "は落ちた。\n四人は炎の中で\nちりぢりになった。"),
-        RPG_T("Days later, in " RPG_NAME_MINE_TOWN ",\nthey find one another\nagain.",
-              "数日後、" RPG_NAME_MINE_TOWN_JA "で\n四人はふたたび\n顔を合わせた。"),
-        RPG_T(RPG_NAME_DEFECTOR ": The survivors went\nsouth, into the hills.",
-              RPG_NAME_DEFECTOR_JA "「生き残りは、\n　南の丘へ向かった。」"),
-        RPG_T("- Chapter 7 -\nThe Lamplight",
-              "- 第7章 -\n灯火"),
     };
 
     constexpr bn::string_view road_lost_pages[] = {
@@ -647,90 +636,152 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 7 "The Lamplight"
     // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view awake_pages[] = {
+        RPG_T("- Chapter 7 -\nThe Lamplight",
+              "- 第7章 -\n灯火"),
+        RPG_T("Firelight. A roof of\nbranches. You are alive.",
+              "火のあかり。木の枝の屋根。\n……生きている。"),
+        RPG_T("Rico: You're awake! I\npulled you out of the\nriver. You're heavy.",
+              "リコ「起きた！ 川から\n　引っぱり上げたんだ。\n　重かったよ。」"),
+        RPG_T(RPG_NAME_HERO ": Rico... from " RPG_NAME_ASH_TOWN ".\nThe others? Where\nare they?",
+              RPG_NAME_HERO_JA "「リコ……" RPG_NAME_ASH_TOWN_JA "の。\n　みんなは。\n　ほかの三人は？」"),
+        RPG_T("Rico: Only you. This is\n" RPG_NAME_REFUGE ". Everyone here\nlost somebody.",
+              "リコ「兄ちゃんだけだよ。\n　ここは" RPG_NAME_REFUGE_JA "。みんな、\n　だれかをなくした人だ。」"),
+    };
+
+    constexpr bn::string_view awake_charm_pages[] = {
+        RPG_T("Rico: Take this. Mum made\nit. For people who\ncome back.",
+              "リコ「これ、あげる。\n　母ちゃんが作ったんだ。\n　帰ってきた人のお守り。」"),
+        RPG_T("Got Rico's Charm!",
+              "リコのお守りを手に入れた！"),
+    };
+
+    constexpr bn::string_view rico_pages[] = {
+        RPG_T("Rico: The lady who heals\nis by the big house.\nShe never sleeps.",
+              "リコ「手当てのお姉ちゃんは\n　大きな家のそばだよ。\n　ぜんぜん寝ないんだ。」"),
+    };
+
+    constexpr bn::string_view rico_later_pages[] = {
+        RPG_T("Rico: I'm not scared.\nYou came back, so\nthey will too.",
+              "リコ「こわくないよ。\n　兄ちゃんが戻ったんだ。\n　みんなも戻るよ。」"),
+    };
+
+    constexpr bn::string_view seer_rejoin_pages[] = {
+        RPG_T(RPG_NAME_SEER ": " RPG_NAME_HERO "! ...You are\nalive. I looked for your\nstar every night.",
+              RPG_NAME_SEER_JA "「" RPG_NAME_HERO_JA "！ ……生きて\n　いたのですね。毎晩、\n　あなたの星をさがしました。」"),
+        RPG_T(RPG_NAME_SEER ": I was tending the\nwounded. But I go\nwhere you go.",
+              RPG_NAME_SEER_JA "「けが人の手当てを\n　していました。でも、\n　あなたと行きます。」"),
+        RPG_T(RPG_NAME_SEER " rejoined the party!",
+              RPG_NAME_SEER_JA "がパーティに戻った！"),
+    };
+
+    constexpr bn::string_view east_gate_ch7_pages[] = {
+        RPG_T("The road east. Not\nalone. Not again.",
+              "東への道だ。\n一人では行かない。\nもう二度と。"),
+    };
+
+    constexpr bn::string_view defector_rejoin_pages[] = {
+        RPG_T("At the broken bridge, a\nman in a torn robe\ncarries the wounded.",
+              "こわれた橋で、やぶれた\nローブの男が、けが人を\n運んでいる。"),
+        RPG_T(RPG_NAME_DEFECTOR ": " RPG_NAME_HERO ". I meant to\ndie in that castle. Then\nI heard a child cry.",
+              RPG_NAME_DEFECTOR_JA "「" RPG_NAME_HERO_JA "か。あの城で\n　死ぬつもりだった。だが、\n　子どもの泣き声がした。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": I am still atoning.\nLet me do it beside you.",
+              RPG_NAME_DEFECTOR_JA "「償いは、まだ途中だ。\n　となりでやらせてくれ。」"),
+        RPG_T(RPG_NAME_DEFECTOR " rejoined the party!",
+              RPG_NAME_DEFECTOR_JA "がパーティに戻った！"),
+    };
+
+    constexpr bn::string_view partner_rejoin_pages[] = {
+        RPG_T(RPG_NAME_PARTNER " crouches by the\nmarsh, watching the fort.",
+              RPG_NAME_PARTNER_JA "が沼のほとりで、\n砦を見はっている。"),
+        RPG_T(RPG_NAME_PARTNER ": ...You're late.\n" RPG_NAME_GENERAL_2 " is inside. I was\ngoing in alone.",
+              RPG_NAME_PARTNER_JA "「……おそいぞ。\n　中に" RPG_NAME_GENERAL_2_JA "がいる。\n　一人で行くところだった。」"),
+        RPG_T(RPG_NAME_SEER ": Alone. As someone\ndid, in the castle?",
+              RPG_NAME_SEER_JA "「一人で、ですか。\n　城での、だれかのように？」"),
+        RPG_T(RPG_NAME_PARTNER ": ...Tch. Fine.\nNot tonight. Back to\nthe fire.",
+              RPG_NAME_PARTNER_JA "「……ちっ。分かった。\n　今夜はやめだ。\n　火のところへ戻るぞ。」"),
+        RPG_T(RPG_NAME_PARTNER " rejoined the party!",
+              RPG_NAME_PARTNER_JA "がパーティに戻った！"),
+    };
+
+    constexpr bn::string_view fort_gate_pages[] = {
+        RPG_T("The gate of the fort.\nNot yet. Not like\nlast time.",
+              "砦の門だ。まだだ。\n前と同じでは、だめだ。"),
+    };
+
+    constexpr bn::string_view campfire_pages[] = {
+        RPG_T("The four sit by the fire.\n" RPG_NAME_PARTNER " sits apart,\nas always.",
+              "四人は火をかこんだ。\n" RPG_NAME_PARTNER_JA "だけは、いつものように\nはなれてすわっている。"),
+        RPG_T(RPG_NAME_HERO ": I ran at " RPG_NAME_GENERAL_2 "\nalone. The king died.\nYou were all scattered.",
+              RPG_NAME_HERO_JA "「おれは一人で" RPG_NAME_GENERAL_2_JA "に\n　斬りかかった。王は死に、\n　みんなはちりぢりになった。」"),
+        RPG_T(RPG_NAME_HERO ": I thought revenge\nwas all I had left.",
+              RPG_NAME_HERO_JA "「復讐だけが、おれに\n　残されたものだと\n　思っていた。」"),
+        RPG_T(RPG_NAME_HERO ": Then a child pulled\nme out of a river.",
+              RPG_NAME_HERO_JA "「でも、子どもが\n　おれを川から\n　引き上げてくれた。」"),
+        RPG_T(RPG_NAME_HERO ": I won't fight for\nrevenge. I don't want to\nlose anyone. Not again.",
+              RPG_NAME_HERO_JA "「復讐のためじゃない。\n　もう、だれも\n　失くしたくない。」"),
+        RPG_T(RPG_NAME_SEER ": ...That is the star\nI was looking for.",
+              RPG_NAME_SEER_JA "「……それが、わたしの\n　さがしていた星です。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": Then I will guard\nthat wish. It is worth\nmore than my life.",
+              RPG_NAME_DEFECTOR_JA "「ならば、その願いを\n　守ろう。私の命より\n　ねうちがある。」"),
+        RPG_T(RPG_NAME_PARTNER " gets up, and sits\ndown by the fire.",
+              RPG_NAME_PARTNER_JA "が立ち上がり、\n火のそばにすわった。"),
+        RPG_T(RPG_NAME_PARTNER ": ..." RPG_NAME_HERO ".",
+              RPG_NAME_PARTNER_JA "「……" RPG_NAME_HERO_JA "。」"),
+        RPG_T(RPG_NAME_PARTNER ": Next time you run,\nI run with you.\nThat's all.",
+              RPG_NAME_PARTNER_JA "「次に走るときは、\n　おれも走る。\n　それだけだ。」"),
+    };
+
+    constexpr bn::string_view campfire_before_pages[] = {
+        RPG_T("A campfire. People warm\ntheir hands, and say\nlittle.",
+              "焚き火だ。人びとが\n手をあたため、\nだまって火を見ている。"),
+    };
+
+    constexpr bn::string_view campfire_after_pages[] = {
+        RPG_T("The fire burns on.",
+              "火は、燃えつづけている。"),
+    };
+
+    constexpr bn::string_view keeper_pages[] = {
+        RPG_T("Elder: " RPG_NAME_REFUGE " is a small\nlight. Small lights are\nhard to put out.",
+              "長老「" RPG_NAME_REFUGE_JA "は小さな\n　灯火だ。小さな火ほど、\n　消えにくいものさ。」"),
+    };
+
+    constexpr bn::string_view bardos_last_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_2 ": The boy from the\nthrone room. You came\nback with a wall.",
+              RPG_NAME_GENERAL_2_JA "「玉座の間の小僧か。\n　壁を連れて\n　戻ってきたな。」"),
+        RPG_T(RPG_NAME_HERO ": Not for the king.\nNot for revenge. For\nthe ones still alive.",
+              RPG_NAME_HERO_JA "「王のためでも、\n　復讐のためでもない。\n　生きている者のためだ。」"),
+        RPG_T(RPG_NAME_GENERAL_2 ": Good. Then this\nwill be a battle.",
+              RPG_NAME_GENERAL_2_JA "「よい。ならば、\n　これは戦になる。」"),
+    };
+
+    constexpr bn::string_view bardos_last_victory_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_2 ": ...A fine wall.\nI have no regrets.",
+              RPG_NAME_GENERAL_2_JA "「……よい壁だ。\n　悔いはない。」"),
+        RPG_T(RPG_NAME_GENERAL_2 " falls. The first\nAsh General to die.",
+              RPG_NAME_GENERAL_2_JA "がたおれた。\n初めて、灰将を討った。"),
+        RPG_T(RPG_NAME_PARTNER ": It can be done.\n...It can be done.",
+              RPG_NAME_PARTNER_JA "「やれるんだ。\n　……やれるんだな。」"),
+    };
+
+    constexpr bn::string_view signal_pages[] = {
+        RPG_T("Elder: A general is dead.\nLet the others know\nthey are not alone.",
+              "長老「灰将が討たれた。\n　ほかの者にも、\n　一人ではないと知らせよう。」"),
+        RPG_T("Signal fires rise from\n" RPG_NAME_REFUGE ", hill after hill.",
+              RPG_NAME_REFUGE_JA "から狼煙が上がる。\n丘から丘へ、次々に。"),
+        RPG_T("- Chapter 8 -\nCounterattack",
+              "- 第8章 -\n反攻"),
+    };
+
     constexpr bn::string_view south_gate_pages[] = {
         RPG_T("A track south, into the\nhills. No reason to\ntake it yet.",
               "南の丘へ続く小道だ。\n今はまだ、\n行く理由がない。"),
     };
 
-    constexpr bn::string_view keeper_pages[] = {
-        RPG_T("Lamps hang from every\nbranch. The fire never\nreached this valley.",
-              "どの枝にも灯火が\n下がっている。この谷に、\n炎は届かなかったのだ。"),
-        RPG_T("Keeper: " CAPITAL " folk, all\nof us. You were on the\nwall. I remember you.",
-              "灯守り「ここの者は皆、\n　" RPG_NAME_CAPITAL_JA "の民だよ。城壁に\n　いたね。覚えているよ。」"),
-        RPG_T(HERO ": Then you know\nI left it.",
-              HERO_JA "「なら、俺が持ち場を\n　離れたことも知っているな。」"),
-        RPG_T("Keeper: I know my grandson\nran through that gate\nwhile it still stood.",
-              "灯守り「知っているのは、\n　門がまだ立っていた間に、\n　孫が逃げのびたことさ。」"),
-        RPG_T("Keeper: Each night we\nlight one lamp for\nsomeone lost.",
-              "灯守り「わたしらは毎晩、\n　失われた誰かのために\n　灯火をひとつともす。」"),
-        RPG_T("Keeper: Take this. Light\nit at the shrine, when you\nknow who it is for.",
-              "灯守り「これをお持ち。\n　誰のための灯か分かったら、\n　祠でともしなさい。」"),
-        RPG_T(HERO " took the lantern.",
-              HERO_JA "は灯火を受け取った。"),
-    };
-
-    constexpr bn::string_view keeper_again_pages[] = {
-        RPG_T("Keeper: The shrine is up\nthe path, in the north-\neast of the valley.",
-              "灯守り「祠は道をのぼった先、\n　谷の北東にあるよ。」"),
-    };
-
     constexpr bn::string_view keeper_after_pages[] = {
         RPG_T("Keeper: A lamp is small.\nThat is why it takes\nso many of us.",
               "灯守り「灯火は小さい。\n　だから、こんなに大勢が\n　要るのさ。」"),
-    };
-
-    constexpr bn::string_view shrine_pages[] = {
-        RPG_T(HERO " lights the lantern.",
-              HERO_JA "は灯火をともした。"),
-        RPG_T(HERO ": For Father. For\nMother. ...For " CAPITAL ".",
-              HERO_JA "「父さんに。母さんに。\n　……" RPG_NAME_CAPITAL_JA "に。」"),
-        RPG_T(PARTNER ": I lit one here for\n" RPG_NAME_PARTNER_HOME ", years ago.\nNever told anyone.",
-              PARTNER_JA "「何年も前、俺もここで\n　" RPG_NAME_PARTNER_HOME_JA "のためにともした。\n　誰にも言わなかったがな。」"),
-        RPG_T(NOX ": May I light one?\nFor those I burned.",
-              RPG_NAME_DEFECTOR_JA "「私も、ひとつ\n　ともしていいだろうか。\n　私が焼いた者たちのために。」"),
-        RPG_T(SEER ": " HERO ". Your star\nis back. Small. But\nit is there.",
-              RPG_NAME_SEER_JA "「" HERO_JA "。あなたの星が\n　戻りました。小さい。\n　けれど、そこにあります。」"),
-        RPG_T(HERO ": I had all of you\nbeside me, and I fought\nalone. I'm sorry.",
-              HERO_JA "「みんなが隣にいたのに、\n　俺はひとりで戦った。\n　すまなかった。」"),
-        RPG_T(HERO ": No more revenge.\nI want there to be lamps\nleft to light.",
-              HERO_JA "「復讐はもういい。\n　ともす灯火が残る世界で\n　あってほしいんだ。」"),
-        RPG_T(PARTNER ": ...Took you\nlong enough.",
-              PARTNER_JA "「……やっと、\n　分かったか。」"),
-        RPG_T("A runner: Torches in the\neast pass! " GENERAL "'s host,\nhunting us!",
-              "伝令「東の峠にたいまつだ！\n　" GENERAL_JA "の軍勢が、\n　俺たちを狩りに来た！」"),
-        RPG_T(HERO ": Not this time.\nTogether.",
-              HERO_JA "「今度はちがう。\n　一緒にだ。」"),
-    };
-
-    constexpr bn::string_view east_gate_ch7_pages[] = {
-        RPG_T("The east pass. The lamps\nare kept dark on\nthis side.",
-              "東の峠だ。こちら側では、\n灯火は消してある。"),
-    };
-
-    constexpr bn::string_view pass_pages[] = {
-        RPG_T(GENERAL ": The ember. Come.\nCharge me, as you\ncharged him.",
-              GENERAL_JA "「火の粉か。来い。\n　" RPG_NAME_GENERAL_2_JA "に斬りかかったように、\n　私にも来るがいい。」"),
-        RPG_T(HERO ": No.",
-              HERO_JA "「いいや。」"),
-        RPG_T(HERO ": " PARTNER ", left.\n" SEER ", light. " NOX ", with\nme. We hold the line.",
-              HERO_JA "「" PARTNER_JA "は左。" RPG_NAME_SEER_JA "、光を。\n　" RPG_NAME_DEFECTOR_JA "は俺と来い。\n　戦列を守るぞ。」"),
-        RPG_T(GENERAL ": ...So. You have\nlearned to burn slow.",
-              GENERAL_JA "「……そうか。\n　ゆっくり燃えることを\n　覚えたな。」"),
-    };
-
-    constexpr bn::string_view pass_victory_pages[] = {
-        RPG_T(GENERAL ": A wall... I broke\na hundred walls...",
-              GENERAL_JA "「壁、か……\n　私は百の壁を\n　くだいてきたのだが……」"),
-        RPG_T(GENERAL " falls, and does\nnot rise. The first of\nthe four.",
-              GENERAL_JA "はたおれ、\n二度と立たなかった。\n四人のうちの、最初のひとり。"),
-        RPG_T(HERO ": It doesn't bring\nthem back.",
-              HERO_JA "「それでも、みんなは\n　帰ってこない。」"),
-        RPG_T(PARTNER ": No. But look\nbehind you.",
-              PARTNER_JA "「ああ。だが、\n　後ろを見てみろ。」"),
-        RPG_T("Down in the valley,\nevery lamp is still lit.",
-              "谷では、すべての灯火が\nまだともっていた。"),
-        RPG_T("- Chapter 8 -\nCounterattack",
-              "- 第8章 -\n反攻"),
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -820,19 +871,19 @@ namespace
     };
 
     constexpr bn::string_view general2_last_pages[] = {
-        RPG_T(GENERAL2 ": The ember.\nYou did not charge.",
-              RPG_NAME_GENERAL_2_JA "「火の粉ね。\n　斬りかかってこないの。」"),
+        RPG_T(GENERAL ": The ember.\nYou did not charge.",
+              GENERAL_JA "「火の粉ね。\n　斬りかかってこないの。」"),
         RPG_T(HERO ": I'm not alone\nthis time.",
               HERO_JA "「今度は、\n　ひとりじゃない。」"),
-        RPG_T(GENERAL2 ": No. You brought\nthe whole hearth.",
-              RPG_NAME_GENERAL_2_JA "「そうね。かまどごと\n　連れてきたのね。」"),
+        RPG_T(GENERAL ": No. You brought\nthe whole hearth.",
+              GENERAL_JA "「そうね。かまどごと\n　連れてきたのね。」"),
     };
 
     constexpr bn::string_view general2_last_victory_pages[] = {
-        RPG_T(GENERAL2 ": ...He never needed\ngenerals. We were\nkindling, too.",
-              RPG_NAME_GENERAL_2_JA "「……あの方に、将軍など\n　要らなかった。私たちも、\n　たきつけだったのよ。」"),
-        RPG_T(GENERAL2 " falls. The four\nAsh Generals are gone.",
-              RPG_NAME_GENERAL_2_JA "がたおれた。\n四人の灰の将軍は、\nもういない。"),
+        RPG_T(GENERAL ": ...He never needed\ngenerals. We were\nkindling, too.",
+              GENERAL_JA "「……あの方に、将軍など\n　要らなかった。私たちも、\n　たきつけだったのよ。」"),
+        RPG_T(GENERAL " falls. The four\nAsh Generals are gone.",
+              GENERAL_JA "がたおれた。\n四人の灰の将軍は、\nもういない。"),
         RPG_T(NOX ": The Emperor is alone\nin his tower now. He\nwill not mind.",
               RPG_NAME_DEFECTOR_JA "「焔帝は今、塔にひとりだ。\n　気にもとめないだろうが。」"),
         RPG_T(HERO ": Then we go to\nthe tower.",
@@ -1053,7 +1104,7 @@ namespace
 
     constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
 
-    constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
+    constexpr EncounterGroup bardos_last_battle = { { EnemyId::bardos_last, EnemyId::cult_knight }, 2 };
 
     // Chapter 6: three battles in a row at the gate, then the general (stopped after 5 rounds).
     constexpr EncounterGroup gate_1_battle = { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 };
@@ -1446,14 +1497,34 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle_turn_limit = bardos_turn_limit;
         break;
 
-    case StoryId::ch6_aftermath:
-        say_pages(ui, aftermath_pages);
-        story_progress = progress::ch7_start;
-        break;
-
     case StoryId::ch6_road_lost:
         say_pages(ui, road_lost_pages);
         result.step_back = true;
+        break;
+
+    // ----- Chapter 7 (E701-E705) -----
+    case StoryId::ch7_awake:
+        // E701: alone. The reward of the eve of the siege (E602) is given here.
+        say_pages(ui, awake_pages);
+
+        if(state.flags.get(FlagId::ch6_eve_done))
+        {
+            say_pages(ui, awake_charm_pages);
+            state.party.add_item(ItemId::rico_charm);
+        }
+
+        story_progress = progress::ch7_awake;
+        break;
+
+    case StoryId::ch7_rico:
+        say_pages(ui, story_progress < progress::ch7_seer ? bn::span<const bn::string_view>(rico_pages) :
+                                                            bn::span<const bn::string_view>(rico_later_pages));
+        break;
+
+    case StoryId::ch7_seer:
+        say_pages(ui, seer_rejoin_pages);
+        state.party.join(ClassId::mage, seer_min_level);        // She comes back as she was (Party::away).
+        story_progress = progress::ch7_seer;
         break;
 
     case StoryId::ch7_south_gate:
@@ -1462,12 +1533,7 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         break;
 
     case StoryId::ch7_keeper:
-        if(story_progress < progress::ch7_lantern)
-        {
-            say_pages(ui, keeper_pages);
-            story_progress = progress::ch7_lantern;
-        }
-        else if(story_progress == progress::ch8_ship_found)
+        if(story_progress == progress::ch8_ship_found)
         {
             // Chapter 8: the refugees are asked to crew the ship.
             say_pages(ui, keeper_rally_pages);
@@ -1475,15 +1541,9 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         }
         else
         {
-            say_pages(ui, story_progress < progress::ch7_resolve ? bn::span<const bn::string_view>(keeper_again_pages) :
+            say_pages(ui, story_progress < progress::ch8_rallied ? bn::span<const bn::string_view>(keeper_pages) :
                                                                    bn::span<const bn::string_view>(keeper_after_pages));
         }
-        break;
-
-    case StoryId::ch7_shrine:
-        say_pages(ui, shrine_pages);
-        state.party.restore_all();      // The night in the valley.
-        story_progress = progress::ch7_resolve;
         break;
 
     case StoryId::ch7_east_gate:
@@ -1491,9 +1551,38 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.step_back = true;
         break;
 
-    case StoryId::ch7_pass:
-        say_pages(ui, pass_pages);
-        result.battle = &pass_battle;
+    case StoryId::ch7_defector:
+        say_pages(ui, defector_rejoin_pages);
+        state.party.join(ClassId::priest, defector_min_level);
+        story_progress = progress::ch7_defector;
+        break;
+
+    case StoryId::ch7_partner:
+        say_pages(ui, partner_rejoin_pages);
+        state.party.join(ClassId::lancer, partner_min_level);
+        story_progress = progress::ch7_partner;
+        break;
+
+    case StoryId::ch7_fort_gate:
+        say_pages(ui, fort_gate_pages);
+        result.step_back = true;
+        break;
+
+    case StoryId::ch7_campfire:
+        // E703: the heart of the story. The night by the fire restores the party.
+        say_pages(ui, campfire_pages);
+        state.party.restore_all();
+        story_progress = progress::ch7_vow;
+        break;
+
+    case StoryId::ch7_bardos:
+        say_pages(ui, bardos_last_pages);
+        result.battle = &bardos_last_battle;
+        break;
+
+    case StoryId::ch7_signal:
+        say_pages(ui, signal_pages);
+        story_progress = progress::ch8_start;
         break;
 
     case StoryId::ch8_shipwright:
@@ -1659,11 +1748,11 @@ BgmId story_bgm(StoryId id)
     case StoryId::ch5_kazami:       // The partner's past.
     case StoryId::ch5_confession:
     case StoryId::ch6_eve:          // The night before the capital falls.
-    case StoryId::ch6_aftermath:
+    case StoryId::ch7_awake:
     case StoryId::ch10_grave:       // The temptation of the ember.
         return BgmId::event_dark;
 
-    case StoryId::ch7_shrine:       // The lantern is lit: the party is whole again.
+    case StoryId::ch7_campfire:     // The vow by the fire: the party is whole again.
     case StoryId::ch10_homecoming:
     case StoryId::ch10_elder:       // The coronation and the ending.
     case StoryId::ch10_seasons:
@@ -1761,9 +1850,16 @@ StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameSt
         state.story_progress = progress::ch6_gate;
         break;
 
-    case StoryId::ch7_pass:
-        say_pages(ui, pass_victory_pages);
-        state.story_progress = progress::ch8_start;
+    case StoryId::ch7_bardos:
+        // E704 + E705: the first Ash General falls; back in the village, the signal fires are lit.
+        say_pages(ui, bardos_last_victory_pages);
+        ui.fade_out(60);
+        ui.wait(30);
+        state.story_progress = progress::ch7_bardos;
+        state.party.restore_all();
+        state.return_to_start();
+        result.reload_map = true;
+        result.next = StoryId::ch7_signal;
         break;
 
     case StoryId::ch8_general_3:
@@ -1802,15 +1898,24 @@ StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameSt
 
     case StoryId::ch6_bardos:
         // E604 + E605: won, lost or stopped, the king dies, the castle falls and the party is scattered.
-        // (Bridge: chapter 7 as implemented starts with the four together again in the mining town.)
         say_pages(ui, bardos_after_pages);
         ui.fade_out(60);
         ui.wait(60);
         state.story_progress = progress::ch6_collapse;
         state.party.restore_all();
-        state.return_to_start();
+
+        // The party is scattered: the hero is alone until the others are found again (E702).
+        state.party.leave(ClassId::lancer);
+        state.party.leave(ClassId::mage);
+        state.party.leave(ClassId::priest);
+
+        // He wakes up in the village of the refugees (E701).
+        state.map = MapId::refuge;
+        state.player_x = 3;
+        state.player_y = 6;
+        state.facing = Direction::down;
         result.reload_map = true;
-        result.next = StoryId::ch6_aftermath;
+        result.next = StoryId::ch7_awake;
         break;
 
     default:

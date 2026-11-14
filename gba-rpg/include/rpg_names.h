@@ -24,7 +24,7 @@
 #define RPG_NAME_PARTNER_HOME "Kazami"  // The partner's home village, burnt long ago.
 #define RPG_NAME_CAPITAL    "Grancel"   // T06: the royal capital, the last city standing.
 #define RPG_NAME_GENERAL_2  "Bardos"    // The Ash General that takes the capital (chapter 6): a pure soldier.
-#define RPG_NAME_REFUGE     "Lanternrest" // T07: the hidden valley of the refugees.
+#define RPG_NAME_REFUGE     "Tomoshibi" // T09: the village of the refugees, the base after the rout.
 #define RPG_NAME_HARBOR     "Saltmere"  // T08: the harbor town.
 #define RPG_NAME_SHIP       "Dawn"      // The last ship of the harbor.
 #define RPG_NAME_GENERAL_3  "Zelma"     // The Ash General that burned the partner's village; the defector's commander.
@@ -45,7 +45,7 @@
 #define RPG_NAME_MINE_TOWN_JA   "ドルン"
 #define RPG_NAME_PARTNER_HOME_JA "カザミ"
 #define RPG_NAME_CAPITAL_JA     "グランセル"
-#define RPG_NAME_REFUGE_JA      "ランタンレスト"
+#define RPG_NAME_REFUGE_JA      "トモシビ"
 #define RPG_NAME_HARBOR_JA      "ソルトミア"
 #define RPG_NAME_SHIP_JA        "あかつき号"
 #define RPG_NAME_CULT_JA        "灰の教団"

@@ -1345,43 +1345,45 @@ namespace
               RPG_NAME_CAPITAL_JA "から持ち出せた\nものばかりさ。\n役に立つものを持っていきな。"),
     };
 
-    constexpr bn::string_view refuge_child_pages[] = {
-        RPG_T("My brother says you were\non the wall. Is the wall\ncoming here, too?",
-              "兄ちゃんが言ってた。城壁に\nいたんでしょ？ 城壁は\nここにも来るの？"),
-    };
-
     constexpr bn::string_view refuge_shrine_before_pages[] = {
-        RPG_T("Dozens of small lamps.\nEach one has a name.",
-              "小さな灯火が何十も並ぶ。\nひとつひとつに\n名前がある。"),
+        RPG_T("A campfire. People warm\ntheir hands, and say\nlittle.",
+              "焚き火だ。人びとが\n手をあたため、\nだまって火を見ている。"),
     };
 
     constexpr bn::string_view refuge_shrine_after_pages[] = {
-        RPG_T("Your lamp burns among\nthe others.",
-              "自分のともした灯火が、\nほかの灯火の中で\n燃えている。"),
+        RPG_T("The fire burns on.",
+              "火は、燃えつづけている。"),
     };
 
     constexpr MapEvent refuge_events[] = {
         { .type = EventType::warp, .x = 9, .y = 0, .warp_map = MapId::dorn, .warp_x = 10, .warp_y = 11 },
+        // The road east (the central highway): not while the hero is alone.
         { .type = EventType::trigger, .x = 19, .y = 6,
-          .max_progress = progress::ch7_resolve - 1, .story = StoryId::ch7_east_gate },
+          .max_progress = progress::ch7_seer - 1, .story = StoryId::ch7_east_gate },
         { .type = EventType::warp, .x = 19, .y = 6, .warp_map = MapId::pass, .warp_x = 2, .warp_y = 1,
-          .min_progress = progress::ch7_resolve },
+          .min_progress = progress::ch7_seer },
         { .type = EventType::inn, .x = 4, .y = 5, .npc_graphics = 2, .pages = innkeeper_pages },
         { .type = EventType::shop, .x = 12, .y = 8, .npc_graphics = 5, .pages = refuge_shop_pages,
           .stock = ashbell_shop_stock },
         { .type = EventType::sign, .x = 14, .y = 9, .pages = refuge_sign_pages },
         { .type = EventType::spring, .x = 6, .y = 8, .pages = spring_pages, .price = 0 },
-        { .type = EventType::talk, .x = 5, .y = 10, .npc_graphics = 0, .pages = refuge_child_pages,
-          .movement = NpcMovement::wander, .wander_radius = 2 },
+        // Rico, the child who pulled the hero out of the river (E701).
+        { .type = EventType::story, .x = 5, .y = 10, .npc_graphics = 0,
+          .movement = NpcMovement::wander, .wander_radius = 2, .story = StoryId::ch7_rico },
+        // E702: the seer (npc_graphics 9) tends the wounded by the big house until she rejoins.
+        { .type = EventType::story, .x = 6, .y = 6, .npc_graphics = 9,
+          .min_progress = progress::ch7_awake, .max_progress = progress::ch7_seer - 1,
+          .story = StoryId::ch7_seer },
+        // The elder of the refugees.
         { .type = EventType::story, .x = 11, .y = 5, .npc_graphics = 1, .story = StoryId::ch7_keeper },
-        // The shrine: just lamps, then the scene, then the hero's own lamp.
+        // E703: the campfire (the 'A' tile). The vow happens once the four are together again.
         { .type = EventType::sign, .x = 14, .y = 2, .pages = refuge_shrine_before_pages,
-          .max_progress = progress::ch7_lantern - 1 },
+          .max_progress = progress::ch7_partner - 1 },
         { .type = EventType::story, .x = 14, .y = 2,
-          .min_progress = progress::ch7_lantern, .max_progress = progress::ch7_lantern,
-          .story = StoryId::ch7_shrine },
+          .min_progress = progress::ch7_partner, .max_progress = progress::ch7_vow - 1,
+          .story = StoryId::ch7_campfire },
         { .type = EventType::sign, .x = 14, .y = 2, .pages = refuge_shrine_after_pages,
-          .min_progress = progress::ch7_resolve },
+          .min_progress = progress::ch7_vow },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1402,13 +1404,56 @@ namespace
 
     constexpr MapEvent pass_events[] = {
         { .type = EventType::warp, .x = 1, .y = 1, .warp_map = MapId::refuge, .warp_x = 18, .warp_y = 6 },
-        { .type = EventType::story, .x = 16, .y = 3, .npc_graphics = 8,
-          .min_progress = progress::ch7_resolve, .max_progress = progress::ch8_start - 1,
-          .story = StoryId::ch7_pass },
+        // E702: the defector at the broken bridge (the only way through).
+        { .type = EventType::trigger, .x = 16, .y = 3,
+          .max_progress = progress::ch7_defector - 1, .story = StoryId::ch7_defector },
         { .type = EventType::chest, .x = 15, .y = 6, .npc_graphics = 3,
           .flag = FlagId::chest_pass, .gold = 500 },
-        // Down to the harbor (only reachable once the general is dead).
-        { .type = EventType::warp, .x = 16, .y = 6, .warp_map = MapId::harbor, .warp_x = 1, .warp_y = 6 },
+        // On to the fort in the marsh.
+        { .type = EventType::warp, .x = 16, .y = 6, .warp_map = MapId::fort_marsh, .warp_x = 9, .warp_y = 11 },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D09: the Fort of the Weeping Marsh. The partner waits at its entrance (E702); General Bardos
+    // (npc_graphics 8) holds the corridor to the keep (E704). Behind him, the way down to the harbor.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view fort_marsh_rows[] = {
+        "####################",    // 0
+        "#########>##########",    // 1
+        "#######_____########",    // 2
+        "#######_____########",    // 3
+        "#########_##########",    // 4
+        "##______________####",    // 5
+        "##_####~~~~####_####",    // 6
+        "##_####~~~~####_####",    // 7
+        "##______________####",    // 8
+        "#########_##########",    // 9
+        "~~~~~~~~_=_~~~~~~~~~",    // 10
+        "~~~~~~~~~=~~~~~~~~~~",    // 11
+        "~~~~~~~~~>~~~~~~~~~~",    // 12
+    };
+
+    static_assert(valid_layout(fort_marsh_rows), "Invalid marsh fort layout");
+
+    constexpr MapEvent fort_marsh_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 12, .warp_map = MapId::pass, .warp_x = 16, .warp_y = 5 },
+        // E702: the partner, watching the fort from the causeway.
+        { .type = EventType::trigger, .x = 9, .y = 10,
+          .max_progress = progress::ch7_partner - 1, .story = StoryId::ch7_partner },
+        // The gate stays shut until the vow by the campfire (E703).
+        { .type = EventType::trigger, .x = 9, .y = 9,
+          .max_progress = progress::ch7_vow - 1, .story = StoryId::ch7_fort_gate },
+        // E704.
+        { .type = EventType::story, .x = 9, .y = 4, .npc_graphics = 8,
+          .min_progress = progress::ch7_vow, .max_progress = progress::ch7_bardos - 1,
+          .story = StoryId::ch7_bardos },
+        { .type = EventType::warp, .x = 9, .y = 1, .warp_map = MapId::harbor, .warp_x = 1, .warp_y = 6 },
+    };
+
+    constexpr EncounterGroup fort_marsh_encounters[] = {
+        { { EnemyId::ash_zealot, EnemyId::cult_knight }, 2 },
+        { { EnemyId::cult_knight, EnemyId::cult_knight, EnemyId::cult_knight }, 3 },
+        { { EnemyId::ash_zealot, EnemyId::ash_zealot }, 2 },
     };
 
     constexpr EncounterGroup pass_encounters[] = {
@@ -1465,7 +1510,7 @@ namespace
     };
 
     constexpr MapEvent harbor_events[] = {
-        { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::pass, .warp_x = 16, .warp_y = 5 },
+        { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::fort_marsh, .warp_x = 9, .warp_y = 2 },
         { .type = EventType::trigger, .x = 20, .y = 6,
           .max_progress = progress::ch8_ship - 1, .story = StoryId::ch8_pier },
         { .type = EventType::warp, .x = 20, .y = 6, .warp_map = MapId::citadel, .warp_x = 9, .warp_y = 10,
@@ -1724,7 +1769,7 @@ namespace
             .border = TileId::tree,
         },
         {
-            .name = RPG_T("Lantern Pass", "灯火の峠"),
+            .name = RPG_T("Central Highway", "中央街道"),
             .rows = pass_rows,
             .events = pass_events,
             .encounters = pass_encounters,
@@ -1766,6 +1811,14 @@ namespace
             .rows = throne_rows,
             .events = throne_events,
             .border = TileId::wall,
+        },
+        {
+            .name = RPG_T("Weeping Marsh Fort", "嘆きの沼の砦"),
+            .rows = fort_marsh_rows,
+            .events = fort_marsh_events,
+            .encounters = fort_marsh_encounters,
+            .encounter_rate = 12,
+            .border = TileId::water,
         },
     };
 

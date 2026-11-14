@@ -67,10 +67,14 @@ namespace progress
     constexpr uint8_t ch6_throne = 57;      //!< E604: lost to General Bardos in the throne room; the king was killed.
     constexpr uint8_t ch6_collapse = 59;    //!< E605: the hero's rage, the castle collapses, the party is scattered.
 
-    // Chapter 7 "The Lamplight" (60-69)
-    constexpr uint8_t ch7_start = 60;       //!< The capital is lost. The party is back in the mining town, broken.
-    constexpr uint8_t ch7_lantern = 61;     //!< The keeper of the refugee valley gave the hero a lantern.
-    constexpr uint8_t ch7_resolve = 62;     //!< The hero lit it and made peace with the party: the east pass opens.
+    // Chapter 7 "The Lamplight" (60-69), E701-E705.
+    constexpr uint8_t ch7_start = 60;       //!< (The chapter really starts at 61: E605 leaves the progress at 59.)
+    constexpr uint8_t ch7_awake = 61;       //!< E701: the hero woke up alone in the village of the refugees.
+    constexpr uint8_t ch7_seer = 62;        //!< E702: the seer rejoined (the infirmary of the village).
+    constexpr uint8_t ch7_defector = 63;    //!< E702: the defector rejoined (the broken bridge of the highway).
+    constexpr uint8_t ch7_partner = 65;     //!< E702: the partner rejoined (the entrance of the marsh fort).
+    constexpr uint8_t ch7_vow = 66;         //!< E703: the vow by the campfire.
+    constexpr uint8_t ch7_bardos = 68;      //!< E704: General Bardos was killed: the first Ash General to fall.
 
     // Chapter 8 "Counterattack" (70-79)
     constexpr uint8_t ch8_start = 70;       //!< General 1 was killed in the pass: the first Ash General to fall.
@@ -148,13 +152,19 @@ enum class StoryId : uint8_t
     ch6_palace,         //!< The palace doors: the way into the royal castle once the gate is held.
     ch6_great_gate,     //!< The great gate of the capital, barred for the siege.
     ch6_bardos,         //!< E604/E605: General Bardos in the throne room: a battle that is lost. The castle falls.
-    ch6_aftermath,      //!< Bridge to chapter 7 as it is implemented now: the party meets again in the mining town.
     ch6_road_lost,      //!< The road to the capital after it fell.
-    ch7_south_gate,     //!< The track from the mining town to the refugee valley, closed until chapter 7.
-    ch7_keeper,         //!< The keeper of the lamps gives the hero a lantern.
-    ch7_shrine,         //!< Lighting the lantern: the party is whole again.
-    ch7_east_gate,      //!< The pass east of the valley, closed until the hero's resolve.
-    ch7_pass,           //!< Boss of the pass: General 1 dies. Winning starts chapter 8.
+    ch7_awake,          //!< E701: waking up alone, saved by the child of the ash town (follows ch6_bardos).
+    ch7_rico,           //!< The child, afterwards.
+    ch7_seer,           //!< E702: the seer rejoins.
+    ch7_south_gate,     //!< The track from the mining town to the village of the refugees, closed until chapter 7.
+    ch7_keeper,         //!< The elder of the refugees (and, in chapter 8, the call to crew the ship).
+    ch7_east_gate,      //!< The road east of the village, closed while the hero is alone.
+    ch7_defector,       //!< E702: the defector rejoins at the broken bridge.
+    ch7_partner,        //!< E702: the partner rejoins at the entrance of the marsh fort.
+    ch7_fort_gate,      //!< The inner gate of the fort, closed until the vow.
+    ch7_campfire,       //!< E703: the vow by the campfire.
+    ch7_bardos,         //!< E704: boss of the marsh fort. Winning leads to ch7_signal.
+    ch7_signal,         //!< E705: the signal fires. Starts chapter 8.
     ch8_shipwright,     //!< The shipwright of the harbor: needs a crew, then launches the ship.
     ch8_pier,           //!< The pier of the harbor, empty until the ship is launched.
     ch8_general_3,      //!< First boss of the citadel.
