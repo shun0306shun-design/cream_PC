@@ -294,6 +294,17 @@ def gen_music():
          '--h---h-'),
     ])
 
+    # Title screen: slow and open, A minor leaning to C. No drums.
+    write_mod('bgm_title', 'placeholder title', 84, [
+        TRIANGLE,
+        ('A4 . . E5 . . D5 C5 | B4 . . G4 . . . . | C5 . . G5 . . F5 E5 | D5 . . . E5 . . .',
+         'A2 . E3 . A2 . E3 . | G2 . D3 . G2 . D3 . | F2 . C3 . F2 . C3 . | G2 . D3 . E2 . B2 .',
+         '-'),
+        ('A5 . . G5 . . E5 . | F5 . . E5 . . C5 . | D5 . E5 . F5 . D5 . | E5 . . . . . - .',
+         'F2 . C3 . F2 . C3 . | C3 . G3 . C3 . G3 . | D3 . A2 . D3 . A2 . | E2 . B2 . E2 . . .',
+         '-'),
+    ])
+
 
 def main():
     os.makedirs(AUDIO, exist_ok=True)

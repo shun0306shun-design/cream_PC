@@ -40,6 +40,7 @@ enum class BgmId : uint8_t
     boss,           //!< Battles with a boss or last boss rank enemy.
     event_dark,     //!< Important scenes: loss, ruin.
     event_hope,     //!< Important scenes: resolve, the ending.
+    title,          //!< The title screen.
     count
 };
 

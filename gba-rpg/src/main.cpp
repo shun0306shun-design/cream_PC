@@ -36,6 +36,9 @@ namespace
         bool has_save = rpg::has_saved_game();
         bool language_chosen = false;
 
+        // Keeps playing until the first map chooses its own music.
+        rpg::audio::play_bgm(rpg::BgmId::title);
+
         while(true)
         {
             // The language entry shows the current language. It is not saved: Japanese is the default

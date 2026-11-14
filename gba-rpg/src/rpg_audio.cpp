@@ -36,6 +36,7 @@ namespace
         { bn::music_items::bgm_boss,        0.6 },
         { bn::music_items::bgm_event_dark,  0.6 },
         { bn::music_items::bgm_event_hope,  0.6 },
+        { bn::music_items::bgm_title,       0.6 },
     };
 
     static_assert(sizeof(bgm_table) / sizeof(bgm_table[0]) == int(BgmId::count) - 1, "Music table doesn't match BgmId");
