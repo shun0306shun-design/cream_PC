@@ -1257,19 +1257,23 @@ namespace
     static_assert(valid_layout(harbor_rows), "Invalid harbor layout");
 
     constexpr bn::string_view harbor_sign_pages[] = {
-        RPG_NAME_HARBOR " - HARBOR\nEast: the pier",
+        RPG_T(RPG_NAME_HARBOR " - HARBOR\nEast: the pier",
+              "港町" RPG_NAME_HARBOR_JA "\n東: 桟橋"),
     };
 
     constexpr bn::string_view harbor_shop_pages[] = {
-        "Ship's stores. Nobody is\nsailing, so they are\nyours.",
+        RPG_T("Ship's stores. Nobody is\nsailing, so they are\nyours.",
+              "船の備品だよ。誰も海に\n出ないんだ、\n持っていきな。"),
     };
 
     constexpr bn::string_view harbor_fisher_ch8_pages[] = {
-        "The citadel is across the\nstrait. On clear nights\nyou can see its fires.",
+        RPG_T("The citadel is across the\nstrait. On clear nights\nyou can see its fires.",
+              "城塞は海峡の向こうだ。\n晴れた夜には、\nあそこの火が見える。"),
     };
 
     constexpr bn::string_view harbor_fisher_ch9_pages[] = {
-        "The citadel is dark.\nFirst dark night\nin ten years.",
+        RPG_T("The citadel is dark.\nFirst dark night\nin ten years.",
+              "城塞の火が消えた。\n暗い夜なんて、\n十年ぶりだ。"),
     };
 
     // The harbor can't be reached before chapter 8: the first eight sets are never shown.
@@ -1318,7 +1322,8 @@ namespace
     static_assert(valid_layout(citadel_rows), "Invalid citadel layout");
 
     constexpr bn::string_view citadel_circle_pages[] = {
-        "A circle of ash on the\nfloor. Whatever rite it\nwas for, it is cold.",
+        RPG_T("A circle of ash on the\nfloor. Whatever rite it\nwas for, it is cold.",
+              "床に灰でえがかれた円。\n何の儀式のものであれ、\nもう冷えきっている。"),
     };
 
     constexpr MapEvent citadel_events[] = {
@@ -1484,13 +1489,13 @@ namespace
             .border = TileId::cave_wall,
         },
         {
-            .name = RPG_NAME_HARBOR,
+            .name = RPG_T(RPG_NAME_HARBOR, RPG_NAME_HARBOR_JA),
             .rows = harbor_rows,
             .events = harbor_events,
             .border = TileId::water,
         },
         {
-            .name = "Ember Citadel",
+            .name = RPG_T("Ember Citadel", "残り火の城塞"),
             .rows = citadel_rows,
             .events = citadel_events,
             .encounters = citadel_encounters,

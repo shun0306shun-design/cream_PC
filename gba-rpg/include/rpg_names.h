@@ -46,9 +46,13 @@
 #define RPG_NAME_PARTNER_HOME_JA "カザミ"
 #define RPG_NAME_CAPITAL_JA     "グランセル"
 #define RPG_NAME_REFUGE_JA      "ランタンレスト"
+#define RPG_NAME_HARBOR_JA      "ソルトミア"
+#define RPG_NAME_SHIP_JA        "あかつき号"
 #define RPG_NAME_CULT_JA        "灰の教団"
 #define RPG_NAME_EMPEROR_JA     "ヴァルグレン"
 #define RPG_NAME_GENERAL_1_JA   "ドレイク"
 #define RPG_NAME_GENERAL_2_JA   "ヴェスナ"
+#define RPG_NAME_GENERAL_3_JA   "ガルム"
+#define RPG_NAME_GENERAL_4_JA   "イルゼ"
 
 #endif

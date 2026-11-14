@@ -675,71 +675,103 @@ namespace
     #define GENERAL4 RPG_NAME_GENERAL_4
 
     constexpr bn::string_view shipwright_pages[] = {
-        "A shipwright planes a\nhull, alone, on a dead\nwaterfront.",
-        "Shipwright: The " SHIP ". Last\nhull in " RPG_NAME_HARBOR ". No crew,\nno sail, no reason.",
-        HERO ": The generals sit in\nthe citadel across the\nstrait. That's a reason.",
-        "Shipwright: I need forty\nhands to launch her.\nI have two.",
-        SEER ": Forty lamps burn\nin " REFUGE ".",
-        HERO ": Then we ask them.",
+        RPG_T("A shipwright planes a\nhull, alone, on a dead\nwaterfront.",
+              "人けのない波止場で、\n船大工がひとり、\n船体にかんなをかけている。"),
+        RPG_T("Shipwright: The " SHIP ". Last\nhull in " RPG_NAME_HARBOR ". No crew,\nno sail, no reason.",
+              "船大工「" RPG_NAME_SHIP_JA "だ。\n　" RPG_NAME_HARBOR_JA "最後の船さ。乗り手も\n　帆も、出す理由もない。」"),
+        RPG_T(HERO ": The generals sit in\nthe citadel across the\nstrait. That's a reason.",
+              HERO_JA "「将軍たちは、海峡の\n　向こうの城塞にいる。\n　それが理由だ。」"),
+        RPG_T("Shipwright: I need forty\nhands to launch her.\nI have two.",
+              "船大工「進水させるには\n　人手が四十は要る。\n　いるのは、おれひとりだ。」"),
+        RPG_T(SEER ": Forty lamps burn\nin " REFUGE ".",
+              RPG_NAME_SEER_JA "「" RPG_NAME_REFUGE_JA "には、\n　四十の灯火が\n　ともっています。」"),
+        RPG_T(HERO ": Then we ask them.",
+              HERO_JA "「なら、頼みに行こう。」"),
     };
 
     constexpr bn::string_view shipwright_wait_pages[] = {
-        "Shipwright: Forty hands.\nBring them, and the\n" SHIP " sails.",
+        RPG_T("Shipwright: Forty hands.\nBring them, and the\n" SHIP " sails.",
+              "船大工「人手が四十だ。\n　連れてくれば、\n　" RPG_NAME_SHIP_JA "は海に出る。」"),
     };
 
     constexpr bn::string_view shipwright_launch_pages[] = {
-        "The waterfront is full of\nvoices. " REFUGE " came.\nAnd " RPG_NAME_MINE_TOWN ". And more.",
-        "Shipwright: Well, I'll be.\nHaul! HAUL!",
-        "The " SHIP " slides into\nthe water.",
-        PARTNER ": An army of\nbakers and miners.",
-        HERO ": An army.",
-        "The " SHIP " waits at\nthe pier.",
+        RPG_T("The waterfront is full of\nvoices. " REFUGE " came.\nAnd " RPG_NAME_MINE_TOWN ". And more.",
+              "波止場は人の声であふれて\nいた。" RPG_NAME_REFUGE_JA "が来た。\n" RPG_NAME_MINE_TOWN_JA "も。さらに大勢が。"),
+        RPG_T("Shipwright: Well, I'll be.\nHaul! HAUL!",
+              "船大工「こいつはおどろいた。\n　引け！ 引けえ！」"),
+        RPG_T("The " SHIP " slides into\nthe water.",
+              RPG_NAME_SHIP_JA "が、\n海へすべり出していく。"),
+        RPG_T(PARTNER ": An army of\nbakers and miners.",
+              PARTNER_JA "「パン屋と坑夫の\n　軍隊か。」"),
+        RPG_T(HERO ": An army.",
+              HERO_JA "「軍隊だ。」"),
+        RPG_T("The " SHIP " waits at\nthe pier.",
+              RPG_NAME_SHIP_JA "は、\n桟橋で待っている。"),
     };
 
     constexpr bn::string_view shipwright_after_pages[] = {
-        "Shipwright: She's yours.\nBring her back, or\ndon't come back.",
+        RPG_T("Shipwright: She's yours.\nBring her back, or\ndon't come back.",
+              "船大工「船はあんたらのものだ。\n　連れて帰ってこい。でなきゃ\n　帰ってくるな。」"),
     };
 
     constexpr bn::string_view keeper_rally_pages[] = {
-        HERO ": We have a ship and\nno crew. I'm asking you\nall to stop hiding.",
-        "Keeper: You ask a great\ndeal, wall-boy.",
-        "Keeper: ...But a lamp kept\nunder a bowl lights\nnothing. We will come.",
-        "The valley empties\ntoward the sea.",
+        RPG_T(HERO ": We have a ship and\nno crew. I'm asking you\nall to stop hiding.",
+              HERO_JA "「船はある。乗り手がいない。\n　みんなに頼みたい。\n　隠れるのを、やめてくれ。」"),
+        RPG_T("Keeper: You ask a great\ndeal, wall-boy.",
+              "灯守り「ずいぶんなことを\n　頼むね、城壁の坊や。」"),
+        RPG_T("Keeper: ...But a lamp kept\nunder a bowl lights\nnothing. We will come.",
+              "灯守り「……だが、鉢をかぶせた\n　灯火は何も照らさない。\n　行くよ、わたしらも。」"),
+        RPG_T("The valley empties\ntoward the sea.",
+              "谷の人々が、\n海へ向かって動き出す。"),
     };
 
     constexpr bn::string_view pier_pages[] = {
-        "A long pier. No ship\nis moored here.",
+        RPG_T("A long pier. No ship\nis moored here.",
+              "長い桟橋だ。\n船は一隻もつながれていない。"),
     };
 
     constexpr bn::string_view general3_pages[] = {
-        GENERAL3 ": Bakers and miners,\non a boat. I will enjoy\nthe quiet after.",
-        HERO ": Together. Go!",
+        RPG_T(GENERAL3 ": Bakers and miners,\non a boat. I will enjoy\nthe quiet after.",
+              RPG_NAME_GENERAL_3_JA "「パン屋と坑夫が、船でか。\n　片づけたあとの静けさが\n　楽しみだ。」"),
+        RPG_T(HERO ": Together. Go!",
+              HERO_JA "「一緒にだ。行くぞ！」"),
     };
 
     constexpr bn::string_view general3_victory_pages[] = {
-        GENERAL3 " falls. The second\nof the four.",
+        RPG_T(GENERAL3 " falls. The second\nof the four.",
+              RPG_NAME_GENERAL_3_JA "がたおれた。\n四人のうちの、ふたりめ。"),
     };
 
     constexpr bn::string_view general4_pages[] = {
-        GENERAL4 ": Two of us dead?\nThen I will take both\ntheir shares of you.",
+        RPG_T(GENERAL4 ": Two of us dead?\nThen I will take both\ntheir shares of you.",
+              RPG_NAME_GENERAL_4_JA "「ふたりも死んだの？\n　なら、ふたりの取り分まで\n　私がもらうわ。」"),
     };
 
     constexpr bn::string_view general4_victory_pages[] = {
-        GENERAL4 " falls.\nOne is left.",
+        RPG_T(GENERAL4 " falls.\nOne is left.",
+              RPG_NAME_GENERAL_4_JA "がたおれた。\n残るは、ひとり。"),
     };
 
     constexpr bn::string_view general2_last_pages[] = {
-        GENERAL2 ": The ember.\nYou did not charge.",
-        HERO ": I'm not alone\nthis time.",
-        GENERAL2 ": No. You brought\nthe whole hearth.",
+        RPG_T(GENERAL2 ": The ember.\nYou did not charge.",
+              RPG_NAME_GENERAL_2_JA "「火の粉ね。\n　斬りかかってこないの。」"),
+        RPG_T(HERO ": I'm not alone\nthis time.",
+              HERO_JA "「今度は、\n　ひとりじゃない。」"),
+        RPG_T(GENERAL2 ": No. You brought\nthe whole hearth.",
+              RPG_NAME_GENERAL_2_JA "「そうね。かまどごと\n　連れてきたのね。」"),
     };
 
     constexpr bn::string_view general2_last_victory_pages[] = {
-        GENERAL2 ": ...He never needed\ngenerals. We were\nkindling, too.",
-        GENERAL2 " falls. The four\nAsh Generals are gone.",
-        NOX ": The Emperor is alone\nin his tower now. He\nwill not mind.",
-        HERO ": Then we go to\nthe tower.",
-        "- Chapter 9 -",
+        RPG_T(GENERAL2 ": ...He never needed\ngenerals. We were\nkindling, too.",
+              RPG_NAME_GENERAL_2_JA "「……あの方に、将軍など\n　要らなかった。私たちも、\n　たきつけだったのよ。」"),
+        RPG_T(GENERAL2 " falls. The four\nAsh Generals are gone.",
+              RPG_NAME_GENERAL_2_JA "がたおれた。\n四人の灰の将軍は、\nもういない。"),
+        RPG_T(NOX ": The Emperor is alone\nin his tower now. He\nwill not mind.",
+              RPG_NAME_DEFECTOR_JA "「炎帝は今、塔にひとりだ。\n　気にもとめないだろうが。」"),
+        RPG_T(HERO ": Then we go to\nthe tower.",
+              HERO_JA "「なら、塔へ行く。」"),
+        RPG_T("- Chapter 9 -",
+              "- 第9章 -"),
     };
 
     constexpr EncounterGroup general3_battle = { { EnemyId::general_3, EnemyId::cult_knight }, 2 };
