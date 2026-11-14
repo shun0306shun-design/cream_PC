@@ -477,69 +477,102 @@ namespace
     #define GENERAL2 RPG_NAME_GENERAL_2
 
     constexpr bn::string_view captain_pages[] = {
-        "Captain: Halt! You came by\nthe pilgrim road? Then\nthe Cathedral has fallen.",
-        HERO ": " GENERAL " is dead.",
-        "Captain: Then hear this.\n" CAPITAL " is the last city\nstanding. And they come.",
-        "Captain: General " GENERAL2 "\nleads ten thousand to our\neast wall. Tonight.",
-        SEER ": The stars over this\ncity... I cannot find\nthem.",
-        HERO ": A general. Here.\nGood.",
-        PARTNER ": " HERO ". We hold\nthe wall. We don't hunt.",
-        "Captain: Rest, arm, then\ncome to the east gate.\nWe need every blade.",
+        RPG_T("Captain: Halt! You came by\nthe pilgrim road? Then\nthe Cathedral has fallen.",
+              "隊長「止まれ！ 巡礼路から\n　来たのか？ ならば、\n　聖堂は落ちたのだな。」"),
+        RPG_T(HERO ": " GENERAL " is dead.",
+              HERO_JA "「" GENERAL_JA "は死んだ。」"),
+        RPG_T("Captain: Then hear this.\n" CAPITAL " is the last city\nstanding. And they come.",
+              "隊長「ならば聞け。" RPG_NAME_CAPITAL_JA "は\n　最後に残った都だ。\n　そこへ奴らが来る。」"),
+        RPG_T("Captain: General " GENERAL2 "\nleads ten thousand to our\neast wall. Tonight.",
+              "隊長「将軍" RPG_NAME_GENERAL_2_JA "が一万の兵で\n　東の城壁に迫っている。\n　今夜だ。」"),
+        RPG_T(SEER ": The stars over this\ncity... I cannot find\nthem.",
+              RPG_NAME_SEER_JA "「この都の上の星が……\n　見つかりません。」"),
+        RPG_T(HERO ": A general. Here.\nGood.",
+              HERO_JA "「将軍が、ここに。\n　……ちょうどいい。」"),
+        RPG_T(PARTNER ": " HERO ". We hold\nthe wall. We don't hunt.",
+              PARTNER_JA "「" HERO_JA "。俺たちは城壁を\n　守るんだ。\n　狩りに来たんじゃない。」"),
+        RPG_T("Captain: Rest, arm, then\ncome to the east gate.\nWe need every blade.",
+              "隊長「休んで、装備を整えたら\n　東門へ来てくれ。\n　剣は一本でも多く要る。」"),
     };
 
     constexpr bn::string_view captain_again_pages[] = {
-        "Captain: The east gate,\nwhen you are ready.\nThere is little time.",
+        RPG_T("Captain: The east gate,\nwhen you are ready.\nThere is little time.",
+              "隊長「準備ができたら東門へ。\n　時間はあまりない。」"),
     };
 
     constexpr bn::string_view east_gate_closed_pages[] = {
-        "The east gate. Guards\nwave you back from\nthe wall.",
+        RPG_T("The east gate. Guards\nwave you back from\nthe wall.",
+              "東門だ。衛兵が手をふって、\n城壁から下がれと\n合図している。"),
     };
 
     constexpr bn::string_view siege_pages[] = {
-        "Horns. The plain beyond\nthe wall is a sea of\ntorches.",
-        "Captain: Hold the gate!\nHold--",
-        "The wall does not break.\nIt melts.",
+        RPG_T("Horns. The plain beyond\nthe wall is a sea of\ntorches.",
+              "角笛が鳴る。\n城壁の向こうの平原は、\nたいまつの海だった。"),
+        RPG_T("Captain: Hold the gate!\nHold--",
+              "隊長「門を守れ！\n　守り抜――」"),
+        RPG_T("The wall does not break.\nIt melts.",
+              "城壁は、くずれなかった。\n溶けたのだ。"),
     };
 
     constexpr bn::string_view burning_pages[] = {
-        "Within the hour, " CAPITAL "\nis burning.",
-        NOX ": The palace. She will\ngo for the king. That is\nhow it is done.",
+        RPG_T("Within the hour, " CAPITAL "\nis burning.",
+              "一時間もたたずに、\n" RPG_NAME_CAPITAL_JA "は燃えていた。"),
+        RPG_T(NOX ": The palace. She will\ngo for the king. That is\nhow it is done.",
+              RPG_NAME_DEFECTOR_JA "「宮殿だ。彼女は王を\n　ねらう。それが\n　奴らのやり方だ。」"),
     };
 
     constexpr bn::string_view general2_pages[] = {
-        GENERAL2 ": So you are the\nember that killed " GENERAL ".",
-        GENERAL2 ": " RPG_NAME_VILLAGE ", was it?\nI signed that order.\nA small one. I forget it.",
-        PARTNER ": " HERO ", don't!\nPeople are still getting\nout. Hold the line!",
-        HERO ": ...She signed it.",
-        HERO " breaks from the\nline and charges alone.",
+        RPG_T(GENERAL2 ": So you are the\nember that killed " GENERAL ".",
+              RPG_NAME_GENERAL_2_JA "「あなたが、" GENERAL_JA "を\n　殺した火の粉ね。」"),
+        RPG_T(GENERAL2 ": " RPG_NAME_VILLAGE ", was it?\nI signed that order.\nA small one. I forget it.",
+              RPG_NAME_GENERAL_2_JA "「" VILLAGE_JA "村、だったかしら。\n　あの命令書に署名したのは私。\n　小さな村よ。もう忘れたわ。」"),
+        RPG_T(PARTNER ": " HERO ", don't!\nPeople are still getting\nout. Hold the line!",
+              PARTNER_JA "「" HERO_JA "、やめろ！\n　まだ人が逃げている。\n　戦列を守れ！」"),
+        RPG_T(HERO ": ...She signed it.",
+              HERO_JA "「……あいつが、\n　署名した。」"),
+        RPG_T(HERO " breaks from the\nline and charges alone.",
+              HERO_JA "は戦列を飛び出し、\nひとりで斬りかかった。"),
     };
 
     constexpr bn::string_view rout_lost_pages[] = {
-        "The flames close in.\nYour sword arm will\nnot rise.",
+        RPG_T("The flames close in.\nYour sword arm will\nnot rise.",
+              "炎がせまってくる。\n剣を持つ腕が、\nもう上がらない。"),
     };
 
     constexpr bn::string_view rout_won_pages[] = {
-        GENERAL2 " steps back,\nunhurt, and laughs. Behind\nher, the palace roof falls.",
+        RPG_T(GENERAL2 " steps back,\nunhurt, and laughs. Behind\nher, the palace roof falls.",
+              RPG_NAME_GENERAL_2_JA "は無傷のまま\n一歩下がり、笑った。\nその背後で宮殿の屋根が落ちる。"),
     };
 
     constexpr bn::string_view rout_pages[] = {
-        "The line you left is\ngone. So are the people\nbehind it.",
-        "Hands drag you away.\nBehind you, the palace\nsinks into the fire.",
-        GENERAL2 ": Run, ember. Tell\nthe ashes what you saw.",
+        RPG_T("The line you left is\ngone. So are the people\nbehind it.",
+              "離れてきた戦列は、\nもうない。その後ろに\nいた人々も。"),
+        RPG_T("Hands drag you away.\nBehind you, the palace\nsinks into the fire.",
+              "いくつもの手に\n引きずられていく。背後で、\n宮殿が炎に沈んでいく。"),
+        RPG_T(GENERAL2 ": Run, ember. Tell\nthe ashes what you saw.",
+              RPG_NAME_GENERAL_2_JA "「逃げなさい、火の粉。\n　見たものを、\n　灰に語ってやるといいわ。」"),
     };
 
     constexpr bn::string_view aftermath_pages[] = {
-        RPG_NAME_MINE_TOWN ". Three days later.\n" CAPITAL " is gone.",
-        PARTNER ": The gate held\nuntil you left it. Do you\nknow how many we lost?",
-        HERO ": ...I saw her, and\nI couldn't see anything\nelse.",
-        PARTNER ": You didn't fight\nfor " CAPITAL ". You fought\nfor " RPG_NAME_VILLAGE ". Again.",
-        SEER ": " HERO ". I looked for\nyour star last night.\nIt was not there.",
-        HERO ": ...I couldn't\nsave anything.",
-        "- Chapter 7 -",
+        RPG_T(RPG_NAME_MINE_TOWN ". Three days later.\n" CAPITAL " is gone.",
+              RPG_NAME_MINE_TOWN_JA "。三日後。\n" RPG_NAME_CAPITAL_JA "は、もうない。"),
+        RPG_T(PARTNER ": The gate held\nuntil you left it. Do you\nknow how many we lost?",
+              PARTNER_JA "「門は持ちこたえていた。\n　お前が離れるまではな。\n　何人死んだか分かるか？」"),
+        RPG_T(HERO ": ...I saw her, and\nI couldn't see anything\nelse.",
+              HERO_JA "「……あいつを見たら、\n　ほかには何も\n　見えなくなった。」"),
+        RPG_T(PARTNER ": You didn't fight\nfor " CAPITAL ". You fought\nfor " RPG_NAME_VILLAGE ". Again.",
+              PARTNER_JA "「お前は" RPG_NAME_CAPITAL_JA "のために\n　戦ったんじゃない。\n　また" VILLAGE_JA "村のためだ。」"),
+        RPG_T(SEER ": " HERO ". I looked for\nyour star last night.\nIt was not there.",
+              RPG_NAME_SEER_JA "「" HERO_JA "。昨夜、あなたの\n　星を探しました。\n　どこにも、なかった。」"),
+        RPG_T(HERO ": ...I couldn't\nsave anything.",
+              HERO_JA "「……何も、\n　守れなかった。」"),
+        RPG_T("- Chapter 7 -",
+              "- 第7章 -"),
     };
 
     constexpr bn::string_view road_lost_pages[] = {
-        "The pilgrim road is choked\nwith smoke. There is no\ngoing back.",
+        RPG_T("The pilgrim road is choked\nwith smoke. There is no\ngoing back.",
+              "巡礼路は煙でふさがっている。\nもう、戻れない。"),
     };
 
     constexpr EncounterGroup general2_battle = { { EnemyId::general_2 }, 1 };

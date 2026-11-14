@@ -1081,15 +1081,18 @@ namespace
     static_assert(valid_layout(grancel_burning_rows), "Invalid burning grancel layout");
 
     constexpr bn::string_view grancel_sign_pages[] = {
-        RPG_NAME_CAPITAL " - ROYAL CAPITAL\nNorth: the palace\nEast: the great wall",
+        RPG_T(RPG_NAME_CAPITAL " - ROYAL CAPITAL\nNorth: the palace\nEast: the great wall",
+              "王都" RPG_NAME_CAPITAL_JA "\n北: 宮殿\n東: 大城壁"),
     };
 
     constexpr bn::string_view grancel_shop_pages[] = {
-        "The royal armory is open\nto anyone who will stand\non the wall.",
+        RPG_T("The royal armory is open\nto anyone who will stand\non the wall.",
+              "城壁に立つ者になら、\n王家の武器庫は\n誰にでも開かれている。"),
     };
 
     constexpr bn::string_view grancel_citizen_pages[] = {
-        "The king says the wall\nhas never fallen.\nIt has never been tried.",
+        RPG_T("The king says the wall\nhas never fallen.\nIt has never been tried.",
+              "王さまは、城壁は一度も\n落ちたことがないと言う。\n攻められたこともないのさ。"),
     };
 
     constexpr uint8_t last_before_siege = progress::ch6_siege - 1;
@@ -1245,7 +1248,7 @@ namespace
             .border = TileId::wall,
         },
         {
-            .name = RPG_NAME_CAPITAL,
+            .name = RPG_T(RPG_NAME_CAPITAL, RPG_NAME_CAPITAL_JA),
             .rows = grancel_rows,
             .events = grancel_events,
             .border = TileId::wall,
@@ -1270,7 +1273,7 @@ namespace
         {
             MapId::grancel, progress::ch6_siege, progress::game_clear,
             {
-                .name = RPG_NAME_CAPITAL,
+                .name = RPG_T(RPG_NAME_CAPITAL, RPG_NAME_CAPITAL_JA),
                 .rows = grancel_burning_rows,
                 .events = grancel_events,
                 .encounters = grancel_encounters,
