@@ -594,6 +594,7 @@ def gen_npcs():
         person('down', 0, hair=7, tunic=7, trim=6),     # 8 Ash General
         person('down', 0, hair=6, tunic=14, trim=9),    # 9 the seer
         wyrm_head(),                                    # 10 ember wyrm
+        person('down', 0, hair=9, tunic=12, trim=6),    # 11 the stranger (after the ending)
     ]
     write_bmp('npc.bmp', stack(frames), SPRITE_PALETTE)
     write_json('npc.json', '{\n    "type": "sprite",\n    "height": 16\n}\n')

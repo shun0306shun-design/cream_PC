@@ -170,6 +170,10 @@ namespace
               "長老「王さま、ばんざい。\n　さて、井戸の修理が\n　残っておりますぞ、陛下。」"),
     };
 
+    constexpr bn::string_view stranger_pages[] = {
+        "???: I will stay. If I\nflicker, tell me what\nday it is.",
+    };
+
     constexpr bn::string_view survivor_rebuilt_pages[] = {
         RPG_T("It isn't the same.\nBut the bread is warm,\nand the door shuts.",
               "元どおりじゃない。\nでもパンは温かいし、\n戸はちゃんと閉まる。"),
@@ -305,6 +309,12 @@ namespace
         { .type = EventType::story, .x = 12, .y = 9, .npc_graphics = 1,
           .min_progress = progress::ch10_ember_out, .max_progress = progress::game_clear - 1,
           .story = StoryId::ch10_elder },
+        // After the ending: the stranger (npc_graphics 11) appears in the square as soon as the hero is crowned.
+        { .type = EventType::story, .x = 13, .y = 11, .npc_graphics = 11,
+          .min_progress = progress::game_clear, .max_progress = progress::game_clear,
+          .story = StoryId::post_stranger },
+        { .type = EventType::talk, .x = 13, .y = 11, .npc_graphics = 11, .pages = stranger_pages,
+          .min_progress = progress::post_stranger },
         { .type = EventType::talk, .x = 12, .y = 9, .npc_graphics = 1, .pages = elder_king_pages,
           .min_progress = progress::game_clear },
         { .type = EventType::talk, .x = 5, .y = 7, .npc_graphics = 0, .pages = survivor_rebuilt_pages,
@@ -725,6 +735,9 @@ namespace
         { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 9,
           .min_progress = progress::ch3_start, .max_progress = progress::ch3_start,
           .story = StoryId::ch3_seer_village },
+        // After the ending: the elder of the seers (npc_graphics 1) comes out to read the stranger's necklace.
+        { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 1,
+          .min_progress = progress::post_stranger, .story = StoryId::post_seer_elder },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1653,7 +1666,7 @@ namespace
 
     constexpr MapState map_states[] = {
         {
-            MapId::grancel, progress::ch6_siege, progress::game_clear,
+            MapId::grancel, progress::ch6_siege, 0xFF,
             {
                 .name = RPG_T(RPG_NAME_CAPITAL, RPG_NAME_CAPITAL_JA),
                 .rows = grancel_burning_rows,

@@ -86,6 +86,11 @@ namespace progress
     constexpr uint8_t ch10_rebuilt = 93;    //!< The village was rebuilt (another state of its map).
 
     constexpr uint8_t game_clear = 100;
+
+    // After the ending, part 1 "The Runaway Necklace" (100-109). story_progress is a u8: there is room up to 255.
+    constexpr uint8_t post_stranger = 101;      //!< Met and calmed the stranger whose necklace slips through time.
+    constexpr uint8_t post_seer_elder = 102;    //!< The elder of the seers' village took on the reading of the necklace.
+    constexpr uint8_t post_part_1_clear = 110;  //!< Where part 1 is meant to end (not reached yet).
 }
 
 /// Chapter number counting from 0 (0 = chapter 1): what NPC lines are selected with.
@@ -148,6 +153,8 @@ enum class StoryId : uint8_t
     ch10_grave,         //!< At the parents' graves: the temptation of the ember.
     ch10_elder,         //!< The elder: rebuilding the village, then the coronation and the ending.
     ch10_seasons,       //!< The village after it is rebuilt (follows ch10_elder).
+    post_stranger,      //!< After the ending: the stranger with the runaway necklace, in the home village.
+    post_seer_elder,    //!< The elder of the seers' village: the first clue about the necklace.
     count,
     none = 0xFF
 };

@@ -936,6 +936,35 @@ namespace
               "- おわり -\n遊んでくれてありがとう。"),
     };
 
+    // ---------------------------------------------------------------------------------------------------------------
+    // After the ending, part 1 "The Runaway Necklace"
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view post_stranger_pages[] = {
+        "Someone stands in the\nsquare, flickering like\na candle in the wind.",
+        "???: It was morning. Then\nlast winter. Then this\nplace was ash. Is it ash?",
+        HERO ": Easy. This is " RPG_NAME_VILLAGE ".\nIt's rebuilt. You are\nstanding in it.",
+        "???: The necklace. It\nslips. A little forward,\na little back. Sideways.",
+        "???: Sideways is worst.\nA world where no one\nlit a single lamp.",
+        SEER ": Breathe. Look at\nme. One sky. This one.",
+        PARTNER ": Sit, before you\nfall through the floor.\nThere. Better.",
+        "The flickering slows.\nThe necklace still hums.",
+        "???: ...Thank you. I\ncan't make it stop. I\ndon't know when I am.",
+        SEER ": There are several\nskies in that stone. The\nElder of " RPG_NAME_SEER_TOWN " reads such.",
+        HERO ": Then we ask her.\nStay here. You are safe\nin " RPG_NAME_VILLAGE ".",
+    };
+
+    constexpr bn::string_view post_seer_elder_pages[] = {
+        "Elder Seer: " SEER ". You\nbring a strange star\nhome with you.",
+        SEER ": A necklace that\nslips through time.\nAnd across worlds.",
+        "Elder Seer: Forward, back\nand aside. Three threads\nnever meant to be tied.",
+        "Elder Seer: Its clasp is\n" RPG_NAME_SEER_TOWN " work. Older\nthan I am.",
+        "Elder Seer: I will read\nits sky. Come back when\nthe stars have turned.",
+    };
+
+    constexpr bn::string_view post_seer_elder_wait_pages[] = {
+        "Elder Seer: The reading\nis not done. Patience.",
+    };
+
     constexpr EncounterGroup pyre_battle = { { EnemyId::emperor_pyre }, 1 };
 
     constexpr EncounterGroup general2_last_battle = { { EnemyId::general_2_last }, 1 };
@@ -1379,6 +1408,23 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
 
     case StoryId::ch10_seasons:
         say_pages(ui, seasons_pages);
+        break;
+
+    case StoryId::post_stranger:
+        say_pages(ui, post_stranger_pages);
+        story_progress = progress::post_stranger;
+        break;
+
+    case StoryId::post_seer_elder:
+        if(story_progress < progress::post_seer_elder)
+        {
+            say_pages(ui, post_seer_elder_pages);
+            story_progress = progress::post_seer_elder;
+        }
+        else
+        {
+            say_pages(ui, post_seer_elder_wait_pages);  // Part 2 continues from here.
+        }
         break;
 
     default:
