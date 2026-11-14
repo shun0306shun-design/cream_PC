@@ -30,7 +30,14 @@ struct GameState
     void init_new_game();
 
     /// Moves the player to the respawn point of the current chapter (used after a defeat).
+    /// The respawn point is checked too: if something stands on it now, the closest free tile next to it is used.
     void return_to_start();
+
+    /**
+     * Returns true if the player can be where it is: a walkable tile of the current map, free of NPCs and chests
+     * that stay in place, with at least one walkable tile next to it (not walled in).
+     */
+    [[nodiscard]] bool position_safe() const;
 };
 
 /// Writes the game to SRAM.
@@ -38,7 +45,8 @@ void save_game(const GameState& state);
 
 /**
  * Reads the game from SRAM. Returns false (leaving `state` untouched) if there's no valid save.
- * If the saved position is no longer walkable, the player is moved back to the start (see GameState::return_to_start).
+ * If the saved position is no longer safe (GameState::position_safe), the player is moved back to the respawn point
+ * of the chapter (GameState::return_to_start). A corrupt facing is reset.
  */
 [[nodiscard]] bool load_game(GameState& state);
 
