@@ -2,6 +2,8 @@
 
 #include "bn_sram.h"
 
+#include "rpg_audio.h"
+
 namespace rpg
 {
 
@@ -39,6 +41,9 @@ namespace
     // If this fails: update the number below AND bump save_version, so old saves are ignored instead of misread.
     // (Adding items or flags doesn't change the size: the bag and EventFlags have fixed capacities.)
     static_assert(sizeof(SaveData) == 128, "SaveData changed: bump save_version and update this size");
+
+    // The sound settings live in SRAM after the saved game (rpg_audio.h).
+    static_assert(int(sizeof(SaveData)) <= audio::sram_settings_offset, "SaveData overlaps the sound settings");
 }
 
 void GameState::init_new_game()

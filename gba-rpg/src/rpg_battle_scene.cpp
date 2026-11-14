@@ -4,6 +4,7 @@
 #include "bn_sprite_item.h"
 
 #include "rpg_text.h"
+#include "rpg_audio.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -74,6 +75,19 @@ BattleScene::BattleScene(GameState& state, Ui& ui, const EncounterGroup& group, 
         sprite.set_bg_priority(scene_sprite_bg_priority);
         _enemies.push_back(Enemy{ &data, data.stats.max_hp, name, bn::move(sprite) });
     }
+
+    // Any boss in the group makes it a boss battle. FieldScene restores the music of the map afterwards.
+    bool boss_battle = false;
+
+    for(const Enemy& enemy : _enemies)
+    {
+        if(enemy.data->rank != EnemyRank::normal)
+        {
+            boss_battle = true;
+        }
+    }
+
+    audio::play_bgm(boss_battle ? BgmId::boss : BgmId::battle);
 
     _refresh_status();
 }
@@ -523,6 +537,7 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
             if(target >= 0)
             {
                 stream << member.name() << tr(" attacks!", "の攻撃！");
+                audio::play_se(SeId::attack);
                 box.say_timed(text);
 
                 int defense = _enemies[target].data->stats.defense;
@@ -536,6 +551,12 @@ void BattleScene::_party_turn(int member_index, MessageBox& box)
         {
             const SpellData& spell = spell_data(SpellId(action.id));
             stream << member.name() << tr(" uses ", "は") << localized(spell.name) << tr("!", "を使った！");
+
+            if(spell.effect.type == EffectType::physical)
+            {
+                audio::play_se(SeId::attack);
+            }
+
             box.say_timed(text);
 
             member.mp = int16_t(member.mp - spell.mp_cost);
@@ -619,6 +640,7 @@ void BattleScene::_enemy_turn(int enemy_index, MessageBox& box)
             int target = _random_alive_member(last_target);
             last_target = target;
             stream << enemy.name << tr(" attacks!", "の攻撃！");
+            audio::play_se(SeId::attack);
             box.say_timed(text);
 
             int defense = _party.members[target].stats().defense;
@@ -793,6 +815,7 @@ void BattleScene::_damage_enemy(int enemy_index, int amount, MessageBox& box)
 {
     Enemy& enemy = _enemies[enemy_index];
     enemy.hp = int16_t(amount >= enemy.hp ? 0 : enemy.hp - amount);
+    audio::play_se(SeId::damage);
 
     // Hit feedback: blink the sprite.
     for(int blink = 0; blink < 6; ++blink)
@@ -818,6 +841,7 @@ void BattleScene::_damage_member(int member_index, int amount, MessageBox& box)
 {
     PartyMember& member = _party.members[member_index];
     member.take_damage(amount);
+    audio::play_se(SeId::damage);
     _refresh_status();
 
     Text text;
@@ -950,6 +974,7 @@ void BattleScene::_victory(MessageBox& box)
         if(member.add_exp(exp) > 0)
         {
             _refresh_status();
+            audio::play_se(SeId::level_up);
 
             {
                 Text text;

@@ -243,6 +243,7 @@ const EncounterGroup& FieldScene::run()
 void FieldScene::_load_map()
 {
     _map = &map_data(_state.map, _state.story_progress);
+    audio::play_bgm(_map->music());     // Keeps playing if the new map has the same music.
 
     fill_cells(*_map, _map_item);
     _bg_map.reload_cells_ref();
@@ -705,6 +706,14 @@ const EncounterGroup* FieldScene::_run_story(StoryId id)
     while(id != StoryId::none)
     {
         uint8_t old_progress = _state.story_progress;
+
+        // Important scenes have their own music. The others keep what is playing, so a chain of scenes
+        // doesn't jump back to the map's music between two of them.
+        if(BgmId bgm = story_bgm(id); bgm != BgmId::none)
+        {
+            audio::play_bgm(bgm);
+        }
+
         StoryResult result = run_story(id, _state, _ui);
 
         if(result.step_back)
@@ -739,6 +748,7 @@ const EncounterGroup* FieldScene::_run_story(StoryId id)
         id = result.next;
     }
 
+    audio::play_bgm(_map->music());
     return nullptr;
 }
 

@@ -13,9 +13,9 @@ SOURCES     	:=  src src/data
 INCLUDES    	:=  include
 DATA        	:=
 GRAPHICS    	:=  graphics
-AUDIO       	:=
-# No music yet: "null" needs no audio tools. Switch to "maxmod" and set AUDIO := audio to add music/SFX.
-AUDIOBACKEND	?=  null
+AUDIO       	:=  audio
+# Music (.mod/.xm/.it/.s3m) and sound effects (.wav) of audio/ are played with Maxmod (mmutil comes with devkitPro).
+AUDIOBACKEND	:=  maxmod
 AUDIOTOOL		:=
 DMGAUDIO    	:=
 DMGAUDIOBACKEND	:=  null

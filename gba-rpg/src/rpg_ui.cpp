@@ -17,6 +17,7 @@
 #include "common_fixed_8x16_sprite_font.h"
 #include "common_variable_8x16_sprite_font.h"
 #include "rpg_japanese_sprite_font.h"
+#include "rpg_audio.h"
 
 namespace rpg
 {
@@ -308,11 +309,13 @@ int Menu::run(bool cancellable)
 
         if(bn::keypad::a_pressed())
         {
+            audio::play_se(SeId::confirm);
             return _index;
         }
 
         if(cancellable && bn::keypad::b_pressed())
         {
+            audio::play_se(SeId::cancel);
             return -1;
         }
 

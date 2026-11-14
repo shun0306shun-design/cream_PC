@@ -6,6 +6,7 @@
 
 #include "bn_sprite_items_npc.h"
 
+#include "rpg_audio.h"
 #include "rpg_game_state.h"
 
 namespace rpg
@@ -165,6 +166,7 @@ bool open_chest(GameState& state, Ui& ui, const MapEvent& event, bn::sprite_ptr*
     // Open it for good (the flag is saved with the game) and show the open sprite
     // before the messages, so the player sees it open while reading them.
     state.flags.set(event.flag);
+    audio::play_se(SeId::chest);
 
     if(chest_sprite)
     {

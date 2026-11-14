@@ -13,7 +13,8 @@
 - 素早さベースの行動順、攻撃・技（MP消費）・アイテム、経験値とレベルアップ（最大Lv100）、レベルによる技習得
 - 敵のランク（通常 / ボス / ラスボス）に応じた複数回行動
 - マップ名の一時表示（シーン開始時・ワープ時に画面上部中央へ約1.75秒）と、右上の常時ミニマップ（`@`=自分 / `#`=通れない / `.`=通れる）
-- フィールドメニュー（START）：ステータス / 道具 / 技（回復系のみ） / 装備 / セーブ（SRAM）
+- フィールドメニュー（START）：ステータス / 道具 / 技（回復系のみ） / 装備 / セーブ（SRAM） / サウンド
+- 仮の BGM（町・ダンジョン・通常戦闘・ボス戦・重要イベント2曲）と SE（決定・キャンセル・攻撃・ダメージ・レベルアップ・宝箱）、音量調整とミュート
 
 | ボタン | フィールド | メニュー・戦闘 |
 | --- | --- | --- |
@@ -51,9 +52,11 @@ Butano 公式の導入ガイド: <https://gvaliente.github.io/butano/getting_sta
 ```
 gba-rpg/
 ├── Makefile                    Butano テンプレートベースのビルド設定
+├── audio/                      BGM（bgm_*.mod）と SE（se_*.wav）。すべて仮の音
 ├── graphics/                   画像アセット（BMP + JSON）。すべてプレースホルダー
 ├── tools/
 │   ├── gen_placeholder_assets.py   プレースホルダー画像の生成スクリプト
+│   ├── gen_placeholder_audio.py    仮の BGM（.mod）・SE（.wav）の生成スクリプト
 │   ├── gen_japanese_font.py        日本語フォント（BMP + JSON + ヘッダー）の生成スクリプト
 │   └── fonts/                      PixelMplus12（M+ FONT LICENSE）
 ├── include/
@@ -67,6 +70,7 @@ gba-rpg/
 │   ├── rpg_party.h             パーティの実行時状態（HP/MP/Lv/所持品/ゴールド）
 │   ├── rpg_game_state.h        シーン間で共有する状態 + セーブ/ロード
 │   ├── rpg_ui.h                ウィンドウ / メニュー / メッセージボックス
+│   ├── rpg_audio.h             BGM・SE の再生、音量・ミュート設定
 │   ├── rpg_text.h              言語設定と2言語テキスト（`RPG_T` / `localized()` / `tr()`）
 │   ├── rpg_japanese_sprite_font.h   日本語フォント定義（自動生成。手で編集しない）
 │   ├── rpg_field_scene.h       マップ探索シーン
@@ -229,8 +233,32 @@ Lv61〜100 はやり込み用です。敵の HP・攻撃力などは本編のま
 - **スプライト数**: 全角文字は1スプライトに2文字です（英語は4〜6文字）。全角18文字×3行で27スプライト。
 - **英語フォントに戻す・差し替える**: `Ui` のコンストラクタ（rpg_ui.cpp）で渡している `bn::sprite_font` を変えます。
 
-### BGM・効果音を入れる
-`Makefile` の `AUDIOBACKEND` を `maxmod` に、`AUDIO := audio` にして、`audio/` に .mod/.xm/.it/.wav を置きます。
+### BGM・効果音（仮の音）
+Butano の Maxmod バックエンドで再生します（`Makefile` の `AUDIOBACKEND := maxmod` / `AUDIO := audio`。変換ツール mmutil は devkitPro に同梱）。
+`audio/` の音はすべて `python3 tools/gen_placeholder_audio.py` が生成した短いチップチューン風の仮素材です。
+
+| ID（rpg_audio.h） | ファイル | 鳴る場面 |
+| --- | --- | --- |
+| `BgmId::town` | `bgm_town.mod` | ランダム戦闘のないマップ（町・村）。明るめ |
+| `BgmId::dungeon` | `bgm_dungeon.mod` | ランダム戦闘のあるマップ（草原・洞窟・城など）。暗め |
+| `BgmId::battle` | `bgm_battle.mod` | 通常戦闘 |
+| `BgmId::boss` | `bgm_boss.mod` | ボス・ラスボスランクの敵がいる戦闘 |
+| `BgmId::event_dark` | `bgm_event_dark.mod` | 重要イベント（村の焼き討ち、相棒の過去、王都陥落など）と、焼け跡の村 |
+| `BgmId::event_hope` | `bgm_event_hope.mod` | 重要イベント（灯火の祠、帰郷〜エンディング）と、再建後の村 |
+| `SeId::confirm` / `cancel` | `se_confirm.wav` / `se_cancel.wav` | メニューの決定（A）/ キャンセル（B） |
+| `SeId::attack` / `damage` | `se_attack.wav` / `se_damage.wav` | 武器攻撃・物理技 / ダメージを受けたとき（敵味方共通） |
+| `SeId::level_up` | `se_level_up.wav` | レベルアップ |
+| `SeId::chest` | `se_chest.wav` | 宝箱を開けたとき |
+
+- **差し替え**: 同じファイル名で上書きして再ビルドするだけです（BGM は .mod / .xm / .it / .s3m、SE は無圧縮の .wav。BGM の形式を変えるときは古い .mod を消す）。
+  ファイル名を変える・曲ごとの音量バランスを直すときは `src/rpg_audio.cpp` の表を編集します。
+- **曲や SE を増やす**: `BgmId` / `SeId` に追加 → `audio/` にファイル → `rpg_audio.cpp` の表に1行。
+- **マップごとの曲**: 既定は自動（エンカウントの有無で町／ダンジョン）。`MapData::bgm` を指定すると上書きできます（章ごとに曲調を変える場合はここ）。
+- **イベントの曲**: `story_bgm()`（rpg_story.cpp）にシーンを追加します。シーンが終わるとマップの曲に戻ります。
+- **再生**: `audio::play_bgm(id)`（同じ曲なら鳴らし直さない）/ `audio::play_se(id)`。
+- **音量・ミュート**: フィールドメニューの「サウンド」で BGM 音量・SE 音量（0〜4）とミュートを変更できます。
+  設定はセーブデータとは別に SRAM へ即保存され、次回起動時も有効です（既存のセーブには影響しません）。
+- タイトル画面は無音です。
 
 ## ストーリー進行（第1章〜第10章）
 
@@ -292,7 +320,7 @@ Lv61〜100 はやり込み用です。敵の HP・攻撃力などは本編のま
 
 ## 未実装（次に足すと良いもの）
 
-蘇生アイテム（蘇生は宿屋とザオラルのみ）、装備の比較表示（装備前の能力変化プレビュー）、装備の特殊効果、武具屋、まとめ買い（数量指定）、状態異常、防御コマンド、建物の内部マップ、NPCの向きアニメーション（今は1コマ）、決まった道順を歩くNPC、BGM/SE。
+蘇生アイテム（蘇生は宿屋とザオラルのみ）、装備の比較表示（装備前の能力変化プレビュー）、装備の特殊効果、武具屋、まとめ買い（数量指定）、状態異常、防御コマンド、建物の内部マップ、NPCの向きアニメーション（今は1コマ）、決まった道順を歩くNPC。
 
 ## ライセンス表記
 

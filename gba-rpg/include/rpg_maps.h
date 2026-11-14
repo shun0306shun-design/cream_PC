@@ -10,6 +10,7 @@
 
 #include "bn_span.h"
 
+#include "rpg_audio.h"
 #include "rpg_enemies.h"
 #include "rpg_flags.h"
 #include "rpg_items.h"
@@ -176,6 +177,19 @@ struct MapData
     bn::span<const EncounterGroup> encounters = {}; //!< Empty = no random battles.
     uint8_t encounter_rate = 0;                     //!< Chance per step out of 256 (scaled by TileInfo::encounter).
     TileId border = TileId::void_;                  //!< Tile shown outside the map.
+    BgmId bgm = BgmId::none;                        //!< Music of the map. BgmId::none = chosen by music().
+
+    /// The music to play in this map: `bgm` if it was given, else dungeon music where there are random
+    /// battles and town music where there aren't.
+    [[nodiscard]] constexpr BgmId music() const
+    {
+        if(bgm != BgmId::none)
+        {
+            return bgm;
+        }
+
+        return encounters.empty() ? BgmId::town : BgmId::dungeon;
+    }
 
     [[nodiscard]] constexpr int width() const
     {

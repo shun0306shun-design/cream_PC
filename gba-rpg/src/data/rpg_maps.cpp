@@ -1670,6 +1670,7 @@ namespace
                 .rows = village_rebuilt_rows,
                 .events = village_events,
                 .border = TileId::tree,
+                .bgm = BgmId::event_hope,
             },
         },
         {
@@ -1679,6 +1680,7 @@ namespace
                 .rows = village_burnt_rows,
                 .events = village_events,
                 .border = TileId::tree,
+                .bgm = BgmId::event_dark,
             },
         },
     };

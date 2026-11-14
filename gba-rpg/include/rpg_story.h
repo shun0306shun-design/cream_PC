@@ -15,6 +15,7 @@
 #ifndef RPG_STORY_H
 #define RPG_STORY_H
 
+#include "rpg_audio.h"
 #include "rpg_enemies.h"
 
 namespace rpg
@@ -162,6 +163,12 @@ struct StoryResult
 
 /// Runs a scene (blocks until it ends). It may change the story progress, the party and the player position.
 [[nodiscard]] StoryResult run_story(StoryId id, GameState& state, Ui& ui);
+
+/**
+ * Music of an important scene, played while it runs (FieldScene goes back to the map's music afterwards).
+ * BgmId::none for the scenes that keep the music of the map.
+ */
+[[nodiscard]] BgmId story_bgm(StoryId id);
 
 /**
  * Returns true if losing the boss battle of this scene is part of the story: instead of the usual penalty
