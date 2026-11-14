@@ -785,6 +785,8 @@ const EncounterGroup* FieldScene::_run_story(StoryId id)
         if(result.battle)
         {
             _state.story_battle = id;
+            _state.battle_turn_limit = result.battle_turn_limit;
+            _state.battle_join_turn = result.battle_join_turn;
             return result.battle;
         }
 

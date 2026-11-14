@@ -6,6 +6,7 @@
 #include "rpg_text.h"
 #include "rpg_audio.h"
 #include "rpg_game_state.h"
+#include "rpg_story.h"
 
 namespace rpg
 {
@@ -121,8 +122,23 @@ BattleResult BattleScene::_run_battle()
         box.say(text);
     }
 
+    int round = 0;
+
     while(true)
     {
+        ++round;
+
+        // Story battles: someone may join the fight at the start of a given round.
+        if(round == _state.battle_join_turn)
+        {
+            MessageBox box(_ui);
+
+            if(story_battle_reinforce(_state, box))
+            {
+                _refresh_status();
+            }
+        }
+
         // 1) The player chooses what every party member will do.
         bool wants_to_run = _select_commands();
 
@@ -147,6 +163,12 @@ BattleResult BattleScene::_run_battle()
         {
             box.say(RPG_T("The party was wiped out...", "パーティは全滅した……"));
             return BattleResult::defeat;
+        }
+
+        // Story battles that end by themselves after some rounds.
+        if(_state.battle_turn_limit > 0 && round >= _state.battle_turn_limit)
+        {
+            return BattleResult::stopped;
         }
     }
 }

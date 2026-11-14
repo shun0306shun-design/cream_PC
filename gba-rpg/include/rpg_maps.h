@@ -82,6 +82,8 @@ enum class MapId : uint8_t
     harbor,     //!< T08: the harbor town.
     citadel,    //!< D08: the island citadel of the generals.
     castle,     //!< D09: the Flame Emperor's castle (last dungeon).
+    mine,       //!< D06: the abandoned mine of the mining town (the secret way to the cathedral).
+    throne,     //!< D08: the royal castle of the capital (throne room).
     count
 };
 

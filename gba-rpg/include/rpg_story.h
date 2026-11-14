@@ -22,6 +22,7 @@ namespace rpg
 {
 
 class Ui;
+class MessageBox;
 struct GameState;
 
 /// Milestones of GameState::story_progress. A value means "this already happened".
@@ -49,17 +50,22 @@ namespace progress
     constexpr uint8_t ch4_wasteland = 31;   //!< Saw the burnt plains beyond the gate.
     constexpr uint8_t ch4_truth = 32;       //!< Learned that eight parts in ten of the world burned: the canyon opens.
 
-    // Chapter 5 "Ashes of Betrayal" (40-49)
-    constexpr uint8_t ch5_start = 40;       //!< The wyrm of the Searing Canyon was defeated.
-    constexpr uint8_t ch5_defector = 41;    //!< The former cult priest joined: the ruins of the partner's village open.
-    constexpr uint8_t ch5_split = 42;       //!< The partner's past came out and he left the party: the cathedral opens.
-    constexpr uint8_t ch5_reunited = 43;    //!< The partner came back for the battle against General 1.
+    // Chapter 5 "Ashes of Betrayal" (40-49). The values are the SP column of the design document (E501-E507).
+    constexpr uint8_t ch5_start = 40;       //!< E406: the wyrm of the Searing Canyon was defeated; on to the mining town.
+    constexpr uint8_t ch5_dorn = 41;        //!< E501: saw the mining town that lives by obeying the cult.
+    constexpr uint8_t ch5_deserter = 42;    //!< E502: saved the defector from the cult soldiers; he comes along as a guest.
+    constexpr uint8_t ch5_mine = 44;        //!< E503: boss of the abandoned mine beaten; the defector joined for good.
+    constexpr uint8_t ch5_kazami = 45;      //!< E504: the ruins of the partner's home village.
+    constexpr uint8_t ch5_split = 46;       //!< E505: the defector's confession; the partner left the party.
+    constexpr uint8_t ch5_cathedral = 48;   //!< E506: facing General Zelma in the Ash Cathedral (the partner returns in battle).
 
-    // Chapter 6 "The Sinking Capital" (50-59)
-    constexpr uint8_t ch6_start = 50;       //!< General 1 was driven from the Ash Cathedral: the road to the capital opens.
-    constexpr uint8_t ch6_muster = 51;      //!< The captain asked for help on the east wall.
-    constexpr uint8_t ch6_siege = 52;       //!< The wall fell: the capital burns (another state of its map).
-    constexpr uint8_t ch6_rout = 53;        //!< The hero broke the line, lost to General 2 and the party fled.
+    // Chapter 6 "The Sinking Capital" (50-59), E601-E605.
+    constexpr uint8_t ch6_start = 50;       //!< E507: Zelma fled; the next target is the capital.
+    constexpr uint8_t ch6_audience = 52;    //!< E601: audience with the king: the party joins the defense.
+    constexpr uint8_t ch6_eve = 53;         //!< E602: the night before the battle (the companions can be talked to).
+    constexpr uint8_t ch6_gate = 55;        //!< E603: the gate was held through three battles in a row.
+    constexpr uint8_t ch6_throne = 57;      //!< E604: lost to General Bardos in the throne room; the king was killed.
+    constexpr uint8_t ch6_collapse = 59;    //!< E605: the hero's rage, the castle collapses, the party is scattered.
 
     // Chapter 7 "The Lamplight" (60-69)
     constexpr uint8_t ch7_start = 60;       //!< The capital is lost. The party is back in the mining town, broken.
@@ -122,16 +128,27 @@ enum class StoryId : uint8_t
     ch4_chronicler,     //!< The chronicler of the ash town shows the map of what burned.
     ch4_canyon_gate,    //!< The way to the Searing Canyon, closed until the truth is known.
     ch4_wyrm,           //!< Boss of the Searing Canyon. Winning starts chapter 5.
-    ch5_defector,       //!< Meeting the former cult priest in the mining town: he joins.
-    ch5_north_gate,     //!< The road to the ruined village, closed until he joins.
-    ch5_ruins,          //!< At the grave of the ruined village: the partner's past. He leaves the party.
-    ch5_east_gate,      //!< The way to the Ash Cathedral, closed until the party splits.
-    ch5_cathedral,      //!< Boss of the Ash Cathedral: the partner returns. Winning starts chapter 6.
-    ch6_captain,        //!< The captain of the capital asks for help.
-    ch6_east_gate,      //!< The east gate of the capital: going there starts the siege.
-    ch6_burning,        //!< The capital burns (follows ch6_east_gate).
-    ch6_general,        //!< General 2 at the palace: a battle that is meant to be lost. Then the rout.
-    ch6_aftermath,      //!< Back in the mining town after the rout. Starts chapter 7.
+    ch5_dorn,           //!< E501: arriving in the mining town.
+    ch5_deserter,       //!< E502: behind the tavern: an event battle to save the defector.
+    ch5_mine_gate,      //!< The abandoned mine, closed until the defector shows the way.
+    ch5_overseer,       //!< E503: boss of the abandoned mine. The defector joins for good.
+    ch5_kazami,         //!< E504: entering the ruins of the partner's village.
+    ch5_confession,     //!< E505: the grave marker: the confession, a choice, and the partner leaves.
+    ch5_cathedral_gate, //!< The way from the ruins to the cathedral, closed until the confession.
+    ch5_east_gate,      //!< The main road to the cathedral: always shut.
+    ch5_zelma,          //!< E506/E507: boss of the Ash Cathedral. The partner returns on the third round.
+    ch6_audience,       //!< E601: entering the capital: audience with the king.
+    ch6_inn,            //!< E602/E603: the inn of the capital: the eve, then three battles in a row at the gate.
+    ch6_eve,            //!< E602: night falls (follows ch6_inn).
+    ch6_eve_partner,    //!< E602: the three companions, on the eve.
+    ch6_eve_seer,
+    ch6_eve_defector,
+    ch6_gate_2,         //!< E603: second and third battles at the gate (they follow ch6_inn).
+    ch6_gate_3,
+    ch6_palace,         //!< The palace doors: the way into the royal castle once the gate is held.
+    ch6_great_gate,     //!< The great gate of the capital, barred for the siege.
+    ch6_bardos,         //!< E604/E605: General Bardos in the throne room: a battle that is lost. The castle falls.
+    ch6_aftermath,      //!< Bridge to chapter 7 as it is implemented now: the party meets again in the mining town.
     ch6_road_lost,      //!< The road to the capital after it fell.
     ch7_south_gate,     //!< The track from the mining town to the refugee valley, closed until chapter 7.
     ch7_keeper,         //!< The keeper of the lamps gives the hero a lantern.
@@ -166,6 +183,8 @@ struct StoryResult
     bool step_back = false;                 //!< Push the player back to the tile it came from (closed ways).
     bool reload_map = false;                //!< The scene ended with the screen faded out: reload the map and fade in.
     StoryId next = StoryId::none;           //!< Scene to run right after this one.
+    uint8_t battle_turn_limit = 0;          //!< The battle stops after this many rounds (0 = fought to the end).
+    uint8_t battle_join_turn = 0;           //!< story_battle_reinforce() is called at the start of this round (0 = no).
 };
 
 /// Runs a scene (blocks until it ends). It may change the story progress, the party and the player position.
@@ -182,6 +201,12 @@ struct StoryResult
  * (half the gold, back to town), the party is restored and run_story_after_battle() tells what happens.
  */
 [[nodiscard]] bool story_defeat_continues(StoryId id);
+
+/**
+ * Called by the battle at the start of the round StoryResult::battle_join_turn: someone joins the fight.
+ * Returns true if the party changed (the battle then refreshes its status window).
+ */
+[[nodiscard]] bool story_battle_reinforce(GameState& state, MessageBox& box);
 
 /**
  * Runs what follows the boss battle started by a scene.

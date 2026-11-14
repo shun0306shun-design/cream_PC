@@ -30,7 +30,8 @@ enum class EnemyId : uint8_t
     cult_knight,
     ember_wyrm,     //!< Boss of the Searing Canyon (chapter 4).
     ash_zealot,
-    drake_true,     //!< Boss of the Ash Cathedral (chapter 5): General 1 at full strength.
+    zelma,          //!< Boss of the Ash Cathedral (chapter 5): she escapes.
+    mine_overseer,  //!< Boss of the abandoned mine (chapter 5).
     general_2,      //!< General 2 in the capital (chapter 6): not meant to be beaten.
     drake_last,     //!< Boss of the pass (chapter 7): the first Ash General that dies.
     general_3,      //!< Bosses of the citadel (chapter 8).

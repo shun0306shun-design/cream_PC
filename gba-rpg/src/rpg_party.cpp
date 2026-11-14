@@ -198,6 +198,13 @@ void Party::init_new_game()
     members[0].init(ClassId::hero, 1);
     size = 1;
 
+    for(PartyMember& member : away)
+    {
+        member = PartyMember();
+    }
+
+    away_count = 0;
+
     for(uint8_t& item : items)
     {
         item = 0;
@@ -224,6 +231,25 @@ bool Party::join(ClassId class_id, int level)
         }
     }
 
+    // Someone who left before comes back as it was.
+    for(int index = 0; index < away_count; ++index)
+    {
+        if(away[index].class_id == class_id)
+        {
+            members[size] = away[index];
+            ++size;
+
+            for(int other = index; other < away_count - 1; ++other)
+            {
+                away[other] = away[other + 1];
+            }
+
+            --away_count;
+            away[away_count] = PartyMember();
+            return true;
+        }
+    }
+
     members[size] = PartyMember();
     members[size].init(class_id, level);
     ++size;
@@ -236,14 +262,11 @@ bool Party::leave(ClassId class_id)
     {
         if(members[index].class_id == class_id)
         {
-            // Keep the equipment: it returns to the bag (if the bag has room for it).
-            for(ItemId id : { members[index].weapon, members[index].armor })
-            {
-                if(id != ItemId::none)
-                {
-                    add_item(id);
-                }
-            }
+            BN_ASSERT(away_count < max_party_size - 1, "Too many members away");
+
+            // The member is kept as it is (level, experience, equipment) for when it comes back.
+            away[away_count] = members[index];
+            ++away_count;
 
             for(int other = index; other < size - 1; ++other)
             {
@@ -259,11 +282,31 @@ bool Party::leave(ClassId class_id)
     return false;
 }
 
+uint8_t Party::party_mask() const
+{
+    uint8_t mask = 0;
+
+    for(const PartyMember& member : active())
+    {
+        mask = uint8_t(mask | class_bit(member.class_id));
+    }
+
+    return mask;
+}
+
 bool Party::valid() const
 {
-    if(size < 1 || size > max_party_size)
+    if(size < 1 || size > max_party_size || away_count > max_party_size - 1)
     {
         return false;
+    }
+
+    for(int index = 0; index < away_count; ++index)
+    {
+        if(! away[index].valid())
+        {
+            return false;
+        }
     }
 
     for(const PartyMember& member : active())

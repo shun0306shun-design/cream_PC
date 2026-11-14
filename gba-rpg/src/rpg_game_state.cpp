@@ -10,7 +10,7 @@ namespace rpg
 namespace
 {
     constexpr uint32_t save_magic = 0x47505242;     // "BRPG"
-    constexpr uint32_t save_version = 6;            // Bump it when SaveData changes: old saves are then ignored.
+    constexpr uint32_t save_version = 7;            // Bump it when SaveData changes: old saves are then ignored.
 
     /// What is stored in SRAM. Must stay trivially copyable.
     struct SaveData
@@ -40,7 +40,7 @@ namespace
     // Any change to what is saved (a new field, a bigger array...) moves the data of existing saves.
     // If this fails: update the number below AND bump save_version, so old saves are ignored instead of misread.
     // (Adding items or flags doesn't change the size: the bag and EventFlags have fixed capacities.)
-    static_assert(sizeof(SaveData) == 128, "SaveData changed: bump save_version and update this size");
+    static_assert(sizeof(SaveData) == 180, "SaveData changed: bump save_version and update this size");
 
     // The sound settings live in SRAM after the saved game (rpg_audio.h).
     static_assert(int(sizeof(SaveData)) <= audio::sram_settings_offset, "SaveData overlaps the sound settings");

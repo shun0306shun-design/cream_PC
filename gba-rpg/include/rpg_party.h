@@ -89,6 +89,10 @@ struct Party
     uint8_t items[max_items] = {};      //!< Amount owned of each item, indexed by ItemId (the rest is unused).
     int32_t gold = 0;
 
+    // Members that left with the story and may come back: they keep their level, experience and equipment.
+    PartyMember away[max_party_size - 1];
+    uint8_t away_count = 0;
+
     void init_new_game();
 
     /// The members that are in the party.
@@ -102,12 +106,16 @@ struct Party
         return bn::span<const PartyMember>(members, size);
     }
 
-    /// Adds a member with full HP/MP. Returns false if the party is full or that class is already in it.
+    /// Adds a member with full HP/MP. If that class left the party before (see leave()), the same member comes
+    /// back as it was and `level` is ignored. Returns false if the party is full or that class is already in it.
     bool join(ClassId class_id, int level);
 
-    /// Removes the member of that class (never the first one). What it wears goes back to the bag.
+    /// Removes the member of that class (never the first one). It waits in `away`, as it is, until it joins again.
     /// Returns false if nobody of that class is in the party.
     bool leave(ClassId class_id);
+
+    /// Which of the four story characters are in the party, as a mask of class_bit() values.
+    [[nodiscard]] uint8_t party_mask() const;
 
     /// Checks that the data (for example loaded from a save) can't make the game crash.
     [[nodiscard]] bool valid() const;

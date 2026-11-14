@@ -34,6 +34,12 @@ enum class FlagId : uint8_t
     chest_pass,
     chest_citadel,
     chest_castle,
+    chest_mine,
+    stopped_shion,      //!< E505: the hero stepped between the partner and the defector (changes one line of E507).
+    ch6_eve_done,       //!< E602: talked to the three companions on the eve of the siege (a reward in chapter 7).
+    ch6_eve_partner,    //!< E602: who was already talked to.
+    ch6_eve_seer,
+    ch6_eve_defector,
     // Add new flags here.
     count,
     none = 0xFF         //!< "No flag": the default of MapEvent::flag.

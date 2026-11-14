@@ -37,6 +37,9 @@ constexpr int yes_no_row = screen_rows - MessageBox::box_rows - yes_no_rows;
  */
 [[nodiscard]] bool ask_yes_no(Ui& ui);
 
+/// Like ask_yes_no(), with two custom options (a bit wider). Returns true for the first one (B chooses the second).
+[[nodiscard]] bool ask_choice(Ui& ui, const bn::string_view& first, const bn::string_view& second);
+
 /// EventType::talk and EventType::sign: shows the pages (the ones of the current chapter, if it has them).
 void run_talk(const GameState& state, Ui& ui, const MapEvent& event);
 

@@ -3,6 +3,7 @@
 #include "bn_assert.h"
 
 #include "rpg_ui.h"
+#include "rpg_events.h"
 #include "rpg_text.h"
 #include "rpg_names.h"
 #include "rpg_game_state.h"
@@ -365,110 +366,156 @@ namespace
     // ---------------------------------------------------------------------------------------------------------------
     #define NOX RPG_NAME_DEFECTOR
 
-    constexpr bn::string_view defector_pages[] = {
-        RPG_T("A man in a cult robe sits\nalone. The miners give\nhim a wide berth.",
-              "教団のローブを着た男が\nひとりで座っている。\n坑夫たちは近よらない。"),
-        RPG_T(HERO ": That crest--!",
-              HERO_JA "「その紋章は――！」"),
-        RPG_T("???: Put the sword down.\nI took the robe off once.\nIt doesn't come off.",
-              "？？？「剣を下ろせ。\n　このローブは一度ぬいだ。\n　だが、ぬげはしないのだ。」"),
-        RPG_T(NOX ": I am " NOX ". I was a\npriest of the " RPG_NAME_CULT ".\nI lit their fires.",
-              RPG_NAME_DEFECTOR_JA "「私は" RPG_NAME_DEFECTOR_JA "。\n　" RPG_NAME_CULT_JA "の司祭だった。\n　奴らの火をつけた者だ。」"),
-        RPG_T(PARTNER ": Then burn.",
-              PARTNER_JA "「なら、燃えろ。」"),
-        RPG_T(NOX ": Soon enough. First:\n" GENERAL " prays at the Ash\nCathedral, east of here.",
-              RPG_NAME_DEFECTOR_JA "「いずれな。その前に――\n　" GENERAL_JA "は東の\n　灰の聖堂で祈っている。」"),
-        RPG_T(NOX ": Its doors open only\nto the seal of a priest.\nI can open them.",
-              RPG_NAME_DEFECTOR_JA "「聖堂の扉は、司祭の\n　印章にしか開かない。\n　私なら開けられる。」"),
-        RPG_T(NOX ": But I buried my seal\nin a ruin, north of here.\nWe need it first.",
-              RPG_NAME_DEFECTOR_JA "「だが印章は、北の廃墟に\n　埋めてきた。\n　まず、それが要る。」"),
-        RPG_T(SEER ": His star is dim.\nBut it is not lying.",
-              RPG_NAME_SEER_JA "「彼の星は暗い。\n　けれど、うそは\n　ついていません。」"),
-        RPG_T(HERO ": ...You walk in\nfront. Where I can\nsee you.",
-              HERO_JA "「……お前は前を歩け。\n　俺から見えるところをな。」"),
-        RPG_T(NOX " joined the party!",
+    constexpr bn::string_view dorn_arrival_pages[] = {
+        RPG_T(RPG_NAME_MINE_TOWN ". The mine works.\nCarts of ore roll out\nunder the cult's banner.",
+              "鉱山町" RPG_NAME_MINE_TOWN_JA "。\n教団の旗の下、鉱石の\n荷車が出ていく。"),
+        RPG_T("Miner: We dig, they let us\nlive. Don't ask us for\nhelp, traveler.",
+              "鉱夫「掘れば、生かして\n　もらえる。おれたちに\n　助けを求めるな。」"),
+        RPG_T(RPG_NAME_PARTNER ": A town that kneels.\n...It's still standing,\nat least.",
+              RPG_NAME_PARTNER_JA "「ひざまずいた町か。\n　……まだ立っているだけ\n　ましだな。」"),
+    };
+
+    constexpr bn::string_view deserter_pages[] = {
+        RPG_T("Behind the tavern, cult\nsoldiers corner a man\nin a torn robe.",
+              "酒場の裏で、教団兵が\nやぶれたローブの男を\n追いつめている。"),
+        RPG_T("Soldier: Deserter. The\ngeneral wants you back\nin pieces.",
+              "教団兵「脱走兵め。\n　将軍は、お前をばらばらで\n　連れ戻せとおおせだ。」"),
+        RPG_T(RPG_NAME_HERO ": Cult soldiers.\nThat's all I need\nto know.",
+              RPG_NAME_HERO_JA "「教団兵か。\n　それだけ分かれば\n　じゅうぶんだ。」"),
+    };
+
+    constexpr bn::string_view deserter_victory_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": ...Why help me? I\nwore that robe too.\nI am " RPG_NAME_DEFECTOR ".",
+              RPG_NAME_DEFECTOR_JA "「……なぜ助ける。\n　私もあのローブを着ていた。\n　" RPG_NAME_DEFECTOR_JA "という。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": General " RPG_NAME_GENERAL_3 " sits\nin the Ash Cathedral.\nI know a way in.",
+              RPG_NAME_DEFECTOR_JA "「灰将" RPG_NAME_GENERAL_3_JA "は\n　灰の聖堂にいる。\n　抜け道を知っている。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": Through the old\nmine, north of town.\nLet me guide you.",
+              RPG_NAME_DEFECTOR_JA "「町の北の廃坑を\n　抜けるのだ。\n　案内させてくれ。」"),
+        RPG_T(RPG_NAME_DEFECTOR " comes along!",
+              RPG_NAME_DEFECTOR_JA "が同行する！"),
+    };
+
+    constexpr bn::string_view mine_gate_pages[] = {
+        RPG_T("The old mine. The shaft\nis boarded up.",
+              "古い廃坑だ。\n入口は板でふさがれている。"),
+    };
+
+    constexpr bn::string_view overseer_pages[] = {
+        RPG_T("Overseer: " RPG_NAME_DEFECTOR ". " RPG_NAME_GENERAL_3 "\nmisses her favorite\nfire-starter.",
+              "監督官「" RPG_NAME_DEFECTOR_JA "。\n　" RPG_NAME_GENERAL_3_JA "さまが、お気に入りの\n　火つけ役をお待ちだ。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": I am done\nlighting fires.",
+              RPG_NAME_DEFECTOR_JA "「火をつけるのは、\n　もうやめた。」"),
+    };
+
+    constexpr bn::string_view overseer_victory_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": Beyond this shaft\nlies a ruin, and past\nit, the cathedral.",
+              RPG_NAME_DEFECTOR_JA "「この坑道の先に\n　廃墟がある。その向こうが\n　聖堂だ。」"),
+        RPG_T(RPG_NAME_SEER ": You fight like one\nlooking for a place\nto die.",
+              RPG_NAME_SEER_JA "「あなたは、死に場所を\n　さがすように戦うのですね。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": ...Perhaps. Until\nthen, use me.",
+              RPG_NAME_DEFECTOR_JA "「……かもしれん。\n　それまで、使ってくれ。」"),
+        RPG_T(RPG_NAME_DEFECTOR " joined the party!",
               RPG_NAME_DEFECTOR_JA "が仲間になった！"),
     };
 
-    constexpr bn::string_view north_gate_pages[] = {
-        RPG_T("A road north, into ruins.\nThe miners say no one\nlives there anymore.",
-              "北の廃墟へ続く道だ。\n坑夫たちの話では、\nもう誰も住んでいない。"),
+    constexpr bn::string_view kazami_arrival_pages[] = {
+        RPG_T(RPG_NAME_PARTNER " stops walking.",
+              RPG_NAME_PARTNER_JA "が足を止めた。"),
+        RPG_T(RPG_NAME_PARTNER ": ...That wall.\nThat was my house.",
+              RPG_NAME_PARTNER_JA "「……あの壁。\n　あれが、おれの家だ。」"),
+        RPG_T(RPG_NAME_HERO ": " RPG_NAME_PARTNER_HOME ". You are\nfrom here.",
+              RPG_NAME_HERO_JA "「" RPG_NAME_PARTNER_HOME_JA "村。\n　ここが、お前の……」"),
+        RPG_T(RPG_NAME_PARTNER ": Burned. Like yours.\nI never said. Saying\nchanges nothing.",
+              RPG_NAME_PARTNER_JA "「焼かれた。お前の村と\n　同じだ。言わなかった。\n　言っても変わらん。」"),
+    };
+
+    constexpr bn::string_view confession_pages[] = {
+        RPG_T("A grave marker, tended\nonce, long ago.",
+              "墓標がある。\nずっと昔に、だれかが\n手入れしていたようだ。"),
+        RPG_T(RPG_NAME_DEFECTOR ": ...I know this\nplace. I was in the unit\nthat burned this village.",
+              RPG_NAME_DEFECTOR_JA "「……ここを知っている。\n　この村を焼いた隊に、\n　私はいた。」"),
+        RPG_T(RPG_NAME_PARTNER "'s spear is at\n" RPG_NAME_DEFECTOR "'s throat.",
+              RPG_NAME_PARTNER_JA "の槍が、\n" RPG_NAME_DEFECTOR_JA "ののどに向けられた。"),
+    };
+
+    constexpr bn::string_view confession_stop_pages[] = {
+        RPG_T(RPG_NAME_HERO ": " RPG_NAME_PARTNER ". Not like this.",
+              RPG_NAME_HERO_JA "「" RPG_NAME_PARTNER_JA "。\n　こんなやり方はよせ。」"),
+        RPG_T(RPG_NAME_PARTNER ": ...You'd shield\nhim. Fine.",
+              RPG_NAME_PARTNER_JA "「……かばうのか。\n　好きにしろ。」"),
+    };
+
+    constexpr bn::string_view confession_watch_pages[] = {
+        RPG_T("The spear trembles.\nIt does not strike.",
+              "槍先がふるえる。\nだが、突かれはしなかった。"),
+        RPG_T(RPG_NAME_DEFECTOR ": Do it. I came\nhere for that.",
+              RPG_NAME_DEFECTOR_JA "「やれ。\n　そのために来た。」"),
+    };
+
+    constexpr bn::string_view confession_leave_pages[] = {
+        RPG_T(RPG_NAME_PARTNER ": I can't walk\nbeside him.",
+              RPG_NAME_PARTNER_JA "「こいつとは、\n　ならんで歩けん。」"),
+        RPG_T(RPG_NAME_PARTNER " left the party.",
+              RPG_NAME_PARTNER_JA "がパーティを離れた。"),
+    };
+
+    constexpr bn::string_view cathedral_gate_pages[] = {
+        RPG_T("A path climbs north,\ntoward a black spire.",
+              "北へ道がのびている。\n黒い尖塔が見える。"),
     };
 
     constexpr bn::string_view east_gate_ch5_pages[] = {
-        RPG_T("A black spire rises in\nthe east. Its doors are\nsealed to outsiders.",
-              "東に黒い尖塔がそびえている。\nその扉は、よそ者には\n閉ざされている。"),
+        RPG_T("The cathedral road. Its\ngate is shut to all but\nthe faithful.",
+              "聖堂への道だ。門は\n信徒のほかには\n閉ざされている。"),
     };
 
-    constexpr bn::string_view ruins_pages[] = {
-        RPG_T("A single grave marker.\nSomeone tended it, once.",
-              "墓標がひとつだけ。\nかつては誰かが、\n手入れをしていたようだ。"),
-        RPG_T(PARTNER ": ...Stop.\nDon't touch that.",
-              PARTNER_JA "「……やめろ。\n　それにさわるな。」"),
-        RPG_T(PARTNER ": This is " RPG_NAME_PARTNER_HOME ".\nThis was my home.",
-              PARTNER_JA "「ここは" RPG_NAME_PARTNER_HOME_JA "。\n　俺の故郷だった。」"),
-        RPG_T(HERO ": You said you hunt\nfor bounties.",
-              HERO_JA "「賞金かせぎだと\n　言っていただろう。」"),
-        RPG_T(PARTNER ": A bounty is\nlighter to carry than\na grave.",
-              PARTNER_JA "「賞金のほうが、\n　墓より軽く\n　背負えるからな。」"),
-        RPG_T(NOX ": ...I know this\nplace. I held a torch\nhere, that night.",
-              RPG_NAME_DEFECTOR_JA "「……この場所を知っている。\n　あの夜、私はここで\n　たいまつを持っていた。」"),
-        RPG_T(PARTNER ": You.",
-              PARTNER_JA "「……お前が。」"),
-        RPG_T(PARTNER "'s spear is at\n" NOX "'s throat. " HERO "\nsteps between them.",
-              PARTNER_JA "の槍が、" RPG_NAME_DEFECTOR_JA "の\nのどもとに突きつけられた。\n" HERO_JA "が間に割って入る。"),
-        RPG_T(PARTNER ": You'd shield him?\nAfter " RPG_NAME_VILLAGE "? After your\nown dead?",
-              PARTNER_JA "「こいつをかばうのか？\n　" VILLAGE_JA "村のあとで？\n　お前の家族が死んだのに？」"),
-        RPG_T(HERO ": We need him to\nreach " GENERAL ".",
-              HERO_JA "「" GENERAL_JA "にたどり着くには\n　こいつが必要だ。」"),
-        RPG_T(PARTNER ": Then need him.\nI'm done needing anyone.",
-              PARTNER_JA "「なら、必要としていろ。\n　俺はもう、誰も\n　必要としない。」"),
-        RPG_T(PARTNER " left the party.",
-              PARTNER_JA "がパーティを離れた。"),
-        RPG_T(NOX ": The seal is here.\n...So is everything\nelse I buried.",
-              RPG_NAME_DEFECTOR_JA "「印章はここにある。\n　……私が埋めた、ほかの\n　すべてのものと一緒に。」"),
+    constexpr bn::string_view zelma_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_3 ": " RPG_NAME_DEFECTOR ". My lost lamb.\nYou brought me guests.",
+              RPG_NAME_GENERAL_3_JA "「" RPG_NAME_DEFECTOR_JA "。迷える子羊。\n　お客を連れてきたのね。」"),
+        RPG_T(RPG_NAME_GENERAL_3 ": " RPG_NAME_PARTNER_HOME "? I gave that\norder. It burned\nbeautifully.",
+              RPG_NAME_GENERAL_3_JA "「" RPG_NAME_PARTNER_HOME_JA "？ わたしが\n　命じたわ。美しく\n　燃えたでしょう。」"),
+        RPG_T(RPG_NAME_DEFECTOR ": The Emperor's dream\nis a lie, " RPG_NAME_GENERAL_3 ".",
+              RPG_NAME_DEFECTOR_JA "「焔帝の夢は\n　いつわりだ、" RPG_NAME_GENERAL_3_JA "。」"),
     };
 
-    constexpr bn::string_view cathedral_pages[] = {
-        RPG_T("The doors open at " NOX "'s\ntouch. " GENERAL " kneels\nbefore a pyre.",
-              RPG_NAME_DEFECTOR_JA "が触れると、扉が開く。\n" GENERAL_JA "が火葬台の前に\nひざまずいていた。"),
-        RPG_T(GENERAL ": The traitor, the\nstray, the stargazer. And\nno spear. Did he break?",
-              GENERAL_JA "「裏切り者に、のら犬に、\n　星読みか。槍がおらんな。\n　折れたか？」"),
-        RPG_T(HERO ": He's not here.\nI am.",
-              HERO_JA "「あいつはいない。\n　俺がいる。」"),
-        RPG_T("A spear strikes the floor\nbetween them.",
-              "一本の槍が、\n二人の間の床に突き立った。"),
-        RPG_T(PARTNER ": I didn't come\nfor you, " HERO ".",
-              PARTNER_JA "「お前のために\n　来たんじゃないぞ、" HERO_JA "。」"),
-        RPG_T(PARTNER ": " RPG_NAME_PARTNER_HOME " deserves\nbetter than a son who\nruns. Move over.",
-              PARTNER_JA "「" RPG_NAME_PARTNER_HOME_JA "に、逃げる息子は\n　ふさわしくない。\n　そこをあけろ。」"),
-        RPG_T(PARTNER " rejoined the party!",
-              PARTNER_JA "が仲間に戻った！"),
+    constexpr bn::string_view zelma_again_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_3 ": Back for more ash?",
+              RPG_NAME_GENERAL_3_JA "「また灰に\n　なりに来たの？」"),
     };
 
-    constexpr bn::string_view cathedral_again_pages[] = {
-        RPG_T(PARTNER ": Again.\nHe falls today.",
-              PARTNER_JA "「もう一度だ。\n　奴は今日、たおれる。」"),
+    constexpr bn::string_view zelma_reinforce_pages[] = {
+        RPG_T("A spear flies in from\nthe doors. " RPG_NAME_PARTNER "\nis back!",
+              "扉から槍が飛んできた。\n" RPG_NAME_PARTNER_JA "が戻ってきた！"),
     };
 
-    constexpr bn::string_view cathedral_victory_pages[] = {
-        RPG_T(GENERAL ": So the ash\nremembers its dead...",
-              GENERAL_JA "「灰は、死者を\n　覚えているというのか……」"),
-        RPG_T(GENERAL ": I gave the orders.\nBut the fire is his.\nIt will eat you, too.",
-              GENERAL_JA "「命じたのは私だ。\n　だが炎は焔帝さまのもの。\n　貴様らも食われるぞ。」"),
-        RPG_T(GENERAL " vanishes into the\nsmoke. The pyre goes out.",
-              GENERAL_JA "は煙の中へ消えた。\n火葬台の火が消える。"),
-        RPG_T(PARTNER ": ...Gone. Again.",
-              PARTNER_JA "「……また、\n　逃げられたか。」"),
-        RPG_T(PARTNER ": " NOX ". I won't\nforgive you. But I'll\nstand next to you.",
-              PARTNER_JA "「" RPG_NAME_DEFECTOR_JA "。お前を許しは\n　しない。だが、\n　となりには立ってやる。」"),
-        RPG_T(NOX ": That is more than\nI will ever ask.",
-              RPG_NAME_DEFECTOR_JA "「それは、私が望める\n　以上のことだ。」"),
-        RPG_T(HERO ": He bleeds. Next\ntime, he falls.",
-              HERO_JA "「奴も血を流す。\n　次は、たおす。」"),
+    constexpr bn::string_view zelma_victory_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_3 ": Enough. The capital\nburns next. Come\nand watch.",
+              RPG_NAME_GENERAL_3_JA "「もういいわ。\n　次は王都が燃える。\n　見にいらっしゃい。」"),
+        RPG_T(RPG_NAME_GENERAL_3 " vanishes in the\nsmoke of the pyre.",
+              RPG_NAME_GENERAL_3_JA "は、火葬台の煙の\n中へ消えた。"),
+        RPG_T(RPG_NAME_PARTNER ": " RPG_NAME_DEFECTOR ". I don't\nforgive you. But\ndon't die.",
+              RPG_NAME_PARTNER_JA "「" RPG_NAME_DEFECTOR_JA "。許さん。\n　だが、死ぬな。」"),
+        RPG_T(RPG_NAME_PARTNER ": Atone alive.",
+              RPG_NAME_PARTNER_JA "「償いは、\n　生きてやれ。」"),
+    };
+
+    constexpr bn::string_view zelma_stopped_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": ...You stood\nbetween us, " RPG_NAME_HERO ".\nI will not waste it.",
+              RPG_NAME_DEFECTOR_JA "「……あの時、間に\n　立ってくれたな、" RPG_NAME_HERO_JA "。\n　むだにはしない。」"),
+    };
+
+    constexpr bn::string_view zelma_watched_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": ...Then I will\nlive. That is harder.",
+              RPG_NAME_DEFECTOR_JA "「……ならば生きよう。\n　そのほうが、つらい。」"),
+    };
+
+    constexpr bn::string_view zelma_end_pages[] = {
+        RPG_T(RPG_NAME_HERO ": The capital.\n" RPG_NAME_CAPITAL ". We go.",
+              RPG_NAME_HERO_JA "「王都" RPG_NAME_CAPITAL_JA "。\n　行くぞ。」"),
         RPG_T("- Chapter 6 -\nThe Sinking Capital",
               "- 第6章 -\n沈む王都"),
     };
+
 
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 6 "The Sinking Capital"
@@ -476,106 +523,126 @@ namespace
     #define CAPITAL RPG_NAME_CAPITAL
     #define GENERAL2 RPG_NAME_GENERAL_2
 
-    constexpr bn::string_view captain_pages[] = {
-        RPG_T("Captain: Halt! You came by\nthe pilgrim road? Then\nthe Cathedral has fallen.",
-              "隊長「止まれ！ 巡礼路から\n　来たのか？ ならば、\n　聖堂は落ちたのだな。」"),
-        RPG_T(HERO ": " GENERAL " ran from it.",
-              HERO_JA "「" GENERAL_JA "は逃げた。」"),
-        RPG_T("Captain: Then hear this.\n" CAPITAL " is the last city\nstanding. And they come.",
-              "隊長「ならば聞け。" RPG_NAME_CAPITAL_JA "は\n　最後に残った都だ。\n　そこへ奴らが来る。」"),
-        RPG_T("Captain: General " GENERAL2 "\nleads ten thousand to our\neast wall. Tonight.",
-              "隊長「将軍" RPG_NAME_GENERAL_2_JA "が一万の兵で\n　東の城壁に迫っている。\n　今夜だ。」"),
-        RPG_T(SEER ": The stars over this\ncity... I cannot find\nthem.",
-              RPG_NAME_SEER_JA "「この都の上の星が……\n　見つかりません。」"),
-        RPG_T(HERO ": A general. Here.\nGood.",
-              HERO_JA "「将軍が、ここに。\n　……ちょうどいい。」"),
-        RPG_T(PARTNER ": " HERO ". We hold\nthe wall. We don't hunt.",
-              PARTNER_JA "「" HERO_JA "。俺たちは城壁を\n　守るんだ。\n　狩りに来たんじゃない。」"),
-        RPG_T("Captain: Rest, arm, then\ncome to the east gate.\nWe need every blade.",
-              "隊長「休んで、装備を整えたら\n　東門へ来てくれ。\n　剣は一本でも多く要る。」"),
+    constexpr bn::string_view audience_pages[] = {
+        RPG_T("Guards lead you through\na city under siege,\nto the king.",
+              "衛兵に連れられ、\n籠城の都を抜けて\n王の前へ通された。"),
+        RPG_T("King: You drove a general\nfrom her altar. " RPG_NAME_CAPITAL "\nneeds such blades.",
+              "王「灰将を祭壇から\n　追いはらったそうだな。\n　その剣を貸してほしい。」"),
+        RPG_T(RPG_NAME_HERO ": A general is\ncoming here?",
+              RPG_NAME_HERO_JA "「灰将が、\n　ここに来るのか。」"),
+        RPG_T("King: " RPG_NAME_GENERAL_2 ", at dawn.\nStand at our gate. Rest\ntonight, at the inn.",
+              "王「夜明けに、" RPG_NAME_GENERAL_2_JA "が。\n　城門に立ってくれ。\n　今夜は宿で休むがよい。」"),
     };
 
-    constexpr bn::string_view captain_again_pages[] = {
-        RPG_T("Captain: The east gate,\nwhen you are ready.\nThere is little time.",
-              "隊長「準備ができたら東門へ。\n　時間はあまりない。」"),
+    constexpr bn::string_view inn_before_pages[] = {
+        RPG_T("Innkeeper: No rooms.\nThe whole city sleeps\nin its boots.",
+              "宿屋「部屋はないよ。\n　都じゅうが、くつを\n　はいたまま寝てるんだ。」"),
     };
 
-    constexpr bn::string_view east_gate_closed_pages[] = {
-        RPG_T("The east gate. Guards\nwave you back from\nthe wall.",
-              "東門だ。衛兵が手をふって、\n城壁から下がれと\n合図している。"),
+    constexpr bn::string_view inn_rest_pages[] = {
+        RPG_T("Innkeeper: The king pays\ntonight. Sleep while\nyou can.",
+              "宿屋「今夜のお代は王さま\n　もちだ。眠れるうちに\n　眠っておきな。」"),
     };
 
-    constexpr bn::string_view siege_pages[] = {
-        RPG_T("Horns. The plain beyond\nthe wall is a sea of\ntorches.",
-              "角笛が鳴る。\n城壁の向こうの平原は、\nたいまつの海だった。"),
-        RPG_T("Captain: Hold the gate!\nHold--",
-              "隊長「門を守れ！\n　守り抜――」"),
-        RPG_T("The wall does not break.\nIt melts.",
-              "城壁は、くずれなかった。\n溶けたのだ。"),
+    constexpr bn::string_view eve_pages[] = {
+        RPG_T("Night. No one sleeps.\nThe others are out\nin the city.",
+              "夜。だれも眠れない。\n仲間たちは町に出ている。"),
     };
 
-    constexpr bn::string_view burning_pages[] = {
-        RPG_T("Within the hour, " CAPITAL "\nis burning.",
-              "一時間もたたずに、\n" RPG_NAME_CAPITAL_JA "は燃えていた。"),
-        RPG_T(NOX ": The palace. She will\ngo for the king. That is\nhow it is done.",
-              RPG_NAME_DEFECTOR_JA "「宮殿だ。彼女は王を\n　ねらう。それが\n　奴らのやり方だ。」"),
+    constexpr bn::string_view eve_partner_pages[] = {
+        RPG_T(RPG_NAME_PARTNER ": Don't chase the\ngeneral tomorrow. Hold\nthe gate, " RPG_NAME_HERO ".",
+              RPG_NAME_PARTNER_JA "「あした、灰将を\n　追うなよ。門を守れ、\n　" RPG_NAME_HERO_JA "。」"),
     };
 
-    constexpr bn::string_view general2_pages[] = {
-        RPG_T(GENERAL2 ": So you are the\nember that burned " GENERAL ".",
-              RPG_NAME_GENERAL_2_JA "「あなたが、" GENERAL_JA "を\n　焼いた火の粉ね。」"),
-        RPG_T(GENERAL2 ": " RPG_NAME_VILLAGE ", was it?\nI signed that order.\nA small one. I forget it.",
-              RPG_NAME_GENERAL_2_JA "「" VILLAGE_JA "村、だったかしら。\n　あの命令書に署名したのは私。\n　小さな村よ。もう忘れたわ。」"),
-        RPG_T(PARTNER ": " HERO ", don't!\nPeople are still getting\nout. Hold the line!",
-              PARTNER_JA "「" HERO_JA "、やめろ！\n　まだ人が逃げている。\n　戦列を守れ！」"),
-        RPG_T(HERO ": ...She signed it.",
-              HERO_JA "「……あいつが、\n　署名した。」"),
-        RPG_T(HERO " breaks from the\nline and charges alone.",
-              HERO_JA "は戦列を飛び出し、\nひとりで斬りかかった。"),
+    constexpr bn::string_view eve_seer_pages[] = {
+        RPG_T(RPG_NAME_SEER ": I have seen this\ncity burn, in dreams.\nI want to be wrong.",
+              RPG_NAME_SEER_JA "「この都が燃えるのを\n　夢で見ました。\n　外れてほしいのです。」"),
     };
 
-    constexpr bn::string_view rout_lost_pages[] = {
-        RPG_T("The flames close in.\nYour sword arm will\nnot rise.",
-              "炎がせまってくる。\n剣を持つ腕が、\nもう上がらない。"),
+    constexpr bn::string_view eve_defector_pages[] = {
+        RPG_T(RPG_NAME_DEFECTOR ": " RPG_NAME_GENERAL_2 " is no zealot.\nHe is a soldier.\nThat is worse.",
+              RPG_NAME_DEFECTOR_JA "「" RPG_NAME_GENERAL_2_JA "は信者では\n　ない。武人だ。\n　そのほうが悪い。」"),
     };
 
-    constexpr bn::string_view rout_won_pages[] = {
-        RPG_T(GENERAL2 " steps back,\nunhurt, and laughs. Behind\nher, the palace roof falls.",
-              RPG_NAME_GENERAL_2_JA "は無傷のまま\n一歩下がり、笑った。\nその背後で宮殿の屋根が落ちる。"),
+    constexpr bn::string_view inn_sleep_pages[] = {
+        RPG_T("Innkeeper: Sleep until\ndawn?",
+              "宿屋「夜明けまで\n　眠るかい？」"),
     };
 
-    constexpr bn::string_view rout_pages[] = {
-        RPG_T("The line you left is\ngone. So are the people\nbehind it.",
-              "離れてきた戦列は、\nもうない。その後ろに\nいた人々も。"),
-        RPG_T("Hands drag you away.\nBehind you, the palace\nsinks into the fire.",
-              "いくつもの手に\n引きずられていく。背後で、\n宮殿が炎に沈んでいく。"),
-        RPG_T(GENERAL2 ": Run, ember. Tell\nthe ashes what you saw.",
-              RPG_NAME_GENERAL_2_JA "「逃げなさい、火の粉。\n　見たものを、\n　灰に語ってやるといいわ。」"),
+    constexpr bn::string_view gate_1_pages[] = {
+        RPG_T("Dawn. Horns. The enemy\nis at the gate.",
+              "夜明け。角笛が鳴る。\n敵が城門にせまる。"),
+    };
+
+    constexpr bn::string_view gate_2_pages[] = {
+        RPG_T("The second wave climbs\nover the dead.",
+              "第二波が、しかばねを\nこえてくる。"),
+    };
+
+    constexpr bn::string_view gate_3_pages[] = {
+        RPG_T("A third wave. No time\nto breathe.",
+              "第三波だ。\n息をつくひまもない。"),
+    };
+
+    constexpr bn::string_view gate_held_pages[] = {
+        RPG_T("The gate holds. But smoke\nrises from the palace\nbehind you.",
+              "城門は守りきった。\nだが、後ろの王城から\n煙が上がっている。"),
+        RPG_T(RPG_NAME_HERO ": The palace!",
+              RPG_NAME_HERO_JA "「王城だ！」"),
+    };
+
+    constexpr bn::string_view palace_closed_pages[] = {
+        RPG_T("The palace doors\nare shut.",
+              "王城の扉は\n閉ざされている。"),
+    };
+
+    constexpr bn::string_view great_gate_pages[] = {
+        RPG_T("The great gate is barred\nfor the siege.",
+              "大門は、籠城のために\n閉ざされている。"),
+    };
+
+    constexpr bn::string_view bardos_pages[] = {
+        RPG_T("The king lies wounded\nbefore his throne. A\ngiant in iron turns.",
+              "王が玉座の前でたおれて\nいる。鉄のよろいの\n大男がふり向いた。"),
+        RPG_T(RPG_NAME_GENERAL_2 ": The gate was bait.\nGood soldiers. You\nheld it well.",
+              RPG_NAME_GENERAL_2_JA "「城門はおとりだ。\n　よい兵だな。\n　よく守った。」"),
+        RPG_T(RPG_NAME_HERO ": Get away\nfrom him!",
+              RPG_NAME_HERO_JA "「王から\n　はなれろ！」"),
+    };
+
+    constexpr bn::string_view bardos_after_pages[] = {
+        RPG_T(RPG_NAME_GENERAL_2 ": Enough. I have\nwhat I came for.",
+              RPG_NAME_GENERAL_2_JA "「ここまでだ。\n　目的は果たした。」"),
+        RPG_T("The king is struck down.",
+              "王が、斬られた。"),
+        RPG_T("King: ...My people.\nI leave them... to you.",
+              "王「……民を……\n　民を、たのむ……」"),
+        RPG_T(RPG_NAME_HERO ": " RPG_NAME_GENERAL_2 "!!",
+              RPG_NAME_HERO_JA "「" RPG_NAME_GENERAL_2_JA "！！」"),
+        RPG_T(RPG_NAME_HERO " runs at him, alone.\n" RPG_NAME_PARTNER "'s fist stops\nhim cold.",
+              RPG_NAME_HERO_JA "は一人で\n斬りかかろうとした。\n" RPG_NAME_PARTNER_JA "のこぶしが止めた。"),
+        RPG_T(RPG_NAME_PARTNER ": You'll die for\nnothing! " RPG_NAME_HERO "!",
+              RPG_NAME_PARTNER_JA "「むだ死にする気か！\n　" RPG_NAME_HERO_JA "！」"),
+        RPG_T("The ceiling gives way.\nFire and stone fall\nbetween you all.",
+              "天井がくずれ落ちる。\n炎と石が、みんなの\n間をへだてた。"),
     };
 
     constexpr bn::string_view aftermath_pages[] = {
-        RPG_T(RPG_NAME_MINE_TOWN ". Three days later.\n" CAPITAL " is gone.",
-              RPG_NAME_MINE_TOWN_JA "。三日後。\n" RPG_NAME_CAPITAL_JA "は、もうない。"),
-        RPG_T(PARTNER ": The gate held\nuntil you left it. Do you\nknow how many we lost?",
-              PARTNER_JA "「門は持ちこたえていた。\n　お前が離れるまではな。\n　何人死んだか分かるか？」"),
-        RPG_T(HERO ": ...I saw her, and\nI couldn't see anything\nelse.",
-              HERO_JA "「……あいつを見たら、\n　ほかには何も\n　見えなくなった。」"),
-        RPG_T(PARTNER ": You didn't fight\nfor " CAPITAL ". You fought\nfor " RPG_NAME_VILLAGE ". Again.",
-              PARTNER_JA "「お前は" RPG_NAME_CAPITAL_JA "のために\n　戦ったんじゃない。\n　また" VILLAGE_JA "村のためだ。」"),
-        RPG_T(SEER ": " HERO ". I looked for\nyour star last night.\nIt was not there.",
-              RPG_NAME_SEER_JA "「" HERO_JA "。昨夜、あなたの\n　星を探しました。\n　どこにも、なかった。」"),
-        RPG_T(HERO ": ...I couldn't\nsave anything.",
-              HERO_JA "「……何も、\n　守れなかった。」"),
-        RPG_T(NOX ": The survivors went\nsouth, into the hills.\nThey will need hands.",
-              RPG_NAME_DEFECTOR_JA "「生き残りは南の丘へ\n　向かった。\n　人手がいるはずだ。」"),
+        RPG_T(RPG_NAME_CAPITAL " has fallen. The\nfour are scattered\nby the fire.",
+              "王都" RPG_NAME_CAPITAL_JA "は落ちた。\n四人は炎の中で\nちりぢりになった。"),
+        RPG_T("Days later, in " RPG_NAME_MINE_TOWN ",\nthey find one another\nagain.",
+              "数日後、" RPG_NAME_MINE_TOWN_JA "で\n四人はふたたび\n顔を合わせた。"),
+        RPG_T(RPG_NAME_DEFECTOR ": The survivors went\nsouth, into the hills.",
+              RPG_NAME_DEFECTOR_JA "「生き残りは、\n　南の丘へ向かった。」"),
         RPG_T("- Chapter 7 -\nThe Lamplight",
               "- 第7章 -\n灯火"),
     };
 
     constexpr bn::string_view road_lost_pages[] = {
         RPG_T("The pilgrim road is choked\nwith smoke. There is no\ngoing back.",
-              "巡礼路は煙でふさがっている。\nもう、戻れない。"),
+              "巡礼路は煙に\nふさがれている。\nもう戻れない。"),
     };
+
 
     // ---------------------------------------------------------------------------------------------------------------
     // Chapter 7 "The Lamplight"
@@ -641,7 +708,7 @@ namespace
     };
 
     constexpr bn::string_view pass_pages[] = {
-        RPG_T(GENERAL ": The ember. Come.\nCharge me, as you\ncharged her.",
+        RPG_T(GENERAL ": The ember. Come.\nCharge me, as you\ncharged him.",
               GENERAL_JA "「火の粉か。来い。\n　" RPG_NAME_GENERAL_2_JA "に斬りかかったように、\n　私にも来るがいい。」"),
         RPG_T(HERO ": No.",
               HERO_JA "「いいや。」"),
@@ -988,9 +1055,18 @@ namespace
 
     constexpr EncounterGroup pass_battle = { { EnemyId::drake_last, EnemyId::ash_zealot }, 2 };
 
-    constexpr EncounterGroup general2_battle = { { EnemyId::general_2 }, 1 };
+    // Chapter 6: three battles in a row at the gate, then the general (stopped after 5 rounds).
+    constexpr EncounterGroup gate_1_battle = { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 };
+    constexpr EncounterGroup gate_2_battle = { { EnemyId::ash_zealot, EnemyId::cult_knight, EnemyId::cult_knight }, 3 };
+    constexpr EncounterGroup gate_3_battle = { { EnemyId::ash_zealot, EnemyId::ash_zealot, EnemyId::cult_knight }, 3 };
+    constexpr EncounterGroup bardos_battle = { { EnemyId::general_2 }, 1 };
+    constexpr int bardos_turn_limit = 5;
 
-    constexpr EncounterGroup cathedral_battle = { { EnemyId::drake_true, EnemyId::ash_zealot }, 2 };
+    // Chapter 5.
+    constexpr EncounterGroup deserter_battle = { { EnemyId::cult_knight, EnemyId::cult_knight }, 2 };
+    constexpr EncounterGroup overseer_battle = { { EnemyId::mine_overseer, EnemyId::cult_knight }, 2 };
+    constexpr EncounterGroup zelma_battle = { { EnemyId::zelma, EnemyId::ash_zealot }, 2 };
+    constexpr int zelma_join_turn = 3;      // E506: the partner comes back on the third round.
     constexpr int defector_min_level = 12;
 
     constexpr EncounterGroup wyrm_battle = { { EnemyId::ember_wyrm }, 1 };
@@ -1008,8 +1084,14 @@ namespace
 
         if(party.join(class_id, level < min_level ? min_level : level))
         {
+            // Someone who comes back (see Party::leave()) keeps what it was wearing.
             PartyMember& member = party.members[party.size - 1];
-            member.weapon = weapon;
+
+            if(member.weapon == ItemId::none)
+            {
+                member.weapon = weapon;
+            }
+
             member.restore();
         }
     }
@@ -1168,22 +1250,62 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.battle = &wyrm_battle;
         break;
 
-    case StoryId::ch5_defector:
-        say_pages(ui, defector_pages);
-        join_member(state.party, ClassId::priest, defector_min_level, ItemId::oak_staff);
-        story_progress = progress::ch5_defector;
+    // ----- Chapter 5 (E501-E507) -----
+    case StoryId::ch5_dorn:
+        say_pages(ui, dorn_arrival_pages);
+        story_progress = progress::ch5_dorn;
         break;
 
-    case StoryId::ch5_north_gate:
-        say_pages(ui, north_gate_pages);
+    case StoryId::ch5_deserter:
+        say_pages(ui, deserter_pages);
+        result.battle = &deserter_battle;
+        break;
+
+    case StoryId::ch5_mine_gate:
+        say_pages(ui, mine_gate_pages);
         result.step_back = true;
         break;
 
-    case StoryId::ch5_ruins:
-        // The party splits: the partner is gone (his equipment goes to the bag) until the cathedral.
-        say_pages(ui, ruins_pages);
-        state.party.leave(ClassId::lancer);
-        story_progress = progress::ch5_split;
+    case StoryId::ch5_overseer:
+        say_pages(ui, overseer_pages);
+        result.battle = &overseer_battle;
+        break;
+
+    case StoryId::ch5_kazami:
+        say_pages(ui, kazami_arrival_pages);
+        story_progress = progress::ch5_kazami;
+        break;
+
+    case StoryId::ch5_confession:
+        {
+            // E505: either answer makes the partner leave; stopping him is remembered (one line of E507).
+            bool stopped;
+
+            {
+                MessageBox box(ui);
+                box.say_pages(confession_pages);
+                stopped = ask_choice(ui, RPG_T("Stop him", "止める"), RPG_T("Watch", "黙って見る"));
+            }
+
+            if(stopped)
+            {
+                state.flags.set(FlagId::stopped_shion);
+                say_pages(ui, confession_stop_pages);
+            }
+            else
+            {
+                say_pages(ui, confession_watch_pages);
+            }
+
+            say_pages(ui, confession_leave_pages);
+            state.party.leave(ClassId::lancer);     // He keeps his level and equipment until he returns.
+            story_progress = progress::ch5_split;
+        }
+        break;
+
+    case StoryId::ch5_cathedral_gate:
+        say_pages(ui, cathedral_gate_pages);
+        result.step_back = true;
         break;
 
     case StoryId::ch5_east_gate:
@@ -1191,62 +1313,137 @@ StoryResult run_story(StoryId id, GameState& state, Ui& ui)
         result.step_back = true;
         break;
 
-    case StoryId::ch5_cathedral:
-        if(story_progress < progress::ch5_reunited)
+    case StoryId::ch5_zelma:
+        // E506: the battle starts with three; the partner bursts in on the third round (story_battle_reinforce).
+        if(story_progress < progress::ch5_cathedral)
         {
-            say_pages(ui, cathedral_pages);
-            state.party.remove_item(ItemId::iron_spear);    // He takes back the spear he left behind, if it's still there.
-            join_member(state.party, ClassId::lancer, partner_min_level, ItemId::iron_spear);
-            story_progress = progress::ch5_reunited;
+            say_pages(ui, zelma_pages);
+            story_progress = progress::ch5_cathedral;
         }
         else
         {
-            say_pages(ui, cathedral_again_pages);   // After losing the battle.
+            say_pages(ui, zelma_again_pages);   // After losing the battle.
         }
 
-        result.battle = &cathedral_battle;
+        result.battle = &zelma_battle;
+        result.battle_join_turn = zelma_join_turn;
         break;
 
-    case StoryId::ch6_captain:
-        if(story_progress < progress::ch6_muster)
+    // ----- Chapter 6 (E601-E605) -----
+    case StoryId::ch6_audience:
+        say_pages(ui, audience_pages);
+        story_progress = progress::ch6_audience;
+        break;
+
+    case StoryId::ch6_inn:
+        if(story_progress < progress::ch6_audience)
         {
-            say_pages(ui, captain_pages);
-            story_progress = progress::ch6_muster;
+            say_pages(ui, inn_before_pages);
+        }
+        else if(story_progress < progress::ch6_eve)
+        {
+            // E602: the last rest. At night the companions are out in the city.
+            say_pages(ui, inn_rest_pages);
+            ui.fade_out();
+            state.party.restore_all();
+            ui.wait(30);
+            story_progress = progress::ch6_eve;
+            result.reload_map = true;       // Fades in again, with the companions in place.
+            result.next = StoryId::ch6_eve;
+        }
+        else if(story_progress < progress::ch6_gate)
+        {
+            // E603: three battles in a row, with no rest in between.
+            bool sleep;
+
+            {
+                MessageBox box(ui);
+                box.show(inn_sleep_pages[0]);
+                sleep = ask_yes_no(ui);
+            }
+
+            if(sleep)
+            {
+                say_pages(ui, gate_1_pages);
+                result.battle = &gate_1_battle;
+            }
         }
         else
         {
-            say_pages(ui, captain_again_pages);
+            say_pages(ui, inn_before_pages);
         }
         break;
 
-    case StoryId::ch6_east_gate:
-        if(story_progress < progress::ch6_muster)
+    case StoryId::ch6_eve:
+        say_pages(ui, eve_pages);
+        break;
+
+    case StoryId::ch6_eve_partner:
+    case StoryId::ch6_eve_seer:
+    case StoryId::ch6_eve_defector:
         {
-            say_pages(ui, east_gate_closed_pages);
-            result.step_back = true;
+            // E602 (optional): talking to all three is remembered for a reward in chapter 7.
+            if(id == StoryId::ch6_eve_partner)
+            {
+                say_pages(ui, eve_partner_pages);
+                state.flags.set(FlagId::ch6_eve_partner);
+            }
+            else if(id == StoryId::ch6_eve_seer)
+            {
+                say_pages(ui, eve_seer_pages);
+                state.flags.set(FlagId::ch6_eve_seer);
+            }
+            else
+            {
+                say_pages(ui, eve_defector_pages);
+                state.flags.set(FlagId::ch6_eve_defector);
+            }
+
+            if(state.flags.get(FlagId::ch6_eve_partner) && state.flags.get(FlagId::ch6_eve_seer) &&
+               state.flags.get(FlagId::ch6_eve_defector))
+            {
+                state.flags.set(FlagId::ch6_eve_done);
+            }
+        }
+        break;
+
+    case StoryId::ch6_gate_2:
+        say_pages(ui, gate_2_pages);
+        result.battle = &gate_2_battle;
+        break;
+
+    case StoryId::ch6_gate_3:
+        say_pages(ui, gate_3_pages);
+        result.battle = &gate_3_battle;
+        break;
+
+    case StoryId::ch6_palace:
+        if(story_progress < progress::ch6_gate)
+        {
+            say_pages(ui, palace_closed_pages);
         }
         else
         {
-            // The siege: the capital becomes its burning state, with the party just inside the fallen wall.
-            say_pages(ui, siege_pages);
-            ui.fade_out(60);
-            ui.wait(60);
-            story_progress = progress::ch6_siege;
-            state.player_x = 21;
-            state.player_y = 6;
-            state.facing = Direction::left;
+            // Into the royal castle.
+            ui.fade_out();
+            state.map = MapId::throne;
+            state.player_x = 9;
+            state.player_y = 8;
+            state.facing = Direction::up;
             result.reload_map = true;
-            result.next = StoryId::ch6_burning;
         }
         break;
 
-    case StoryId::ch6_burning:
-        say_pages(ui, burning_pages);
+    case StoryId::ch6_great_gate:
+        say_pages(ui, great_gate_pages);
+        result.step_back = true;
         break;
 
-    case StoryId::ch6_general:
-        say_pages(ui, general2_pages);
-        result.battle = &general2_battle;
+    case StoryId::ch6_bardos:
+        // E604: stopped after 5 rounds, or when the party falls. Either way the story goes on.
+        say_pages(ui, bardos_pages);
+        result.battle = &bardos_battle;
+        result.battle_turn_limit = bardos_turn_limit;
         break;
 
     case StoryId::ch6_aftermath:
@@ -1459,8 +1656,9 @@ BgmId story_bgm(StoryId id)
 
     case StoryId::ch1_attack:       // The village burns.
     case StoryId::ch1_awakening:
-    case StoryId::ch5_ruins:        // The partner's past.
-    case StoryId::ch6_burning:      // The capital falls.
+    case StoryId::ch5_kazami:       // The partner's past.
+    case StoryId::ch5_confession:
+    case StoryId::ch6_eve:          // The night before the capital falls.
     case StoryId::ch6_aftermath:
     case StoryId::ch10_grave:       // The temptation of the ember.
         return BgmId::event_dark;
@@ -1476,12 +1674,25 @@ BgmId story_bgm(StoryId id)
     }
 }
 
-bool story_defeat_continues(StoryId id)
+bool story_battle_reinforce(GameState& state, MessageBox& box)
 {
-    return id == StoryId::ch6_general;
+    // E506: the partner comes back in the middle of the battle against Zelma (once: after a lost battle he is
+    // already in the party).
+    if(state.story_battle == StoryId::ch5_zelma && state.party.join(ClassId::lancer, partner_min_level))
+    {
+        box.say_pages(zelma_reinforce_pages);
+        return true;
+    }
+
+    return false;
 }
 
-StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& ui)
+bool story_defeat_continues(StoryId id)
+{
+    return id == StoryId::ch6_bardos;
+}
+
+StoryResult run_story_after_battle(StoryId id, [[maybe_unused]] bool won, GameState& state, Ui& ui)
 {
     StoryResult result;
 
@@ -1516,9 +1727,38 @@ StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& u
         state.story_progress = progress::ch5_start;
         break;
 
-    case StoryId::ch5_cathedral:
-        say_pages(ui, cathedral_victory_pages);
+    case StoryId::ch5_deserter:
+        // E502: the defector comes along as a guest (he joins for good after the mine, E503).
+        say_pages(ui, deserter_victory_pages);
+        join_member(state.party, ClassId::priest, defector_min_level, ItemId::oak_staff);
+        state.story_progress = progress::ch5_deserter;
+        break;
+
+    case StoryId::ch5_overseer:
+        say_pages(ui, overseer_victory_pages);
+        state.story_progress = progress::ch5_mine;
+        break;
+
+    case StoryId::ch5_zelma:
+        // E507: she flees. One line depends on what the player chose in E505.
+        say_pages(ui, zelma_victory_pages);
+        say_pages(ui, state.flags.get(FlagId::stopped_shion) ? bn::span<const bn::string_view>(zelma_stopped_pages) :
+                                                                bn::span<const bn::string_view>(zelma_watched_pages));
+        say_pages(ui, zelma_end_pages);
         state.story_progress = progress::ch6_start;
+        break;
+
+    case StoryId::ch6_inn:
+        result.next = StoryId::ch6_gate_2;      // E603: no rest between the battles.
+        break;
+
+    case StoryId::ch6_gate_2:
+        result.next = StoryId::ch6_gate_3;
+        break;
+
+    case StoryId::ch6_gate_3:
+        say_pages(ui, gate_held_pages);
+        state.story_progress = progress::ch6_gate;
         break;
 
     case StoryId::ch7_pass:
@@ -1560,14 +1800,13 @@ StoryResult run_story_after_battle(StoryId id, bool won, GameState& state, Ui& u
         result.reload_map = true;
         break;
 
-    case StoryId::ch6_general:
-        // Won or lost (it is meant to be lost), the capital falls and the party flees to the mining town.
-        say_pages(ui, won ? bn::span<const bn::string_view>(rout_won_pages) :
-                            bn::span<const bn::string_view>(rout_lost_pages));
-        say_pages(ui, rout_pages);
+    case StoryId::ch6_bardos:
+        // E604 + E605: won, lost or stopped, the king dies, the castle falls and the party is scattered.
+        // (Bridge: chapter 7 as implemented starts with the four together again in the mining town.)
+        say_pages(ui, bardos_after_pages);
         ui.fade_out(60);
         ui.wait(60);
-        state.story_progress = progress::ch6_rout;
+        state.story_progress = progress::ch6_collapse;
         state.party.restore_all();
         state.return_to_start();
         result.reload_map = true;

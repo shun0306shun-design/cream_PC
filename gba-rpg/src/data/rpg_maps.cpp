@@ -1011,20 +1011,33 @@ namespace
     };
 
     constexpr bn::string_view dorn_miner_pages[] = {
-        RPG_T(RPG_NAME_MINE_TOWN " digs no more coal.\nNobody wants anything\nthat burns.",
-              RPG_NAME_MINE_TOWN_JA "はもう石炭を\n掘らない。燃えるものなんて\n誰もほしがらないからな。"),
+        RPG_T("We sell ore to the cult.\nJudge us when your town\nis still standing.",
+              "鉱石は教団に売っている。\n責めるなら、あんたの町が\n残ってからにしな。"),
     };
 
     constexpr MapEvent dorn_events[] = {
         { .type = EventType::warp, .x = 0, .y = 6, .warp_map = MapId::canyon, .warp_x = 15, .warp_y = 1 },
+        // E501: the first steps into the town (every tile next to the arrival tile).
+        { .type = EventType::trigger, .x = 2, .y = 6,
+          .max_progress = progress::ch5_dorn - 1, .story = StoryId::ch5_dorn },
+        { .type = EventType::trigger, .x = 1, .y = 5,
+          .max_progress = progress::ch5_dorn - 1, .story = StoryId::ch5_dorn },
+        { .type = EventType::trigger, .x = 1, .y = 7,
+          .max_progress = progress::ch5_dorn - 1, .story = StoryId::ch5_dorn },
+        // E502: behind the tavern (the north-east house).
+        { .type = EventType::trigger, .x = 15, .y = 1,
+          .min_progress = progress::ch5_dorn, .max_progress = progress::ch5_deserter - 1,
+          .story = StoryId::ch5_deserter },
+        { .type = EventType::trigger, .x = 16, .y = 1,
+          .min_progress = progress::ch5_dorn, .max_progress = progress::ch5_deserter - 1,
+          .story = StoryId::ch5_deserter },
+        // The abandoned mine (D06) opens when the defector shows the way.
         { .type = EventType::trigger, .x = 10, .y = 0,
-          .max_progress = progress::ch5_defector - 1, .story = StoryId::ch5_north_gate },
-        { .type = EventType::warp, .x = 10, .y = 0, .warp_map = MapId::kazami, .warp_x = 9, .warp_y = 9,
-          .min_progress = progress::ch5_defector },
-        { .type = EventType::trigger, .x = 21, .y = 6,
-          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_east_gate },
-        { .type = EventType::warp, .x = 21, .y = 6, .warp_map = MapId::cathedral, .warp_x = 9, .warp_y = 10,
-          .min_progress = progress::ch5_split },
+          .max_progress = progress::ch5_deserter - 1, .story = StoryId::ch5_mine_gate },
+        { .type = EventType::warp, .x = 10, .y = 0, .warp_map = MapId::mine, .warp_x = 7, .warp_y = 8,
+          .min_progress = progress::ch5_deserter },
+        // The main road to the cathedral never opens: the way in is through the mine and the ruins.
+        { .type = EventType::trigger, .x = 21, .y = 6, .story = StoryId::ch5_east_gate },
         // The track south to the valley of the refugees opens in chapter 7.
         { .type = EventType::trigger, .x = 10, .y = 12,
           .max_progress = progress::ch7_start - 1, .story = StoryId::ch7_south_gate },
@@ -1037,15 +1050,50 @@ namespace
         { .type = EventType::spring, .x = 4, .y = 8, .pages = ashbell_spring_pages, .price = 0 },
         { .type = EventType::talk, .x = 7, .y = 9, .npc_graphics = 0, .pages = dorn_miner_pages,
           .movement = NpcMovement::wander, .wander_radius = 2 },
-        { .type = EventType::story, .x = 12, .y = 8, .npc_graphics = 7,
-          .max_progress = progress::ch5_defector - 1, .story = StoryId::ch5_defector },
+    };
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // D06: the abandoned mine north of the mining town. The defector knows it: it comes out at the ruins of the
+    // partner's village, behind the cathedral. The overseer (npc_graphics 7) blocks the last gallery.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view mine_rows[] = {
+        "%%%%%%%%%%%%%%%%%%%%",    // 0
+        "%%%%%%%%%%%%%%%_u_%%",    // 1
+        "%_____%%%%%%%%%_%%%%",    // 2
+        "%_%%%_%%%____%%_%%%%",    // 3
+        "%_%%%_%%%_%%_%%_%%%%",    // 4
+        "%_%%%_____%%____%%%%",    // 5
+        "%_%%%%%%%%%%%%%%%%%%",    // 6
+        "%_______%%%%%%%%%%%%",    // 7
+        "%%%%%%%_%%%%%%%%%%%%",    // 8
+        "%%%%%%%d%%%%%%%%%%%%",    // 9
+        "%%%%%%%%%%%%%%%%%%%%",    // 10
+    };
+
+    static_assert(valid_layout(mine_rows), "Invalid mine layout");
+
+    constexpr MapEvent mine_events[] = {
+        { .type = EventType::warp, .x = 7, .y = 9, .warp_map = MapId::dorn, .warp_x = 10, .warp_y = 1 },
+        { .type = EventType::warp, .x = 16, .y = 1, .warp_map = MapId::kazami, .warp_x = 9, .warp_y = 9 },
+        // E503.
+        { .type = EventType::story, .x = 15, .y = 3, .npc_graphics = 7,
+          .min_progress = progress::ch5_deserter, .max_progress = progress::ch5_mine - 1,
+          .story = StoryId::ch5_overseer },
+        { .type = EventType::chest, .x = 17, .y = 1, .npc_graphics = 3,
+          .flag = FlagId::chest_mine, .item = ItemId::magic_water, .item_amount = 3 },
+    };
+
+    constexpr EncounterGroup mine_encounters[] = {
+        { { EnemyId::cult_knight }, 1 },
+        { { EnemyId::skeleton, EnemyId::skeleton, EnemyId::bat }, 3 },
+        { { EnemyId::cult_knight, EnemyId::skeleton }, 2 },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
     // Ruins of the partner's home village: no battles, one grave ('+').
     // ---------------------------------------------------------------------------------------------------------------
     constexpr bn::string_view kazami_rows[] = {
-        "xxxxxxxxxxxxxxxxxxxx",    // 0
+        "xxxxxxxxx>xxxxxxxxxx",    // 0
         "xaaaaaaaaaaaaaaaaaax",    // 1
         "xaaxxxaaaaaaaxxxaaax",    // 2
         "xaaxxxaaa+aaaxxxaaax",    // 3
@@ -1066,10 +1114,23 @@ namespace
     };
 
     constexpr MapEvent kazami_events[] = {
-        { .type = EventType::warp, .x = 9, .y = 10, .warp_map = MapId::dorn, .warp_x = 10, .warp_y = 1 },
+        { .type = EventType::warp, .x = 9, .y = 10, .warp_map = MapId::mine, .warp_x = 15, .warp_y = 1 },
+        // E504: the first steps into the ruins (every tile next to the arrival tile).
+        { .type = EventType::trigger, .x = 9, .y = 8,
+          .max_progress = progress::ch5_kazami - 1, .story = StoryId::ch5_kazami },
+        { .type = EventType::trigger, .x = 8, .y = 9,
+          .max_progress = progress::ch5_kazami - 1, .story = StoryId::ch5_kazami },
+        { .type = EventType::trigger, .x = 10, .y = 9,
+          .max_progress = progress::ch5_kazami - 1, .story = StoryId::ch5_kazami },
+        // E505: the grave marker.
         { .type = EventType::story, .x = 9, .y = 3,
-          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_ruins },
+          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_confession },
         { .type = EventType::sign, .x = 9, .y = 3, .pages = kazami_grave_pages, .min_progress = progress::ch5_split },
+        // The way to the cathedral, behind the village.
+        { .type = EventType::trigger, .x = 9, .y = 0,
+          .max_progress = progress::ch5_split - 1, .story = StoryId::ch5_cathedral_gate },
+        { .type = EventType::warp, .x = 9, .y = 0, .warp_map = MapId::cathedral, .warp_x = 9, .warp_y = 10,
+          .min_progress = progress::ch5_split },
     };
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -1099,16 +1160,17 @@ namespace
     };
 
     constexpr MapEvent cathedral_events[] = {
-        { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::dorn, .warp_x = 20, .warp_y = 6 },
+        { .type = EventType::warp, .x = 9, .y = 11, .warp_map = MapId::kazami, .warp_x = 9, .warp_y = 1 },
+        // E506: General Zelma (npc_graphics 8) blocks the corridor to the pyre until she flees.
         { .type = EventType::story, .x = 9, .y = 4, .npc_graphics = 8,
           .min_progress = progress::ch5_split, .max_progress = progress::ch6_start - 1,
-          .story = StoryId::ch5_cathedral },
+          .story = StoryId::ch5_zelma },
         { .type = EventType::sign, .x = 9, .y = 1, .pages = cathedral_pyre_pages },
         // Behind the pyre: the pilgrim road to the capital, until the capital falls.
         { .type = EventType::warp, .x = 10, .y = 1, .warp_map = MapId::grancel, .warp_x = 8, .warp_y = 12,
-          .max_progress = progress::ch6_rout - 1 },
+          .max_progress = progress::ch6_collapse - 1 },
         { .type = EventType::trigger, .x = 10, .y = 1,
-          .min_progress = progress::ch6_rout, .story = StoryId::ch6_road_lost },
+          .min_progress = progress::ch6_collapse, .story = StoryId::ch6_road_lost },
         { .type = EventType::chest, .x = 17, .y = 5, .npc_graphics = 3,
           .flag = FlagId::chest_cathedral, .item = ItemId::herb, .item_amount = 5 },
     };
@@ -1177,30 +1239,72 @@ namespace
               "王さまは、城壁は一度も\n落ちたことがないと言う。\n攻められたこともないのさ。"),
     };
 
-    constexpr uint8_t last_before_siege = progress::ch6_siege - 1;
+    constexpr uint8_t last_before_siege = progress::ch6_collapse - 1;    // The city stands until the castle falls.
 
     constexpr MapEvent grancel_events[] = {
         { .type = EventType::warp, .x = 8, .y = 13, .warp_map = MapId::cathedral, .warp_x = 10, .warp_y = 2 },
         { .type = EventType::spring, .x = 3, .y = 5, .pages = spring_pages, .price = 0 },
         { .type = EventType::sign, .x = 20, .y = 5, .pages = grancel_sign_pages },
 
-        // --- Before the siege ---
-        { .type = EventType::inn, .x = 4, .y = 11, .npc_graphics = 2, .pages = innkeeper_pages,
-          .max_progress = last_before_siege },
+        // --- Under siege (until the castle falls) ---
+        // E601: the first steps into the city (every tile next to the arrival tile).
+        { .type = EventType::trigger, .x = 8, .y = 11,
+          .max_progress = progress::ch6_audience - 1, .story = StoryId::ch6_audience },
+        { .type = EventType::trigger, .x = 7, .y = 12,
+          .max_progress = progress::ch6_audience - 1, .story = StoryId::ch6_audience },
+        { .type = EventType::trigger, .x = 9, .y = 12,
+          .max_progress = progress::ch6_audience - 1, .story = StoryId::ch6_audience },
+        // E602 / E603: the innkeeper runs the eve and the morning of the battle.
+        { .type = EventType::story, .x = 4, .y = 11, .npc_graphics = 2,
+          .max_progress = last_before_siege, .story = StoryId::ch6_inn },
         { .type = EventType::shop, .x = 14, .y = 11, .npc_graphics = 5, .pages = grancel_shop_pages,
           .stock = ashbell_shop_stock, .max_progress = last_before_siege },
         { .type = EventType::talk, .x = 18, .y = 9, .npc_graphics = 0, .pages = grancel_citizen_pages,
           .movement = NpcMovement::wander, .wander_radius = 2, .max_progress = last_before_siege },
-        { .type = EventType::story, .x = 9, .y = 5, .npc_graphics = 1,
-          .max_progress = last_before_siege, .story = StoryId::ch6_captain },
-        // Going to the east gate starts the siege (once the captain has asked).
+        // E602: the companions, out in the city on the eve (npc_graphics 6 partner, 9 seer, 7 defector).
+        { .type = EventType::story, .x = 11, .y = 7, .npc_graphics = 6,
+          .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_partner },
+        { .type = EventType::story, .x = 5, .y = 4, .npc_graphics = 9,
+          .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_seer },
+        { .type = EventType::story, .x = 18, .y = 7, .npc_graphics = 7,
+          .min_progress = progress::ch6_eve, .max_progress = progress::ch6_eve, .story = StoryId::ch6_eve_defector },
+        // The palace doors (the 'D' tiles): the way into the royal castle once the gate is held.
+        { .type = EventType::story, .x = 7, .y = 3, .max_progress = last_before_siege, .story = StoryId::ch6_palace },
+        { .type = EventType::story, .x = 8, .y = 3, .max_progress = last_before_siege, .story = StoryId::ch6_palace },
         { .type = EventType::trigger, .x = 23, .y = 6,
-          .max_progress = last_before_siege, .story = StoryId::ch6_east_gate },
+          .max_progress = last_before_siege, .story = StoryId::ch6_great_gate },
+    };
 
-        // --- The burning city ---
-        // General 2 (npc_graphics 8) stands at the palace doors.
-        { .type = EventType::story, .x = 7, .y = 4, .npc_graphics = 8,
-          .min_progress = progress::ch6_siege, .max_progress = progress::ch6_siege, .story = StoryId::ch6_general },
+    // ---------------------------------------------------------------------------------------------------------------
+    // D08: the royal castle of the capital: the throne room. General Bardos (npc_graphics 8) stands over the king.
+    // ---------------------------------------------------------------------------------------------------------------
+    constexpr bn::string_view throne_rows[] = {
+        "####################",    // 0
+        "########_A_#########",    // 1
+        "#######_____########",    // 2
+        "#######_____########",    // 3
+        "#########_##########",    // 4
+        "#########_##########",    // 5
+        "######_______#######",    // 6
+        "######_______#######",    // 7
+        "#########_##########",    // 8
+        "#########>##########",    // 9
+        "####################",    // 10
+    };
+
+    static_assert(valid_layout(throne_rows), "Invalid throne layout");
+
+    constexpr bn::string_view throne_pages[] = {
+        RPG_T("The throne of " RPG_NAME_CAPITAL ".",
+              RPG_NAME_CAPITAL_JA "の玉座だ。"),
+    };
+
+    constexpr MapEvent throne_events[] = {
+        { .type = EventType::warp, .x = 9, .y = 9, .warp_map = MapId::grancel, .warp_x = 8, .warp_y = 4 },
+        // E604.
+        { .type = EventType::story, .x = 9, .y = 4, .npc_graphics = 8,
+          .min_progress = progress::ch6_gate, .max_progress = last_before_siege, .story = StoryId::ch6_bardos },
+        { .type = EventType::sign, .x = 9, .y = 1, .pages = throne_pages },
     };
 
     constexpr EncounterGroup grancel_encounters[] = {
@@ -1649,6 +1753,20 @@ namespace
             .encounter_rate = 10,
             .border = TileId::wall,
         },
+        {
+            .name = RPG_T("Abandoned Mine", RPG_NAME_MINE_TOWN_JA "廃坑"),
+            .rows = mine_rows,
+            .events = mine_events,
+            .encounters = mine_encounters,
+            .encounter_rate = 12,
+            .border = TileId::cave_wall,
+        },
+        {
+            .name = RPG_T("Royal Castle", "王城" RPG_NAME_CAPITAL_JA),
+            .rows = throne_rows,
+            .events = throne_events,
+            .border = TileId::wall,
+        },
     };
 
     static_assert(sizeof(maps) / sizeof(maps[0]) == int(MapId::count), "Map table doesn't match MapId");
@@ -1667,7 +1785,7 @@ namespace
 
     constexpr MapState map_states[] = {
         {
-            MapId::grancel, progress::ch6_siege, 0xFF,
+            MapId::grancel, progress::ch6_collapse, 0xFF,
             {
                 .name = RPG_T(RPG_NAME_CAPITAL, RPG_NAME_CAPITAL_JA),
                 .rows = grancel_burning_rows,

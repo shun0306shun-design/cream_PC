@@ -127,8 +127,13 @@ int main()
         }
 
         state.story_battle_lost = false;
+        state.battle_turn_limit = 0;
+        state.battle_join_turn = 0;
 
-        if(result == rpg::BattleResult::defeat && rpg::story_defeat_continues(state.story_battle))
+        // A battle stopped by its turn limit counts as lost (only battles the story expects to be lost have one).
+        bool lost = result == rpg::BattleResult::defeat || result == rpg::BattleResult::stopped;
+
+        if(lost && rpg::story_defeat_continues(state.story_battle))
         {
             // A battle the story expects to be lost: no penalty, the next FieldScene shows what follows.
             state.party.restore_all();

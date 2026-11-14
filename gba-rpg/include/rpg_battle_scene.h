@@ -22,7 +22,8 @@ enum class BattleResult : uint8_t
 {
     victory,
     defeat,
-    escaped
+    escaped,
+    stopped     //!< A story battle with a turn limit ran out of rounds (see StoryResult::battle_turn_limit).
 };
 
 class BattleScene

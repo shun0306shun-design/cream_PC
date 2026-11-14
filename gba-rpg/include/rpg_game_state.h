@@ -21,6 +21,8 @@ struct GameState
     uint8_t story_progress = progress::ch1_start;   //!< Main story position (saved), see rpg_story.h.
     StoryId story_battle = StoryId::none;   //!< Scene whose boss battle is being fought. Not saved.
     bool story_battle_lost = false;         //!< That battle was lost and the story goes on anyway. Not saved.
+    uint8_t battle_turn_limit = 0;          //!< Rounds after which the story battle is stopped (0 = never). Not saved.
+    uint8_t battle_join_turn = 0;           //!< Round in which story_battle_reinforce() is called (0 = never). Not saved.
     MapId map = start_map;
     uint8_t player_x = start_x;
     uint8_t player_y = start_y;

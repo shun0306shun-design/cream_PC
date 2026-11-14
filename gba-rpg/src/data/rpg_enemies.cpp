@@ -59,12 +59,14 @@ namespace
               { 75,   0, 34,  14, 10 }, R::normal,    enemy_exp_for_level(28, 500),           30,   SpellId::fire,     20 },
         { RPG_T("Ember Wyrm", "炎のワーム"), &bn::sprite_items::enemy_wyrm,
               { 320,  0, 44,  16, 12 }, R::boss,      enemy_exp_for_level(27, 2000),          250,  SpellId::fire,     35 },
-        // Chapter 5: the Ash Cathedral. The general is fought by four this time, and flees again.
+        // Chapter 5: the abandoned mine and the Ash Cathedral. The general (Zelma) flees when she is beaten.
         // The zealots are met until the end of the game: that's why they give so much.
         { RPG_T("Ash Zealot", "灰の狂信者"), &bn::sprite_items::enemy_cultist,
               { 95,   0, 40,  15, 11 }, R::normal,    enemy_exp_for_level(45, 800),           45,   SpellId::fire,     30 },
-        { RPG_T(RPG_NAME_GENERAL_1, RPG_NAME_GENERAL_1_JA), &bn::sprite_items::enemy_drake,
+        { RPG_T(RPG_NAME_GENERAL_3, RPG_NAME_GENERAL_3_JA), &bn::sprite_items::enemy_drake,
               { 520,  0, 54,  20, 14 }, R::boss,      enemy_exp_for_level(35, 3000),          400,  SpellId::blizzard, 35 },
+        { RPG_T("Mine Overseer", "廃坑の監督官"), &bn::sprite_items::enemy_cultist,
+              { 360,  0, 48,  18, 10 }, R::boss,      enemy_exp_for_level(33, 2000),          300,  SpellId::fire,     25 },
         // Chapter 6: a battle the story expects to be lost (see story_defeat_continues()).
         { RPG_T(RPG_NAME_GENERAL_2, RPG_NAME_GENERAL_2_JA), &bn::sprite_items::enemy_drake,
               { 6000, 0, 140, 70, 40 }, R::boss,      0,                                      0,    SpellId::blizzard, 40 },
